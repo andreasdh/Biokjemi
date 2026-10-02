@@ -1,11 +1,15 @@
 # Velkommen {.unnumbered}
 
-Dette er en konseptuell innføring i biokjemi. Målet er at du skal **forstå** hvorfor
-livets molekyler oppfører seg som de gjør, ikke bare pugge hva de heter.
+Hvordan reguleres de kjemiske prosessene i kroppen vår? På hvilken måte bestemmer genene våre hvordan vi blir? Hvorfor puster vi? 
+Og hvordan kan vi bruke denne kunnskapen til å lage nye medisiner og materialer?
+Biokjemi handler om å forstå livet gjennom molekylene og reaksjonene som gjør det mulig.
+
+Denne boka gir en konseptuell innføring i biokjemi, der noen sentrale kjemiske prinsipper går igjen på tvers av temaene. Vi bruker prinsipper fra gunnleggende kjemi, blant annet molekylære vekselvirkninger, elektrontetthet og termodynamikk til å utforske sammenhenger mellom struktur, egenskaper og funksjon. Målet er at du skal kunne forklare **hvordan og hvorfor** biokjemiske prosesser skjer, og bruke forståelsen din til å resonnere om nye problemstillinger.
+
+Gjennom forklaringer, modeller, interaktive animasjoner og oppgaver får du øve på å forutsi, undersøke og begrunne. Boka inviterer deg til å arbeide aktivt: Still spørsmål, prøv ut ideer og vurder om forklaringene dine henger sammen. Slik bygger du et faglig grunnlag som du kan bruke også når du møter molekyler og prosesser du aldri har sett før.
 
 ::: {.nokkelpunkt}
-**Slik bruker du boka.** Hvert kapittel starter med læringsmål, bygger opp ideen steg for steg,
-og avsluttes med oppgaver. Der det står *Interaktiv simulering*, kan du dra i sliderne og se hva som skjer.
+**Biokjemi** Biokjemi er læren om de kjemiske strukturene og prosessene i levende organismer, altså det molekylære grunnlaget for liv.
 :::
 
 ## Innhold
@@ -13,7 +17,3 @@ og avsluttes med oppgaver. Der det står *Interaktiv simulering*, kan du dra i s
 - **Del 1** – ...
 - **Del 2** – ...
 
-::: {.callout-tip}
-## Tips
-Skriv gjerne en kort, inspirerende innledning her: hvorfor er biokjemi spennende?
-:::
