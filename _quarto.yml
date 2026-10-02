@@ -31,6 +31,9 @@ book:
     - kapitler/ordliste.qmd
 
 lang: nb
+language:
+  section-title-appendices: "Appendiks"
+  crossref-apx-prefix: "Appendiks"
 
 format:
   html:
