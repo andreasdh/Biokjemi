@@ -1,0 +1,19 @@
+# Velkommen {.unnumbered}
+
+Dette er en konseptuell innføring i biokjemi. Målet er at du skal **forstå** hvorfor
+livets molekyler oppfører seg som de gjør, ikke bare pugge hva de heter.
+
+::: {.nokkelpunkt}
+**Slik bruker du boka.** Hvert kapittel starter med læringsmål, bygger opp ideen steg for steg,
+og avsluttes med oppgaver. Der det står *Interaktiv simulering*, kan du dra i sliderne og se hva som skjer.
+:::
+
+## Innhold
+
+- **Del 1** – ...
+- **Del 2** – ...
+
+::: {.callout-tip}
+## Tips
+Skriv gjerne en kort, inspirerende innledning her: hvorfor er biokjemi spennende?
+:::

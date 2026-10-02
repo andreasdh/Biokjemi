@@ -1,0 +1,53 @@
+---
+title: "Interaktiv simulering (Observable JS)"
+---
+
+::: {.laeringsmal}
+Læringsmål
+
+- Se hvordan reaksjonshastigheten avhenger av substratkonsentrasjonen.
+- Forstå hva $V_{max}$ og $K_M$ betyr.
+:::
+
+Interaktive elementer som kjører direkte i nettleseren (uten server) lager du enklest med
+**Observable JS**, som er innebygd i Quarto. Eksempelet under er Michaelis–Menten-kinetikk:
+
+$$v = \frac{V_{max}[S]}{K_M + [S]}$$
+
+```{ojs}
+//| echo: false
+viewof Vmax = Inputs.range([1, 100], {value: 50, step: 1, label: "Vmax"})
+viewof Km   = Inputs.range([0.1, 20], {value: 5, step: 0.1, label: "Km"})
+```
+
+::: {.simulering}
+```{ojs}
+//| echo: false
+data = Array.from({length: 201}, (_, i) => {
+  const S = i * 0.2;
+  return {S, v: Vmax * S / (Km + S)};
+})
+
+Plot.plot({
+  height: 340,
+  marginLeft: 50,
+  x: {label: "[S] (mM)"},
+  y: {label: "v (µmol/min)", domain: [0, 100]},
+  marks: [
+    Plot.ruleY([Vmax / 2], {stroke: "#5aa889", strokeDasharray: "4,4"}),
+    Plot.ruleX([Km],       {stroke: "#5aa889", strokeDasharray: "4,4"}),
+    Plot.line(data, {x: "S", y: "v", stroke: "#3d7ea6", strokeWidth: 3}),
+    Plot.dot([{S: Km, v: Vmax / 2}], {x: "S", y: "v", r: 6, fill: "#5aa889"})
+  ]
+})
+```
+:::
+
+Ved $[S] = K_M$ er hastigheten halvparten av $V_{max}$ (den grønne prikken).
+
+::: {.callout-tip}
+## Alternativer for tyngre simuleringer
+Trenger du Python-beregninger i nettleseren, kan du bruke utvidelsen
+[`quarto-live`](https://r-wasm.github.io/quarto-live/) (Pyodide), eller lenke til en
+Binder/JupyterLite-versjon av en notebook.
+:::

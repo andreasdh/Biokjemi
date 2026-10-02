@@ -1,0 +1,91 @@
+/*-- scss:defaults --*/
+
+// Fargepalett: mykt blågrønt
+$bk-blue:        #3d7ea6;
+$bk-blue-dark:   #2a5d7c;
+$bk-green:       #5aa889;
+$bk-green-dark:  #3f8468;
+$bk-mint:        #e8f3ef;
+$bk-sky:         #e9f1f7;
+$bk-ink:         #1f2f38;
+
+$body-bg:        #f7fafb;      // kjølig, nesten hvit (ikke krem)
+$body-color:     $bk-ink;
+$primary:        $bk-blue;
+$secondary:      $bk-green;
+$success:        $bk-green;
+$info:           $bk-blue;
+$link-color:     $bk-blue-dark;
+$link-hover-color: $bk-green-dark;
+
+$font-family-sans-serif: "Source Sans 3", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+$headings-font-family:   "Source Serif 4", Georgia, "Times New Roman", serif;
+$font-family-monospace:  "JetBrains Mono", "Fira Code", SFMono-Regular, Menlo, monospace;
+$font-size-base: 1.075rem;
+$line-height-base: 1.7;
+$headings-color: $bk-blue-dark;
+$headings-font-weight: 600;
+
+$navbar-bg: $bk-blue-dark;
+$sidebar-bg: #eef5f4;
+
+$code-bg: #eef4f6;
+$code-color: #2a5d7c;
+$border-radius: 0.6rem;
+
+/*-- scss:rules --*/
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:wght@500;600;700&display=swap");
+
+body { background: $body-bg; }
+
+// Lesbar linjelengde
+main.content { max-width: 46rem; }
+
+h1.title, h1 { letter-spacing: -0.01em; }
+h2 {
+  margin-top: 2.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid rgba($bk-green, 0.35);
+}
+
+// Sidemeny
+.sidebar nav[role="doc-toc"], .sidebar-navigation {
+  background: $sidebar-bg;
+}
+.sidebar-item .sidebar-item-text.active,
+.sidebar-item a.active { color: $bk-green-dark !important; font-weight: 600; }
+.sidebar-title a { color: $bk-blue-dark; font-family: $headings-font-family; }
+
+// Bilder og figurer
+img, .figure-img, .quarto-figure img {
+  border-radius: 0.6rem;
+}
+figcaption, .figure-caption { color: #5b7380; font-size: 0.92rem; }
+
+// Kode
+div.sourceCode, pre {
+  border-radius: 0.6rem;
+  border: 1px solid rgba($bk-blue, 0.15);
+}
+.cell-output pre { background: $bk-sky; }
+
+// Callouts: avrundet, myke farger, farget venstrekant
+.callout {
+  border-radius: 0.7rem;
+  border-left-width: 6px;
+  box-shadow: 0 1px 4px rgba($bk-ink, 0.06);
+}
+.callout.callout-style-simple { padding: 0.8rem 1rem; }
+.callout-note      { border-left-color: $bk-blue  !important; background: $bk-sky; }
+.callout-tip       { border-left-color: $bk-green !important; background: $bk-mint; }
+.callout-important { border-left-color: #c9826b   !important; background: #fbf0ec; }
+.callout-warning   { border-left-color: #d4a84b   !important; background: #fbf5e6; }
+
+// Tabeller
+table { border-radius: 0.5rem; overflow: hidden; }
+thead th { background: $bk-mint; color: $bk-blue-dark; border-bottom: 2px solid $bk-green !important; }
+
+// Knapper / Observable-kontroller
+.btn-primary, button.btn { background: $bk-blue; border-color: $bk-blue; }
+.btn-primary:hover { background: $bk-green-dark; border-color: $bk-green-dark; }

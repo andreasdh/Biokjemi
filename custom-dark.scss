@@ -1,0 +1,17 @@
+/*-- scss:defaults --*/
+$body-bg:    #121c21;
+$body-color: #dbe7ea;
+$link-color: #8cc9b0;
+$link-hover-color: #a9dcc6;
+$headings-color: #9fd1e8;
+$code-bg: #1a2a31;
+$code-color: #9fd1e8;
+$sidebar-bg: #172329;
+
+/*-- scss:rules --*/
+.callout-note      { background: #172b38; }
+.callout-tip       { background: #173028; }
+.callout-important { background: #33231e; }
+.callout-warning   { background: #332c18; }
+.cell-output pre   { background: #172b38; }
+thead th { background: #173028; color: #9fd1e8; }

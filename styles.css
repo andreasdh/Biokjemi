@@ -1,0 +1,47 @@
+/* Egne klasser du kan bruke i .qmd-filer: ::: {.nokkelpunkt} ... ::: */
+
+.nokkelpunkt {
+  background: linear-gradient(135deg, #e8f3ef 0%, #e9f1f7 100%);
+  border-radius: 0.8rem;
+  padding: 1rem 1.3rem;
+  margin: 1.5rem 0;
+  border: 1px solid rgba(61, 126, 166, 0.2);
+}
+.nokkelpunkt > :first-child { margin-top: 0; }
+.nokkelpunkt > :last-child  { margin-bottom: 0; }
+
+.simulering {
+  border: 1px solid rgba(90, 168, 137, 0.45);
+  border-radius: 0.8rem;
+  padding: 1rem 1.2rem;
+  margin: 1.5rem 0;
+  background: rgba(232, 243, 239, 0.5);
+}
+.simulering::before {
+  content: "Interaktiv simulering";
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3f8468;
+  margin-bottom: 0.5rem;
+}
+
+/* Læringsmål-boks øverst i kapitler */
+.laeringsmal {
+  border-left: 5px solid #5aa889;
+  padding: 0.4rem 1rem;
+  margin: 1.2rem 0 2rem;
+  background: rgba(232, 243, 239, 0.6);
+  border-radius: 0 0.6rem 0.6rem 0;
+}
+.laeringsmal > p:first-child { font-weight: 600; margin-bottom: 0.2rem; }
+
+/* Observable-widgets */
+.cell-output-display .observablehq input[type="range"] { accent-color: #3d7ea6; }
+
+/* Mørk modus (Quarto setter klassen quarto-dark på body) */
+body.quarto-dark .nokkelpunkt { background: linear-gradient(135deg, #173028, #172b38); }
+body.quarto-dark .simulering,
+body.quarto-dark .laeringsmal { background: rgba(23, 48, 40, 0.6); }

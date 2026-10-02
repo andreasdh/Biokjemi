@@ -1,0 +1,58 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Biokjemi"
+  subtitle: "En konseptuell tilnærming"
+  author: "Andreas Haraldsrud"
+  date: today
+  date-format: "D. MMMM YYYY"
+  language: nb
+  repo-url: https://github.com/andreasdh/Biokjemi
+  repo-actions: [edit, issue]
+  search: true
+  page-navigation: true
+  sidebar:
+    style: floating
+    collapse-level: 1
+  chapters:
+    - index.qmd
+    - part: "Del 1: Grunnlaget"
+      chapters:
+        - kapitler/01-eksempel.ipynb
+        - kapitler/02-interaktiv.qmd
+    - part: "Del 2: Neste tema"
+      chapters:
+        - kapitler/03-mal.qmd
+  appendices:
+    - kapitler/ordliste.qmd
+
+lang: nb
+
+format:
+  html:
+    theme:
+      light: [cosmo, custom.scss]
+      dark: [cosmo, custom.scss, custom-dark.scss]
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    toc-title: "På denne siden"
+    number-sections: false
+    code-fold: true
+    code-summary: "Vis kode"
+    code-copy: true
+    smooth-scroll: true
+    link-external-newwindow: true
+    fig-align: center
+    callout-appearance: simple
+    html-math-method: mathjax
+
+execute:
+  enabled: true  # kjør også .ipynb-kapitler ved bygging
+  warning: false
+  echo: true
+
+# Hvis du vil bruke bibliotek-referanser:
+# bibliography: references.bib
