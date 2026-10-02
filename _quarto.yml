@@ -35,7 +35,7 @@ lang: nb
 format:
   html:
     theme:
-      light: [cosmo, custom.scss]
+      light: [cosmo, custom-light.scss, custom.scss]
       dark: [cosmo, custom.scss, custom-dark.scss]
     css: styles.css
     toc: true

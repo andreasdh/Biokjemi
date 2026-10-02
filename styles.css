@@ -47,3 +47,5 @@ body.quarto-dark .simulering,
 body.quarto-dark .laeringsmal { background: rgba(23, 48, 40, 0.6); }
 
 .sidebar-title > a { display: none; }
+/* Logoen har mørk tekst: gi den lys bakgrunn i mørk modus */
+body.quarto-dark .sidebar-logo { background: #f7fafb; padding: 0.4rem; }
