@@ -12,8 +12,10 @@ book:
   repo-url: https://github.com/andreasdh/Biokjemi
   repo-actions: [edit, issue]
   search: true
+  favicon: bilder/logo.png
   page-navigation: true
   sidebar:
+    logo: bilder/logo.png
     style: floating
     collapse-level: 1
   chapters:
