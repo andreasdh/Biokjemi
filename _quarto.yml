@@ -13,7 +13,9 @@ book:
   repo-actions: [edit, issue]
   search: true
   page-navigation: true
+  favicon: bilder/logo.png
   sidebar:
+    logo: bilder/logo.png
     style: floating
     collapse-level: 1
   chapters:
