@@ -24,7 +24,10 @@ book:
       chapters:
         - kapitler/01-eksempel.ipynb
         - kapitler/02-interaktiv.qmd
-    - part: "Del 2: Neste tema"
+    - part: "Del 2: Biologiske makromolekyler"
+      chapters:
+        - kapitler/03-mal.qmd
+    - part: "Del 3: Metabolisme"
       chapters:
         - kapitler/03-mal.qmd
   appendices:
