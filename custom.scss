@@ -9,28 +9,20 @@ $bk-mint:        #e8f3ef;
 $bk-sky:         #e9f1f7;
 $bk-ink:         #1f2f38;
 
-$body-bg:        #f7fafb;      // kjølig, nesten hvit (ikke krem)
-$body-color:     $bk-ink;
 $primary:        $bk-blue;
 $secondary:      $bk-green;
 $success:        $bk-green;
 $info:           $bk-blue;
-$link-color:     $bk-blue-dark;
-$link-hover-color: $bk-green-dark;
 
 $font-family-sans-serif: "Source Sans 3", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 $headings-font-family:   "Source Serif 4", Georgia, "Times New Roman", serif;
 $font-family-monospace:  "JetBrains Mono", "Fira Code", SFMono-Regular, Menlo, monospace;
 $font-size-base: 1.075rem;
 $line-height-base: 1.7;
-$headings-color: $bk-blue-dark;
 $headings-font-weight: 600;
 
 $navbar-bg: $bk-blue-dark;
-$sidebar-bg: #eef5f4;
 
-$code-bg: #eef4f6;
-$code-color: #2a5d7c;
 $border-radius: 0.6rem;
 
 /*-- scss:rules --*/
