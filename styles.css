@@ -45,3 +45,5 @@
 body.quarto-dark .nokkelpunkt { background: linear-gradient(135deg, #173028, #172b38); }
 body.quarto-dark .simulering,
 body.quarto-dark .laeringsmal { background: rgba(23, 48, 40, 0.6); }
+
+.sidebar-title > a { display: none; }
