@@ -8,7 +8,6 @@ book:
   author: "Andreas Haraldsrud"
   date: today
   date-format: "D. MMMM YYYY"
-  language: nb
   repo-url: https://github.com/andreasdh/Biokjemi
   repo-actions: [edit, issue]
   search: true
@@ -31,6 +30,9 @@ book:
     - kapitler/ordliste.qmd
 
 lang: nb
+language:
+  section-title-appendices: "Appendiks"
+  crossref-apx-prefix: "Appendiks"
 
 format:
   html:
