@@ -1,0 +1,10 @@
+_book/
+.quarto/
+/.jupyter_cache/
+__pycache__/
+.ipynb_checkpoints/
+*.quarto_ipynb
+.DS_Store
+
+/.quarto/
+**/*.quarto_ipynb

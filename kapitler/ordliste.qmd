@@ -1,0 +1,8 @@
+---
+title: "Ordliste"
+---
+
+| Begrep | Forklaring |
+|---|---|
+| Enzym | Et protein som katalyserer en reaksjon. |
+| Substrat | Molekylet enzymet virker på. |

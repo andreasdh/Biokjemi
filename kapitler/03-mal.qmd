@@ -1,0 +1,25 @@
+---
+title: "Kapittelmal"
+---
+
+::: {.laeringsmal}
+Læringsmål
+
+- Forklare ...
+- Beskrive ...
+:::
+
+Kopier denne filen når du skal lage et nytt kapittel, og legg den inn i `_quarto.yml`.
+
+## Overskrift
+
+Tekst med formel: $\Delta G = \Delta H - T\Delta S$.
+
+::: {.callout-note}
+## Husk
+En kort påminnelse.
+:::
+
+## Oppgaver {#sec-oppgaver-mal}
+
+1. ...
