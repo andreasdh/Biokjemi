@@ -530,7 +530,7 @@ info = ({
 tegninger = {
   const mito = (x, y, rot, s = 1) => svg`<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})">
     <ellipse rx="44" ry="23" class="mito"/><path d="M-32 0 q6 -15 12 0 t12 0 t12 0 t12 0 t12 0 t12 0" class="mito-in"/></g>`;
-  const kjerne = (x, y, r) => svg`<g><circle cx=${x} cy=${y} r=${r + 3} class="kjerne-hylle"/><circle cx=${x} cy=${y} r=${r} class="kjerne"/><circle cx=${x - r * 0.2} cy=${y - r * 0.1} r=${r * 0.28} class="nukleolus"/></g>`;
+  const kjerne = (x, y, r) => svg`<g><circle cx=${x} cy=${y} r=${r + 3} class="kjerne-hylle" fill="none"/><circle cx=${x} cy=${y} r=${r} class="kjerne"/><circle cx=${x - r * 0.2} cy=${y - r * 0.1} r=${r * 0.28} class="nukleolus"/></g>`;
   // Glatt kurve gjennom punkter (Catmull-Rom omgjort til kubiske Bézier-kurver)
   const glatt = pts => {
     const f = v => v.toFixed(1);
@@ -581,9 +581,9 @@ tegninger = {
     });
     const d = glatt(pts);
     return svg`<g>
-      ${rorer.map(rd => svg`<path d="${rd}" class="er er-tynn"/>`)}
-      <path d="${d}" class="er"/>
-      <path d="${d}" class="er-lumen"/>
+      ${rorer.map(rd => svg`<path d="${rd}" class="er er-tynn" fill="none"/>`)}
+      <path d="${d}" class="er" fill="none"/>
+      <path d="${d}" class="er-lumen" fill="none"/>
       ${dots.map(([x, y]) => svg`<circle cx=${x} cy=${y} r="2.6" class="ribo"/>`)}
     </g>`;
   };
@@ -599,14 +599,13 @@ tegninger = {
   const dyr = "M110 215 C95 110 215 40 335 48 C470 55 570 125 560 235 C550 335 450 395 330 392 C200 390 125 325 110 215Z";
   return {
     "Dyrecelle": [
-      {id: "cyto", kropp: svg`<g><path d="${dyr}" class="cyto"/>
-        <path d="M150 120 L230 180 M420 110 L360 170 M470 230 L380 250 M200 330 L270 270 M420 340 L350 290 M140 250 L220 210" class="skjel"/></g>`},
+      {id: "cyto", kropp: svg`<path d="${dyr}" class="cyto"/>`},
       {id: "er", kropp: er(300, 200, 60, 50, 228, 4, 16)},
       {id: "kjerne", kropp: kjerne(300, 200, 60)},
-      {id: "mito", kropp: svg`<g>${mito(470, 150, -25)}${mito(180, 108, 25)}</g>`},
-      {id: "golgi", kropp: golgi(410, 305, 1.1)},
+      {id: "mito", kropp: svg`<g>${mito(470, 150, -25)}${mito(232, 106, 10, 0.8)}</g>`},
+      {id: "golgi", kropp: golgi(400, 300, 1.0)},
       {id: "lyso", kropp: svg`<g>${lyso(505, 240)}${lyso(528, 282)}</g>`},
-      {id: "vesikkel", kropp: svg`<g>${vesikkel(492, 354)}${vesikkel(524, 330)}${vesikkel(352, 352)}</g>`},
+      {id: "vesikkel", kropp: svg`<g>${vesikkel(372, 352)}${vesikkel(426, 362)}${vesikkel(330, 372)}</g>`},
       {id: "ribo", kropp: ribo([[400, 100], [425, 195], [385, 250], [260, 335], [330, 340], [445, 265], [165, 150]])},
       {id: "membran", kropp: svg`<path d="${dyr}" class="mem"/>`}
     ],
