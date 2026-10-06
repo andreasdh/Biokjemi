@@ -139,7 +139,7 @@ body.quarto-dark .sidebar-logo { background: #f7fafb; padding: 0.4rem; }
 .bk-celle .nukleolus { fill: rgba(61, 126, 166, 0.65); }
 .bk-celle .mito { fill: rgba(240, 150, 120, 0.55); stroke: #b86a50; stroke-width: 3; }
 .bk-celle .mito-in { stroke: #b86a50; stroke-width: 2.5; fill: none; }
-.bk-celle .er { stroke: #e08f8f; stroke-width: 6; fill: none; stroke-linecap: round; }
+.bk-celle .er { stroke: #e08f8f; stroke-width: 8; fill: none; stroke-linecap: round; }
 .bk-celle .ribo { fill: #3f8468; }
 .bk-celle .golgi { stroke: #d8a54a; stroke-width: 6; fill: none; stroke-linecap: round; }
 .bk-celle .lyso { fill: rgba(240, 200, 80, 0.85); stroke: #b88a2a; stroke-width: 2; }
@@ -151,3 +151,7 @@ body.quarto-dark .sidebar-logo { background: #f7fafb; padding: 0.4rem; }
 .bk-celle .plasmid { stroke: #3d7ea6; stroke-width: 4; fill: none; }
 .bk-del:hover, .bk-del:focus-visible { filter: brightness(1.12) drop-shadow(0 0 5px rgba(61,126,166,0.9)); }
 .bk-del.valgt { filter: drop-shadow(0 0 6px rgba(61,126,166,1)); }
+.bk-celle .kjerne-hylle { fill: none; stroke: #3d7ea6; stroke-width: 1.5; opacity: 0.6; }
+.bk-celle .er-tynn { stroke-width: 5; }
+.bk-celle .er-lumen { stroke: rgba(255, 245, 245, 0.55); stroke-width: 2.5; fill: none; stroke-linecap: round; pointer-events: none; }
+.bk-celle .er { stroke-linejoin: round; }

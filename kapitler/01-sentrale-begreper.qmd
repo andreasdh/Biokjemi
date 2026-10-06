@@ -484,7 +484,7 @@ info = ({
     tekst: "Cellens kraftverk. Mesteparten av energien en typisk celle bruker, lages her: drivstoffmolekyler forbrennes til karbondioksid og vann, og energien lagres i ATP. Har to membraner. Den indre membranen avgrenser matriksen.",
     analogi: "Kraftverket i kjelleren."},
   er: {navn: "Endoplasmatisk retikulum (ER)", farge: "coral",
-    tekst: "Et nettverk av membranavgrensede hulrom. Det ru ER har ribosomer som lager proteiner for membraner eller for å skilles ut, og i hulrommet foldes og modifiseres proteinene. Det glatte ER lager lipider og håndterer lipidløselige stoffer (også mange medisiner).",
+    tekst: "Et nettverk av membranavgrensede hulrom. Det henger sammen med kjernemembranen. Det ru ER har ribosomer som lager proteiner for membraner eller for å skilles ut, og i hulrommet foldes og modifiseres proteinene. Det glatte ER lager lipider og håndterer lipidløselige stoffer (også mange medisiner).",
     analogi: "Fabrikken der varene lages og pakkes."},
   golgi: {navn: "Golgiapparatet", farge: "amber",
     tekst: "En stabel av membraner som mottar vesikler fra ER. Her prosesseres proteinene videre, blant annet ved at sukker kobles på (glykosylering), før de sendes videre i nye vesikler.",
@@ -530,11 +530,63 @@ info = ({
 tegninger = {
   const mito = (x, y, rot, s = 1) => svg`<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})">
     <ellipse rx="44" ry="23" class="mito"/><path d="M-32 0 q6 -15 12 0 t12 0 t12 0 t12 0 t12 0 t12 0" class="mito-in"/></g>`;
-  const kjerne = (x, y, r) => svg`<g><circle cx=${x} cy=${y} r=${r} class="kjerne"/><circle cx=${x - r * 0.2} cy=${y - r * 0.1} r=${r * 0.28} class="nukleolus"/></g>`;
-  const er = (x, y, s = 1) => svg`<g transform="translate(${x} ${y}) scale(${s})">
-    ${[0, 1, 2, 3].map(i => svg`<path d="M0 ${i * 15} q15 -13 30 0 t30 0 t30 0 t30 0" class="er"/>`)}
-    ${[8, 30, 52, 74, 96].map(dx => svg`<circle cx=${dx} cy="-9" r="3" class="ribo"/>`)}
-    ${[18, 44, 68, 90].map(dx => svg`<circle cx=${dx} cy="6" r="3" class="ribo"/>`)}</g>`;
+  const kjerne = (x, y, r) => svg`<g><circle cx=${x} cy=${y} r=${r + 3} class="kjerne-hylle"/><circle cx=${x} cy=${y} r=${r} class="kjerne"/><circle cx=${x - r * 0.2} cy=${y - r * 0.1} r=${r * 0.28} class="nukleolus"/></g>`;
+  // Glatt kurve gjennom punkter (Catmull-Rom omgjort til kubiske Bézier-kurver)
+  const glatt = pts => {
+    const f = v => v.toFixed(1);
+    let d = `M${f(pts[0][0])} ${f(pts[0][1])}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(i - 1, 0)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(i + 2, pts.length - 1)];
+      d += ` C${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])} ${f(p2[1])}`;
+    }
+    return d;
+  };
+  // ER: en foldet membranflate som går ut fra kjernemembranen og bukter seg rundt kjernen,
+  // med ribosomer på (ru ER) og rørformede utløpere uten ribosomer (glatt ER).
+  const er = (cx, cy, r, a0, a1, baner = 4, avstand = 15, rorSteg = 6) => {
+    const rad = v => v * Math.PI / 180;
+    const pt = (v, rr) => [cx + rr * Math.cos(rad(v)), cy + rr * Math.sin(rad(v))];
+    const pts = [], dots = [];
+    const ender = i => { const lo = a0 + i * 7, hi = a1 - i * 9; return i % 2 === 0 ? [lo, hi] : [hi, lo]; };
+    for (let i = 0; i < baner; i++) {
+      const [fra, til] = ender(i);
+      const r0 = r + 5 + i * avstand;
+      const n = 22;
+      for (let k = 0; k <= n; k++) {
+        const t = k / n, v = fra + (til - fra) * t;
+        const rr = r0 + Math.sin(t * Math.PI * (1.5 + i * 0.5) + i) * (2 + i) * Math.sin(t * Math.PI);
+        pts.push(pt(v, rr));
+        if (i < baner - 1 && k % 3 === 1 && k < n - 1) dots.push(pt(v, rr + 8));
+      }
+      if (i < baner - 1) {
+        // glatt U-sving til neste bane
+        const neste = ender(i + 1)[0], retn = til > fra ? 1 : -1;
+        for (const u of [0.2, 0.4, 0.6, 0.8]) {
+          pts.push(pt(til + (neste - til) * u + retn * 10 * Math.sin(Math.PI * u), r0 + avstand * u));
+        }
+      }
+    }
+    // glatt ER: rørformede utløpere fra enden av siste bane
+    const slutt = pts[pts.length - 1], forrige = pts[pts.length - 4];
+    const dir = Math.atan2(slutt[1] - forrige[1], slutt[0] - forrige[0]);
+    const rorer = [-0.55, 0.05, 0.6].map((avvik, b) => {
+      const q = [slutt];
+      let [x, y] = slutt, a = dir + avvik;
+      for (let j = 1; j <= rorSteg; j++) {
+        a += Math.sin(j * 1.3 + b) * 0.35;
+        x += Math.cos(a) * 8; y += Math.sin(a) * 8;
+        q.push([x, y]);
+      }
+      return glatt(q);
+    });
+    const d = glatt(pts);
+    return svg`<g>
+      ${rorer.map(rd => svg`<path d="${rd}" class="er er-tynn"/>`)}
+      <path d="${d}" class="er"/>
+      <path d="${d}" class="er-lumen"/>
+      ${dots.map(([x, y]) => svg`<circle cx=${x} cy=${y} r="2.6" class="ribo"/>`)}
+    </g>`;
+  };
   const golgi = (x, y, s = 1) => svg`<g transform="translate(${x} ${y}) scale(${s})">
     ${[0, 1, 2, 3].map(i => svg`<path d="M${i * 3} ${i * 13} q${40 - i * 3} -18 ${80 - i * 6} 0" class="golgi"/>`)}
     <circle cx="-8" cy="38" r="5" class="vesikkel"/><circle cx="92" cy="12" r="5" class="vesikkel"/></g>`;
@@ -549,24 +601,24 @@ tegninger = {
     "Dyrecelle": [
       {id: "cyto", kropp: svg`<g><path d="${dyr}" class="cyto"/>
         <path d="M150 120 L230 180 M420 110 L360 170 M470 230 L380 250 M200 330 L270 270 M420 340 L350 290 M140 250 L220 210" class="skjel"/></g>`},
+      {id: "er", kropp: er(300, 200, 60, 50, 228, 4, 16)},
       {id: "kjerne", kropp: kjerne(300, 200, 60)},
-      {id: "mito", kropp: svg`<g>${mito(470, 150, -25)}${mito(200, 135, 20)}</g>`},
-      {id: "er", kropp: er(150, 262, 1.1)},
-      {id: "golgi", kropp: golgi(385, 295, 1.1)},
+      {id: "mito", kropp: svg`<g>${mito(470, 150, -25)}${mito(180, 108, 25)}</g>`},
+      {id: "golgi", kropp: golgi(410, 305, 1.1)},
       {id: "lyso", kropp: svg`<g>${lyso(505, 240)}${lyso(528, 282)}</g>`},
-      {id: "vesikkel", kropp: svg`<g>${vesikkel(480, 330)}${vesikkel(510, 312)}${vesikkel(360, 345)}</g>`},
-      {id: "ribo", kropp: ribo([[400, 100], [425, 195], [385, 250], [260, 335], [330, 340], [445, 265], [180, 200]])},
+      {id: "vesikkel", kropp: svg`<g>${vesikkel(492, 354)}${vesikkel(524, 330)}${vesikkel(352, 352)}</g>`},
+      {id: "ribo", kropp: ribo([[400, 100], [425, 195], [385, 250], [260, 335], [330, 340], [445, 265], [165, 150]])},
       {id: "membran", kropp: svg`<path d="${dyr}" class="mem"/>`}
     ],
     "Plantecelle": [
       {id: "cyto", kropp: svg`<rect x="92" y="47" width="456" height="331" rx="20" class="cyto"/>`},
       {id: "vakuole", kropp: svg`<ellipse cx="330" cy="215" rx="150" ry="105" class="vakuole"/>`},
-      {id: "kjerne", kropp: kjerne(140, 100, 36)},
-      {id: "mito", kropp: svg`<g>${mito(260, 70, 5, 0.7)}${mito(440, 340, -10, 0.7)}</g>`},
-      {id: "er", kropp: er(110, 160, 0.6)},
+      {id: "er", kropp: er(200, 95, 34, 15, 150, 3, 10, 3)},
+      {id: "kjerne", kropp: kjerne(200, 95, 34)},
+      {id: "mito", kropp: svg`<g>${mito(290, 70, 5, 0.7)}${mito(440, 340, -10, 0.7)}</g>`},
       {id: "golgi", kropp: golgi(400, 66, 0.6)},
       {id: "kloro", kropp: svg`<g>${kloro(130, 280, -20)}${kloro(510, 250, 20)}${kloro(510, 105, -25)}${kloro(330, 345, 0)}</g>`},
-      {id: "ribo", kropp: ribo([[170, 190], [200, 80], [480, 60], [180, 340], [440, 170]])},
+      {id: "ribo", kropp: ribo([[125, 200], [150, 165], [480, 60], [180, 340], [440, 170]])},
       {id: "membran", kropp: svg`<rect x="92" y="47" width="456" height="331" rx="20" class="mem"/>`},
       {id: "vegg", kropp: svg`<rect x="80" y="35" width="480" height="355" rx="26" class="vegg"/>`}
     ],
