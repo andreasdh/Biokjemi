@@ -1,0 +1,148 @@
+```{ojs}
+//| echo: false
+// Titrering av en svak syre: pH som funksjon av tilsatt base, med og uten buffer.
+{
+  const komma = (x) => String(x).replace(".", ",").replace("-", "−");
+  const syrer = [
+    { navn: "Eddiksyre / acetat", pKa: 4.76, HA: "CH₃COOH", A: "CH₃COO⁻" },
+    { navn: "Histidin-sidekjede (imidazol)", pKa: 6.0, HA: "His–H⁺", A: "His" },
+    { navn: "Dihydrogenfosfat / hydrogenfosfat", pKa: 6.86, HA: "H₂PO₄⁻", A: "HPO₄²⁻" },
+    { navn: "Ammonium / ammoniakk", pKa: 9.25, HA: "NH₄⁺", A: "NH₃" },
+  ];
+  const C = 0.1,
+    Kw = 1e-14; // konsentrasjon av syre (M)
+  const velger = Inputs.select(new Map(syrer.map((s, i) => [s.navn, i])), {
+    value: 0,
+    label: "Syre",
+  });
+  const sx = Inputs.range([0, 1.2], { value: 0.5, step: 0.01, label: "Tilsatt OH⁻ (ekv.)" });
+  const bar = html`<div></div>`;
+  const diagram = html`<div></div>`;
+  const panel = html`<div class="bk-panel k-green"></div>`;
+  let bredde = 560;
+
+  // ladningsbalanse: x·C + [H⁺] = C·Ka/(Ka + [H⁺]) + [OH⁻]
+  function pH(pKa, x) {
+    const Ka = Math.pow(10, -pKa);
+    const f = (lp) => {
+      const h = Math.pow(10, -lp);
+      return x * C + h - (C * Ka) / (Ka + h) - Kw / h;
+    };
+    let lo = 0,
+      hi = 14; // f(0) > 0, f(14) < 0
+    for (let i = 0; i < 80; i++) {
+      const mid = (lo + hi) / 2;
+      if (f(mid) > 0) lo = mid;
+      else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+  const vannpH = (x) => {
+    // samme base tilsatt rent vann
+    const oh = (x * C + Math.sqrt((x * C) ** 2 + 4 * Kw)) / 2;
+    return 14 + Math.log10(oh);
+  };
+
+  function oppdater() {
+    const s = syrer[+velger.value],
+      x = +sx.value;
+    const verdi = pH(s.pKa, x),
+      vann = vannpH(x);
+    const kurve = Array.from({ length: 121 }, (_, i) => ({ x: i / 100, pH: pH(s.pKa, i / 100) }));
+    const vannkurve = Array.from({ length: 121 }, (_, i) => ({
+      x: i / 100,
+      pH: vannpH(Math.max(i / 100, 1e-6)),
+    }));
+    const andelA = 1 / (1 + Math.pow(10, s.pKa - verdi));
+    diagram.replaceChildren(
+      Plot.plot({
+        width: bredde,
+        height: 300,
+        marginLeft: 46,
+        marginBottom: 44,
+        style: { background: "transparent", color: "inherit", fontSize: "12px" },
+        x: { label: "Tilsatt OH⁻ (ekvivalenter relativt til syren)", domain: [0, 1.2] },
+        y: { label: "pH", domain: [0, 14], grid: true },
+        marks: [
+          Plot.rectY([{ a: s.pKa - 1, b: s.pKa + 1 }], {
+            x1: 0,
+            x2: 1.2,
+            y1: "a",
+            y2: "b",
+            fill: "#5aa889",
+            fillOpacity: 0.18,
+          }),
+          Plot.text([{ t: "bufferområde (pKa ± 1)" }], {
+            x: 1.19,
+            y: s.pKa - 1.6,
+            text: "t",
+            textAnchor: "end",
+            fontSize: 12,
+          }),
+          Plot.ruleY([s.pKa], { stroke: "#3f8468", strokeDasharray: "4,3" }),
+          Plot.line(vannkurve, {
+            x: "x",
+            y: "pH",
+            stroke: "currentColor",
+            strokeOpacity: 0.55,
+            strokeDasharray: "5,4",
+            strokeWidth: 2,
+          }),
+          Plot.line(kurve, { x: "x", y: "pH", stroke: "#3d7ea6", strokeWidth: 3 }),
+          Plot.dot([{ x, pH: verdi }], {
+            x: "x",
+            y: "pH",
+            r: 7,
+            fill: "#5aa889",
+            stroke: "currentColor",
+          }),
+          Plot.text([{ x: 0.03, pH: 13.2, t: "rent vann (uten buffer)" }], {
+            x: "x",
+            y: "pH",
+            text: "t",
+            textAnchor: "start",
+            fontSize: 12,
+            fillOpacity: 0.8,
+          }),
+        ],
+      }),
+    );
+    bar.replaceChildren(html`<div class="bk-bufferbar" aria-label="Andel protonert og deprotonert">
+      <div class="bk-ha" style="width:${(1 - andelA) * 100}%">${1 - andelA > 0.12 ? s.HA : ""}</div>
+      <div class="bk-a" style="width:${andelA * 100}%">${andelA > 0.12 ? s.A : ""}</div></div>`);
+    const dx = 0.05,
+      nær = x < 1.15 ? pH(s.pKa, x + dx) - verdi : null;
+    const iOmr = Math.abs(verdi - s.pKa) <= 1;
+    panel.className = "bk-panel k-" + (iOmr ? "green" : "coral");
+    const prosent = (a) => (a > 0.995 ? ">99" : a < 0.005 ? "<1" : Math.round(a * 100));
+    const forklaring = iOmr
+      ? `Du er i bufferområdet: både syre og base er til stede i betydelige mengder, og de kan
+         nøytralisere tilsatt base eller syre.`
+      : `Du er utenfor bufferområdet: nesten bare den ene formen finnes igjen, så det er lite
+         igjen til å motvirke endringer.`;
+    const ekstra =
+      nær !== null
+        ? `Tilsetter du ytterligere ${komma(dx)} ekvivalenter base, endrer pH seg med bare
+           <strong>${komma(nær.toFixed(2))}</strong> enheter. Den samme mengden base i rent vann
+           (pH 7) ville gitt pH ${komma(vannpH(dx).toFixed(1))}.`
+        : "";
+    panel.innerHTML = `<p><strong>pH = ${komma(verdi.toFixed(2))}</strong> (pKa = ${komma(s.pKa)}).
+      ${prosent(1 - andelA)} % er ${s.HA}, og ${prosent(andelA)} % er ${s.A}.</p>
+      <p>${forklaring} ${ekstra}</p>`;
+  }
+  velger.addEventListener("input", oppdater);
+  sx.addEventListener("input", oppdater);
+  const rot = html`<div class="bk-buffer-boks">${velger}${sx}${bar}${panel}${diagram}</div>`;
+  oppdater();
+  bkTilpass(
+    rot,
+    560,
+    (w) => {
+      bredde = w;
+      oppdater();
+    },
+    invalidation,
+  );
+  return rot;
+}
+```

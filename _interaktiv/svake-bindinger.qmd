@@ -1,0 +1,99 @@
+```{ojs}
+//| echo: false
+// Mange svake bindinger: stabilt som helhet, men hver enkelt brytes og dannes hele tiden.
+{
+  const R = 8.314e-3,
+    T = 310; // kJ/(mol·K), kroppstemperatur
+  const komma = (x) => String(x).replace(".", ",");
+  const MAKS = 60;
+  const typer = [
+    { navn: "London-kontakt", e: 2 },
+    { navn: "Hydrogenbinding", e: 10 },
+    { navn: "Saltbro", e: 15 },
+  ];
+  const eSlider = Inputs.range([1, 40], { value: 10, step: 1, label: "Energi (kJ/mol)" });
+  const nSlider = Inputs.range([1, MAKS], { value: 20, step: 1, label: "Antall" });
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const rutenett = html`<div></div>`;
+  const tall = html`<div class="bk-panel k-green"></div>`;
+  let lukket = Array(MAKS).fill(true);
+  let historikk = [];
+
+  function tegn() {
+    const N = +nSlider.value;
+    const per = Math.min(N, 20);
+    const rader = Math.ceil(N / per);
+    const celle = 26;
+    const sirkler = [];
+    for (let i = 0; i < N; i++) {
+      const x = 16 + (i % per) * celle,
+        y = 16 + Math.floor(i / per) * celle;
+      const klasse = lukket[i] ? "bk-sv-lukket" : "bk-sv-apen";
+      sirkler.push(svg`<circle cx="${x}" cy="${y}" r="9" class="${klasse}"/>`);
+    }
+    rutenett.replaceChildren(svg`<svg viewBox="0 0 ${16 + per * celle} ${8 + rader * celle + 8}"
+      class="bk-sv" role="img" aria-label="Bindinger som brytes og dannes">${sirkler}</svg>`);
+  }
+
+  function tallTekst() {
+    const N = +nSlider.value,
+      e = +eSlider.value;
+    const x = e / (R * T);
+    const andelApen = 1 / (1 + Math.exp(x));
+    const brutt = lukket.slice(0, N).filter((b) => !b).length;
+    const snitt = historikk.length
+      ? historikk.reduce((a, b) => a + b, 0) / historikk.length
+      : brutt;
+    const total = N * e;
+    const prosentApen = komma((andelApen * 100).toFixed(andelApen < 0.1 ? 1 : 0));
+    tall.innerHTML = `<p>Akkurat nå er <strong>${brutt} av ${N}</strong> bindinger brutt
+      (i gjennomsnitt ca. ${komma(snitt.toFixed(1))}).
+      Hver enkelt binding er åpen ${prosentApen} % av tiden.</p>
+      <p>Samlet bindingsenergi: <strong>${komma(total.toFixed(0))} kJ/mol</strong>.
+      Til sammenlikning: varmebevegelsen ved 37 °C er RT ≈ ${komma((R * T).toFixed(1))} kJ/mol,
+      og én kovalent C–C-binding er ca. 350 kJ/mol.</p>`;
+  }
+
+  function steg() {
+    const N = +nSlider.value,
+      e = +eSlider.value;
+    const apne = Math.exp(-e / (R * T));
+    const a = 0.35;
+    for (let i = 0; i < N; i++) {
+      if (lukket[i]) {
+        if (Math.random() < a * apne) lukket[i] = false;
+      } else if (Math.random() < a) lukket[i] = true;
+    }
+    historikk.push(lukket.slice(0, N).filter((b) => !b).length);
+    if (historikk.length > 80) historikk.shift();
+    tegn();
+    tallTekst();
+  }
+
+  typer.forEach((t) => {
+    const b = html`<button class="bk-chip">${t.navn} (${t.e} kJ/mol)</button>`;
+    b.onclick = () => {
+      eSlider.value = t.e;
+      eSlider.dispatchEvent(new Event("input", { bubbles: true }));
+    };
+    chips.append(b);
+  });
+  const markerChips = () =>
+    chips
+      .querySelectorAll("button")
+      .forEach((b, i) => b.classList.toggle("valgt", typer[i].e === +eSlider.value));
+  eSlider.addEventListener("input", () => {
+    historikk = [];
+    markerChips();
+  });
+  nSlider.addEventListener("input", () => {
+    historikk = [];
+  });
+  markerChips();
+  tegn();
+  tallTekst();
+  const id = setInterval(steg, 140);
+  invalidation.then(() => clearInterval(id));
+  return html`<div class="bk-sv-boks">${chips}${eSlider}${nSlider}${rutenett}${tall}</div>`;
+}
+```

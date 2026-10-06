@@ -155,3 +155,86 @@ body.quarto-dark .sidebar-logo { background: #f7fafb; padding: 0.4rem; }
 .bk-celle .er-tynn { stroke-width: 5; }
 .bk-celle .er-lumen { stroke: rgba(255, 245, 245, 0.55); stroke-width: 2.5; fill: none; stroke-linecap: round; pointer-events: none; }
 .bk-celle .er { stroke-linejoin: round; }
+
+/* ---------- Kapittel 2: molekylvisning og andre interaktive elementer ---------- */
+.bk-molsvg { width: 100%; height: auto; display: block; max-width: 640px; margin: 0 auto; }
+.bk-molsvg .bk-binding { stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.bk-molsvg .bk-hb { stroke: #3f8468; stroke-width: 2.4; stroke-dasharray: 5 4; }
+.bk-molsvg .bk-bak { fill: var(--bs-body-bg, #fff); opacity: 0.85; }
+.bk-molsvg .bk-bokstav { fill: currentColor; font-weight: 700; font-size: 15px; text-anchor: middle; }
+.bk-molsvg .bk-c { fill: currentColor; opacity: 0.35; }
+.bk-molsvg .bk-delta { font-size: 13px; font-weight: 700; }
+.bk-molsvg .bk-fq { font-size: 12px; font-weight: 700; fill: currentColor; }
+.bk-molsvg .bk-ring { fill: none; stroke-width: 2.4; }
+.bk-molsvg .bk-atom { cursor: pointer; outline: none; }
+.bk-molsvg .bk-atom:hover .bk-bokstav, .bk-molsvg .bk-atom.valgt .bk-bokstav { fill: #3d7ea6; }
+.bk-molsvg .bk-atom.valgt .bk-c { opacity: 1; }
+.bk-chiprad { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.4rem 0 0.6rem; }
+.bk-chiprad .bk-chip, .bk-chiprad .bk-chip.btn-quarto {
+  background: rgba(61, 126, 166, 0.14); border: 0; border-radius: 1rem; color: inherit;
+  cursor: pointer; font: inherit; font-size: 0.92rem; padding: 0.05rem 0.75rem; }
+.bk-chiprad .bk-chip:hover, .bk-chiprad .bk-chip.btn-quarto:hover { background: rgba(61, 126, 166, 0.3); color: inherit; }
+.bk-chiprad .bk-chip.valgt, .bk-chiprad .bk-chip.btn-quarto.valgt { background: #3d7ea6; color: #fff; }
+.bk-avkrysning { cursor: pointer; display: block; margin: 0.4rem 0; }
+.bk-avkrysning input { margin-right: 0.4rem; }
+.bk-hint { font-size: 0.9rem; margin: 0.3rem 0; min-height: 1.4em; opacity: 0.75; }
+.bk-phrad form { max-width: 28rem; }
+.bk-en { display: block; height: auto; margin: 0 auto; max-width: 640px; width: 100%; }
+.bk-en .bk-binding { stroke: currentColor; stroke-width: 3; }
+.bk-en .bk-en-atom { fill: var(--bs-body-bg, #fff); fill-opacity: 0.55; stroke: currentColor; stroke-width: 2.4; }
+.bk-en .bk-en-sym { fill: currentColor; font-size: 26px; font-weight: 700; text-anchor: middle; }
+.bk-en .bk-en-delta { font-size: 22px; font-weight: 700; text-anchor: middle; }
+.bk-en .bk-en-pil { stroke: currentColor; stroke-linecap: round; opacity: 0.7; }
+.bk-en .bk-en-pilnavn { fill: currentColor; font-size: 13px; opacity: 0.75; text-anchor: middle; }
+.bk-sv { display: block; height: auto; margin: 0.6rem 0; max-width: 560px; width: 100%; }
+.bk-sv .bk-sv-lukket { fill: #5aa889; stroke: #3f8468; stroke-width: 2; }
+.bk-sv .bk-sv-apen { fill: none; stroke: currentColor; stroke-dasharray: 3 3; stroke-width: 1.6; opacity: 0.55; }
+.bk-styrke { font-size: 0.8rem; font-weight: 400; margin-left: 0.4rem; opacity: 0.75; }
+.bk-undertittel { font-size: 1.05rem; margin: 1.1rem 0 0.4rem; }
+.bk-kombo .bk-panel h4 { font-size: 1rem; }
+.bk-vokter { display: block; height: auto; max-width: 640px; touch-action: none; width: 100%; }
+.bk-vokter .bk-vokter-vann { fill: rgba(61, 126, 166, 0.12); stroke: rgba(61, 126, 166, 0.4); }
+.bk-vokter .bk-vokter-krim { fill: #f4dca0; stroke: #b88a2a; stroke-width: 2.5; }
+.bk-vokter .bk-vokter-k { cursor: grab; }
+.bk-vokter .bk-vokter-k:active { cursor: grabbing; }
+.bk-vokter .bk-vokter-tekst { fill: #1f2f38; font-size: 15px; font-weight: 600; pointer-events: none; text-anchor: middle; }
+.bk-vokter .bk-vokter-v { fill: #3d7ea6; stroke: #2a5d7c; stroke-width: 1.5; transition: transform 0.18s ease-out; }
+.bk-vokter .bk-vokter-v.fri { fill: #a9d0e6; transition: transform 0.9s ease-in-out; }
+.bk-stolpe { background: rgba(127, 170, 190, 0.25); border-radius: 0.5rem; height: 0.7rem; overflow: hidden; }
+.bk-stolpe div { background: #5aa889; height: 100%; transition: width 0.2s; }
+.bk-tg { display: block; height: auto; margin: 0.6rem 0; max-width: 560px; width: 100%; }
+.bk-tg .bk-tg-tekst { fill: currentColor; font-size: 13px; }
+.bk-hp { display: block; height: auto; margin: 0.6rem 0; max-width: 560px; width: 100%; }
+.bk-hp .bk-hp-binding { stroke: currentColor; stroke-width: 2.5; opacity: 0.7; }
+.bk-hp .bk-hp-kontakt { stroke: #c9962f; stroke-dasharray: 4 3; stroke-width: 2; }
+.bk-hp .bk-hp-h { fill: #f4dca0; stroke: #b88a2a; stroke-width: 2; }
+.bk-hp .bk-hp-p { fill: #b4dfcd; stroke: #3f8468; stroke-width: 2; }
+.bk-bufferbar { border-radius: 0.5rem; display: flex; height: 2.2rem; margin: 0.8rem 0; overflow: hidden; }
+.bk-bufferbar div { align-items: center; color: #1f2f38; display: flex; font-size: 0.9rem; font-weight: 600;
+  justify-content: center; overflow: hidden; transition: width 0.15s; white-space: nowrap; }
+.bk-bufferbar .bk-ha { background: #a9d0e6; }
+.bk-bufferbar .bk-a { background: #f2c3b4; }
+.bk-linser { display: grid; gap: 0.7rem; grid-template-columns: 1fr; margin-top: 0.4rem; }
+.bk-linse { background: rgba(127, 170, 190, 0.1); border-left: 6px solid var(--ks, #3d7ea6); border-radius: 0 0.7rem 0.7rem 0;
+  padding: 0.6rem 1rem; }
+.bk-linse h4 { font-size: 1.05rem; margin: 0 0 0.1rem; }
+.bk-linse p { margin: 0.3rem 0; }
+.bk-linse .bk-linse-spm { font-style: italic; opacity: 0.8; }
+.bk-linse .bk-nr { background: var(--kf, #a9d0e6); border-radius: 50%; color: #1f2f38; display: inline-block;
+  font-size: 0.85rem; height: 1.5rem; line-height: 1.5rem; margin-right: 0.3rem; text-align: center; width: 1.5rem; }
+.bk-linse.k-blue { --kf: #a9d0e6; --ks: #3d7ea6; }
+.bk-linse.k-green { --kf: #b4dfcd; --ks: #3f8468; }
+.bk-linse.k-amber { --kf: #f4dca0; --ks: #b88a2a; }
+main table { font-size: 0.93rem; }
+main table th, main table td { padding: 0.4rem 0.55rem; }
+@media (max-width: 767px) {
+  main table { display: block; overflow-x: auto; }
+}
+.bk-sentrert { text-align: center; }
+.bk-tg-rad { align-items: center; display: flex; gap: 0.5rem; margin: 0.35rem 0; }
+.bk-tg-navn { flex: 0 0 3.6rem; font-weight: 600; text-align: right; }
+.bk-tg-spor { background: rgba(127, 170, 190, 0.12); border-radius: 0.3rem; flex: 1; height: 1.6rem; position: relative; }
+.bk-tg-midt { background: currentColor; bottom: 0; left: 50%; opacity: 0.5; position: absolute; top: 0; width: 1px; }
+.bk-tg-stolpe { border-radius: 0.2rem; bottom: 3px; position: absolute; top: 3px; transition: width 0.12s; }
+.bk-tg-verdi { flex: 0 0 3.8rem; font-variant-numeric: tabular-nums; }
+.bk-legende .bk-stedlegende { color: inherit; }

@@ -1,0 +1,276 @@
+```{ojs}
+//| echo: false
+// HP-modellen: en kjede av hydrofobe (H) og polare (P) perler på et gitter.
+// Hver kontakt mellom to H-perler som ikke er naboer i kjeden, gir energien −1.
+// Det er en enkel måte å fange den hydrofobe effekten på: vann presser H-perlene sammen.
+{
+  // --- kjerne start ---
+  function lagHP(seq, tilfeldig = Math.random) {
+    const N = seq.length;
+    const erH = [...seq].map((c) => c === "H");
+    const retn = [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ];
+    const ops = [
+      [0, -1, 1, 0],
+      [-1, 0, 0, -1],
+      [0, 1, -1, 0],
+      [1, 0, 0, -1],
+      [-1, 0, 0, 1],
+      [0, 1, 1, 0],
+      [0, -1, -1, 0],
+    ]; // symmetrier i gitteret
+    const nok = (x, y) => (x + 512) * 1024 + (y + 512);
+    let pos = Array.from({ length: N }, (_, i) => [i, 0]);
+
+    function kart(p) {
+      const m = new Map();
+      p.forEach(([x, y], i) => m.set(nok(x, y), i));
+      return m;
+    }
+    function energi(p) {
+      const m = kart(p);
+      let kontakter = 0;
+      for (let i = 0; i < N; i++) {
+        if (!erH[i]) continue;
+        for (const [dx, dy] of retn) {
+          const j = m.get(nok(p[i][0] + dx, p[i][1] + dy));
+          if (j !== undefined && j > i + 1 && erH[j]) kontakter++;
+        }
+      }
+      return -kontakter;
+    }
+    const opptatt = (p, x, y) => p.some((q) => q[0] === x && q[1] === y);
+
+    function forslag(p) {
+      const r = tilfeldig();
+      if (r < 0.15) {
+        // flytt en ende
+        const slutt = tilfeldig() < 0.5 ? 0 : N - 1;
+        const nabo = slutt === 0 ? 1 : N - 2;
+        const [dx, dy] = retn[Math.floor(tilfeldig() * 4)];
+        const x = p[nabo][0] + dx,
+          y = p[nabo][1] + dy;
+        if (opptatt(p, x, y)) return null;
+        const q = p.map((a) => a.slice());
+        q[slutt] = [x, y];
+        return q;
+      }
+      if (r < 0.55) {
+        // hjørneflipp
+        const i = 1 + Math.floor(tilfeldig() * (N - 2));
+        const a = p[i - 1],
+          b = p[i],
+          c = p[i + 1];
+        if (a[0] === c[0] || a[1] === c[1]) return null;
+        const x = a[0] + c[0] - b[0],
+          y = a[1] + c[1] - b[1];
+        if (opptatt(p, x, y)) return null;
+        const q = p.map((a2) => a2.slice());
+        q[i] = [x, y];
+        return q;
+      }
+      const k = 1 + Math.floor(tilfeldig() * (N - 2)); // pivot: roter/speil en del av kjeden
+      const [a, b, c, d] = ops[Math.floor(tilfeldig() * ops.length)];
+      const hale = tilfeldig() < 0.5;
+      const faste = new Set();
+      for (let i = 0; i < N; i++) if (hale ? i <= k : i >= k) faste.add(nok(p[i][0], p[i][1]));
+      const q = p.map((x) => x.slice());
+      const [px, py] = p[k];
+      for (let i = 0; i < N; i++) {
+        if (hale ? i <= k : i >= k) continue;
+        const dx = p[i][0] - px,
+          dy = p[i][1] - py;
+        q[i] = [px + a * dx + b * dy, py + c * dx + d * dy];
+        if (faste.has(nok(q[i][0], q[i][1]))) return null;
+      }
+      return q;
+    }
+
+    let E = energi(pos);
+    function steg(T, antall = 1) {
+      for (let s = 0; s < antall; s++) {
+        const q = forslag(pos);
+        if (!q) continue;
+        const En = energi(q),
+          dE = En - E;
+        if (dE <= 0 || tilfeldig() < Math.exp(-dE / T)) {
+          pos = q;
+          E = En;
+        }
+      }
+    }
+    function rettUt() {
+      pos = Array.from({ length: N }, (_, i) => [i, 0]);
+      E = energi(pos);
+    }
+    return {
+      steg,
+      rettUt,
+      energi,
+      erH,
+      N,
+      get pos() {
+        return pos;
+      },
+      get E() {
+        return E;
+      },
+    };
+  }
+  // --- kjerne slutt ---
+
+  const sekvenser = [
+    { navn: "Blandet kjede", s: "HPHPPHHPHPPHPHHPPHPH" },
+    { navn: "Hydrofob midtdel", s: "PPPPHHHHHHHHHHPPPPPP" },
+    { navn: "Bare polare", s: "PPPPPPPPPPPPPPPPPPPP" },
+    { navn: "Bare hydrofobe", s: "HHHHHHHHHHHHHHHHHHHH" },
+  ];
+  let valgt = 0,
+    sim = lagHP(sekvenser[0].s),
+    kjorer = true,
+    avkjoling = null;
+  const sT = Inputs.range([0.2, 2.5], { value: 2.0, step: 0.05, label: "Temperatur" });
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const boks = html`<div></div>`;
+  const tall = html`<div class="bk-panel k-amber"></div>`;
+  const play = html`<button class="bk-knapp">Pause</button>`;
+  const rett = html`<button class="bk-knapp">Rett ut kjeden</button>`;
+  const kjol = html`<button class="bk-knapp">Kjøl sakte ned</button>`;
+  const komma = (x) => String(x).replace(".", ",");
+
+  function tegn() {
+    const p = sim.pos,
+      N = sim.N;
+    const xs = p.map((a) => a[0]),
+      ys = p.map((a) => a[1]);
+    const minx = Math.min(...xs),
+      maxx = Math.max(...xs),
+      miny = Math.min(...ys),
+      maxy = Math.max(...ys);
+    const W = 560,
+      H = 300,
+      pad = 30;
+    const c = Math.min(30, (W - 2 * pad) / (maxx - minx + 1), (H - 2 * pad) / (maxy - miny + 1));
+    const X = (x) => W / 2 + (x - (minx + maxx) / 2) * c,
+      Y = (y) => H / 2 + (y - (miny + maxy) / 2) * c;
+    const kart = new Map(p.map(([x, y], i) => [x + "," + y, i]));
+    const kontakter = [];
+    for (let i = 0; i < N; i++)
+      if (sim.erH[i]) {
+        for (const [dx, dy] of [
+          [1, 0],
+          [0, 1],
+        ]) {
+          const j = kart.get(p[i][0] + dx + "," + (p[i][1] + dy));
+          if (j !== undefined && Math.abs(j - i) > 1 && sim.erH[j]) kontakter.push([i, j]);
+        }
+        for (const [dx, dy] of [
+          [-1, 0],
+          [0, -1],
+        ]) {
+          const j = kart.get(p[i][0] + dx + "," + (p[i][1] + dy));
+          if (j !== undefined && Math.abs(j - i) > 1 && sim.erH[j]) kontakter.push([i, j]);
+        }
+      }
+    const unike = kontakter.filter(([i, j]) => i < j);
+    let vannH = 0;
+    for (let i = 0; i < N; i++)
+      if (sim.erH[i])
+        for (const [dx, dy] of [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ]) {
+          if (!kart.has(p[i][0] + dx + "," + (p[i][1] + dy))) vannH++;
+        }
+    boks.replaceChildren(svg`<svg viewBox="0 0 ${W} ${H}" class="bk-hp" role="img"
+        aria-label="Kjede av hydrofobe og polare perler på et gitter">
+      ${unike.map(
+        ([i, j]) => svg`<line class="bk-hp-kontakt" x1="${X(p[i][0])}" y1="${Y(p[i][1])}"
+        x2="${X(p[j][0])}" y2="${Y(p[j][1])}"/>`,
+      )}
+      ${p.slice(1).map(
+        (q, i) => svg`<line class="bk-hp-binding" x1="${X(p[i][0])}" y1="${Y(p[i][1])}"
+        x2="${X(q[0])}" y2="${Y(q[1])}"/>`,
+      )}
+      ${p.map(
+        (q, i) => svg`<circle cx="${X(q[0])}" cy="${Y(q[1])}" r="${c * 0.36}"
+        class="${sim.erH[i] ? "bk-hp-h" : "bk-hp-p"}"/>`,
+      )}
+    </svg>`);
+    const temp = komma((+sT.value).toFixed(2));
+    tall.innerHTML = `<p><strong>${unike.length}</strong> kontakter mellom hydrofobe perler.
+      Energi: <strong>${komma(sim.E).replace("-", "−")}</strong> (i enheter av ε).
+      Hydrofobe perler mot vann: <strong>${vannH}</strong> frie nabo-ruter.</p>
+      <p class="bk-hint">Temperatur ${temp}${avkjoling ? ": avkjøler …" : ""}</p>`;
+  }
+
+  function velgSekvens(i) {
+    valgt = i;
+    sim = lagHP(sekvenser[i].s);
+    avkjoling = null;
+    chips.querySelectorAll("button").forEach((b, k) => b.classList.toggle("valgt", k === i));
+    tegn();
+  }
+  sekvenser.forEach((s, i) => {
+    const b = html`<button class="bk-chip">${s.navn}</button>`;
+    b.onclick = () => velgSekvens(i);
+    chips.append(b);
+  });
+  play.onclick = () => {
+    kjorer = !kjorer;
+    play.textContent = kjorer ? "Pause" : "Fortsett";
+  };
+  rett.onclick = () => {
+    sim.rettUt();
+    avkjoling = null;
+    tegn();
+  };
+  kjol.onclick = () => {
+    sT.value = 2.0;
+    sT.dispatchEvent(new Event("input", { bubbles: true }));
+    avkjoling = { t0: performance.now(), varighet: 9000 };
+    kjorer = true;
+    play.textContent = "Pause";
+  };
+  sT.addEventListener("input", () => {
+    avkjoling = null;
+  });
+
+  let anim,
+    synlig = true;
+  function lop(nå) {
+    if (kjorer && synlig) {
+      if (avkjoling) {
+        const t = Math.min(1, (nå - avkjoling.t0) / avkjoling.varighet);
+        sT.value = 2.0 - t * 1.75;
+        if (t >= 1) avkjoling = null;
+      }
+      sim.steg(+sT.value, 600);
+      tegn();
+    }
+    anim = requestAnimationFrame(lop);
+  }
+  velgSekvens(0);
+  anim = requestAnimationFrame(lop);
+  const rot = html`<div class="bk-hp-boks">
+    <p class="bk-hint">Prøv ulike temperaturer, og se hva som skjer med de hydrofobe (gule)
+      perlene.</p>${chips}${sT}${boks}${tall}
+    <div>${play}${rett}${kjol}</div></div>`;
+  // pause simuleringen når figuren ikke er synlig
+  const observator = new IntersectionObserver(([e]) => {
+    synlig = e.isIntersecting;
+  });
+  observator.observe(rot);
+  invalidation.then(() => {
+    cancelAnimationFrame(anim);
+    observator.disconnect();
+  });
+  return rot;
+}
+```

@@ -1,0 +1,5 @@
+# Trengs bare for verktøyene i tools/ (ikke for å bygge boka)
+rdkit
+scipy
+numpy
+nbformat
