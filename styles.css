@@ -49,3 +49,105 @@ body.quarto-dark .laeringsmal { background: rgba(23, 48, 40, 0.6); }
 .sidebar-title > a { display: none; }
 /* Logoen har mørk tekst: gi den lys bakgrunn i mørk modus */
 body.quarto-dark .sidebar-logo { background: #f7fafb; padding: 0.4rem; }
+
+/* ---------- Illustrasjoner (inline SVG i _figurer/) ---------- */
+.bk-figur { margin: 1.5rem 0; text-align: center; }
+.bk-figur svg { width: 100%; max-width: 680px; height: auto; }
+.bk-figur figcaption { max-width: 38rem; margin: 0.4rem auto 0; }
+.bk-figur text, .bk-celle text, .bk-tankekart text { fill: currentColor; font-size: 14px; font-family: inherit; }
+.bk-figur text.liten { font-size: 12px; opacity: 0.8; }
+.bk-figur text.on { fill: #1f2f38; font-weight: 600; text-anchor: middle; }
+.f-blaa   { fill: #a9d0e6; stroke: #3d7ea6; stroke-width: 2; }
+.f-groenn { fill: #b4dfcd; stroke: #3f8468; stroke-width: 2; }
+.f-gul    { fill: #f4dca0; stroke: #b88a2a; stroke-width: 2; }
+.f-rosa   { fill: #f2c3b4; stroke: #b86a50; stroke-width: 2; }
+.kjede { stroke: currentColor; stroke-width: 3; fill: none; opacity: 0.55; }
+.pil { stroke: currentColor; stroke-width: 2; fill: none; }
+.foldet { stroke: #3d7ea6; stroke-width: 9; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.haler { stroke: #c9962f; stroke-width: 3; fill: none; stroke-linecap: round; }
+.hb { stroke: currentColor; stroke-width: 2; stroke-dasharray: 3 3; opacity: 0.7; }
+.rygg { stroke: #7a95a3; stroke-width: 7; stroke-linecap: round; }
+
+/* ---------- Interaktive elementer (OJS) ---------- */
+.bk-tankekart, .bk-celle svg { width: 100%; height: auto; display: block; }
+.bk-tankekart .bk-linje { stroke: currentColor; stroke-width: 2; opacity: 0.25; }
+.bk-tankekart .bk-sentrum ellipse { fill: #3d7ea6; }
+.bk-tankekart .bk-sentrum text { fill: #fff; font-weight: 700; font-size: 17px; text-anchor: middle; }
+.bk-node, .bk-del { cursor: pointer; outline: none; }
+.bk-node rect { stroke-width: 2; transition: transform 0.15s; }
+.bk-node text { text-anchor: middle; fill: #1f2f38; font-weight: 600; font-size: 13px; pointer-events: none; }
+.bk-node:hover rect, .bk-node:focus-visible rect { filter: brightness(1.06) drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
+.bk-node.valgt rect { stroke-width: 4; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35)); }
+.k-blue rect, .bk-panel.k-blue { --kf: #a9d0e6; --ks: #3d7ea6; }
+.k-green rect, .bk-panel.k-green { --kf: #b4dfcd; --ks: #3f8468; }
+.k-amber rect, .bk-panel.k-amber { --kf: #f4dca0; --ks: #b88a2a; }
+.k-coral rect, .bk-panel.k-coral { --kf: #f2c3b4; --ks: #b86a50; }
+.bk-node rect { fill: var(--kf); stroke: var(--ks); }
+
+.bk-panel {
+  border-left: 6px solid var(--ks, #3d7ea6);
+  background: rgba(127, 170, 190, 0.12);
+  border-radius: 0 0.7rem 0.7rem 0;
+  padding: 0.8rem 1.1rem;
+  margin: 0.8rem 0 1.5rem;
+}
+.bk-panel h4 { margin: 0 0 0.3rem; font-size: 1.1rem; }
+.bk-panel p { margin: 0.3rem 0; }
+.bk-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.5rem 0; }
+.bk-chips span { background: var(--kf, #a9d0e6); color: #1f2f38; border-radius: 1rem; padding: 0.05rem 0.7rem; font-size: 0.85rem; }
+.bk-hint { font-size: 0.9rem; opacity: 0.75; margin: 0.2rem 0 0; }
+
+/* Tidslinje */
+.bk-tid form { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.bk-tid label { background: rgba(61,126,166,0.14); border-radius: 1rem; padding: 0.05rem 0.65rem; cursor: pointer; margin: 0 !important; }
+.bk-tid label:has(input:checked) { background: #3d7ea6; color: #fff; }
+.bk-tid input { display: none; }
+
+/* Sortering */
+.bk-quiz table { width: 100%; }
+.bk-quiz select { max-width: 100%; padding: 0.25rem; border-radius: 0.4rem; }
+.bk-quiz .rett { color: #3f8468; font-weight: 600; }
+.bk-quiz .feil { color: #b86a50; font-weight: 600; }
+.bk-quiz .forkl { font-size: 0.88rem; opacity: 0.85; }
+.bk-knapp { background: #3d7ea6; color: #fff; border: 0; border-radius: 0.5rem; padding: 0.4rem 1rem; cursor: pointer; margin: 0.6rem 0.4rem 0 0; }
+.bk-knapp:hover { background: #3f8468; }
+
+/* Dogme-simulator */
+.bk-dogme { display: flex; overflow-x: auto; padding-bottom: 0.4rem; gap: 3px; font-family: var(--bs-font-monospace, monospace); }
+.bk-dogme .kol { display: flex; flex-direction: column; gap: 3px; text-align: center; min-width: 3.3rem; }
+.bk-dogme .kol.rad { min-width: 4.5rem; text-align: right; font-family: inherit; opacity: 0.75; font-size: 0.85rem; }
+.bk-dogme .kol span { border-radius: 0.4rem; padding: 0.25rem 0.3rem; background: rgba(127,170,190,0.18); color: inherit; }
+.bk-dogme .kol.rad span { background: none; }
+.bk-dogme .kol .aa { color: #1f2f38; font-weight: 700; }
+.bk-dogme .kol.etter { opacity: 0.3; }
+.aa.upolar  { background: #f4dca0 !important; }
+.aa.polar   { background: #b4dfcd !important; }
+.aa.pluss   { background: #a9d0e6 !important; }
+.aa.minus   { background: #f2c3b4 !important; }
+.aa.stopp   { background: #7a95a3 !important; color: #fff !important; }
+.bk-forklaring { margin-top: 0.6rem; padding: 0.5rem 0.9rem; border-radius: 0.6rem; background: rgba(90,168,137,0.15); }
+.bk-legende { display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.82rem; margin: 0.5rem 0; }
+.bk-legende span { border-radius: 0.4rem; padding: 0.05rem 0.5rem; color: #1f2f38; }
+
+/* Celle */
+.bk-celle .mem { stroke: #d77aa6; stroke-width: 7; fill: none; pointer-events: stroke; }
+.bk-celle .cyto { fill: rgba(245, 225, 140, 0.30); stroke: none; }
+.bk-celle .vegg { stroke: #5aa889; stroke-width: 9; fill: none; pointer-events: stroke; }
+.bk-celle .vegg2 { stroke: #8aa0ad; stroke-width: 4; fill: none; pointer-events: stroke; }
+.bk-celle .skjel { stroke: currentColor; stroke-width: 1.5; opacity: 0.3; fill: none; }
+.bk-celle .kjerne { fill: rgba(120, 180, 215, 0.55); stroke: #3d7ea6; stroke-width: 3; }
+.bk-celle .nukleolus { fill: rgba(61, 126, 166, 0.65); }
+.bk-celle .mito { fill: rgba(240, 150, 120, 0.55); stroke: #b86a50; stroke-width: 3; }
+.bk-celle .mito-in { stroke: #b86a50; stroke-width: 2.5; fill: none; }
+.bk-celle .er { stroke: #e08f8f; stroke-width: 6; fill: none; stroke-linecap: round; }
+.bk-celle .ribo { fill: #3f8468; }
+.bk-celle .golgi { stroke: #d8a54a; stroke-width: 6; fill: none; stroke-linecap: round; }
+.bk-celle .lyso { fill: rgba(240, 200, 80, 0.85); stroke: #b88a2a; stroke-width: 2; }
+.bk-celle .vesikkel { fill: rgba(215, 122, 166, 0.35); stroke: #d77aa6; stroke-width: 2; }
+.bk-celle .vakuole { fill: rgba(120, 190, 230, 0.35); stroke: #3d7ea6; stroke-width: 3; }
+.bk-celle .kloro { fill: rgba(80, 170, 110, 0.65); stroke: #2f7a4d; stroke-width: 3; }
+.bk-celle .grana { fill: rgba(30, 110, 60, 0.6); }
+.bk-celle .dna { stroke: #3d7ea6; stroke-width: 5; fill: none; stroke-linecap: round; }
+.bk-celle .plasmid { stroke: #3d7ea6; stroke-width: 4; fill: none; }
+.bk-del:hover, .bk-del:focus-visible { filter: brightness(1.12) drop-shadow(0 0 5px rgba(61,126,166,0.9)); }
+.bk-del.valgt { filter: drop-shadow(0 0 6px rgba(61,126,166,1)); }
