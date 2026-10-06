@@ -1,20 +1,21 @@
-```{ojs}
 //| echo: false
 hendelser = [
-  {aar: 1828, tittel: "Wöhler lager urea", tekst: "Friedrich Wöhler fremstiller urea, et stoff som finnes i urin, fra uorganiske startstoffer. Det viser at molekylene i levende organismer ikke trenger noen mystisk «livskraft». De følger vanlig kjemi."},
-  {aar: 1869, tittel: "Nuklein", tekst: "Friedrich Miescher isolerer et fosforrikt stoff fra cellekjerner i hvite blodceller og kaller det nuklein. Dette er det vi i dag kaller DNA."},
-  {aar: 1897, tittel: "Gjæring uten levende celler", tekst: "Eduard Buchner viser at gjæring av sukker kan skje i et ekstrakt uten levende celler. Det er molekyler, enzymer, og ikke «livet selv» som gjør jobben."},
-  {aar: 1926, tittel: "Enzymer er proteiner", tekst: "James Sumner krystalliserer enzymet urease og viser at det er et protein. Enzymer er altså vanlige molekyler som vi kan rense, krystallisere og studere."},
-  {aar: 1944, tittel: "DNA er arvestoffet", tekst: "Oswald Avery, Colin MacLeod og Maclyn McCarty viser at det er DNA, og ikke proteiner, som bærer arvestoffet."},
-  {aar: 1953, tittel: "Dobbelthelikset", tekst: "James Watson og Francis Crick foreslår strukturen til DNA, bygd på røntgendata fra blant andre Rosalind Franklin og Maurice Wilkins. Strukturen avslører umiddelbart hvordan DNA kan kopieres."},
-  {aar: 1958, tittel: "Første proteinstruktur", tekst: "John Kendrew løser 3D-strukturen til myoglobin med røntgenkrystallografi. For første gang ser vi et protein atom for atom."},
-  {aar: 1966, tittel: "Den genetiske koden", tekst: "Den genetiske koden er knekt: hvilke tre baser som koder for hvilken aminosyre. Dette er sentralt for hvordan arvestoffet blir til proteiner (se «Det sentrale dogmet» lenger ned)."},
-  {aar: 1977, tittel: "DNA-sekvensering", tekst: "Frederick Sanger utvikler en metode for å lese rekkefølgen av basene i DNA."},
-  {aar: 1985, tittel: "PCR", tekst: "Med PCR (polymerasekjedereaksjon), utviklet av Kary Mullis og kolleger, kan en liten bit DNA kopieres millioner av ganger i et rør."},
-  {aar: 2003, tittel: "Menneskets genom", tekst: "Det humane genomet er sekvensert: omtrent tre milliarder basepar."},
-  {aar: 2024, tittel: "Nobelprisen i kjemi", tekst: "David Baker får prisen for å designe helt nye proteiner, og Demis Hassabis og John Jumper for AlphaFold, som bruker kunstig intelligens til å forutsi 3D-strukturen til et protein fra aminosyrerekkefølgen."}
+  {aar: 1828, tittel: "Wöhler lager urea", tekst: "Friedrich Wöhler fremstiller urea, et stoff som finnes i urin, fra uorganiske startstoffer. Forsøket utfordrer forestillingen om at organiske forbindelser bare kan dannes i levende organismer ved hjelp av en egen «livskraft»."},
+  {aar: 1869, tittel: "Nuklein", tekst: "Friedrich Miescher isolerer et fosforrikt stoff fra cellekjerner i hvite blodceller og kaller det nuklein. Stoffet han oppdager, er det vi i dag kaller DNA."},
+  {aar: 1897, tittel: "Gjæring uten levende celler", tekst: "Eduard Buchner viser at gjæring av sukker kan skje i et ekstrakt uten levende celler. Reaksjonene drives av enzymer og krever ikke at cellene er levende og intakte."},
+  {aar: 1926, tittel: "Urease krystalliseres", tekst: "James Sumner krystalliserer enzymet urease og viser at det er et protein. Arbeidet viser at et enzym kan renses, krystalliseres og studeres som andre kjemiske forbindelser."},
+  {aar: 1944, tittel: "DNA som arvestoff", tekst: "Oswald Avery, Colin MacLeod og Maclyn McCarty viser at DNA kan overføre en arvelig egenskap mellom bakterier. Forsøket gir sterke holdepunkter for at DNA er arvestoffet."},
+  {aar: 1953, tittel: "DNA-dobbelheliksen", tekst: "James Watson og Francis Crick foreslår strukturen til DNA, bygd på blant annet røntgendata fra Rosalind Franklin og Maurice Wilkins. Baseparingen peker mot hvordan DNA kan kopieres: Hver tråd kan fungere som mal for en ny."},
+  {aar: 1958, tittel: "Første proteinstruktur", tekst: "John Kendrew og kolleger presenterer en tredimensjonal modell av myoglobin basert på røntgenkrystallografi. For første gang ser vi den tredimensjonale oppbygningen til et protein. En mer detaljert struktur følger i 1960."},
+  {aar: 1961, tittel: "Proteiner kan folde seg på nytt", tekst: "Christian Anfinsen og kolleger viser at utfoldet ribonuklease kan gjenvinne sin funksjonelle struktur og enzymaktivitet under passende betingelser. Aminosyresekvensen inneholder altså informasjonen som trengs for foldingen. Struktur og funksjon kan forklares gjennom kjemiske egenskaper og vekselvirkninger."},
+  {aar: 1961, tittel: "En protongradient driver ATP-dannelse", tekst: "Peter Mitchell foreslår at energi fra elektrontransport brukes til å bygge opp en elektrokjemisk protongradient over en membran. Når protonene strømmer tilbake gjennom ATP-syntase, kan dette drive dannelsen av ATP. Forslaget blir senere underbygd av eksperimenter."},
+  {aar: 1966, tittel: "Den genetiske koden", tekst: "Den genetiske koden er knekt: Vi vet hvilke kodoner, grupper på tre baser i mRNA, som angir de ulike aminosyrene, og hvilke som signaliserer stopp. Dette er sentralt for hvordan informasjon i arvestoffet brukes til å lage proteiner (se «Det sentrale dogmet» lenger ned)."},
+  {aar: 1977, tittel: "DNA-sekvensering", tekst: "Frederick Sanger og kolleger utvikler en metode for å lese rekkefølgen av basene i DNA. Metoden gjør det mulig å undersøke genetisk informasjon direkte og blir sentral i kartleggingen av genomer."},
+  {aar: 1983, tittel: "RNA kan katalysere reaksjoner", tekst: "Sidney Altman og kolleger viser at RNA-delen av enzymet RNase P kan katalysere en reaksjon uten proteindelen. Sammen med Thomas Cechs arbeid med selvspleisende RNA viser dette at RNA både kan bære informasjon og ha katalytisk funksjon."},
+  {aar: 1985, tittel: "PCR", tekst: "Med PCR (polymerasekjedereaksjon), utviklet av Kary Mullis og kolleger, kan et bestemt DNA-område kopieres millioner av ganger i et rør. Dermed kan selv små mengder DNA gi nok materiale til videre undersøkelser."},
+  {aar: 2003, tittel: "Menneskets genom", tekst: "Det humane genomprosjektet fullføres og gir en referansesekvens som dekker det meste av menneskets genom på omtrent tre milliarder basepar. Det finnes fortsatt hull, men prosjektet gir et nytt grunnlag for å studere gener, biologisk funksjon og sykdom."},
+  {aar: 2024, tittel: "Nobelprisen i kjemi", tekst: "David Baker får halve prisen for beregningsbasert proteindesign. Demis Hassabis og John Jumper deler den andre halvdelen for prediksjon av proteinstruktur med AlphaFold. Arbeidet viser hvordan beregninger og kunstig intelligens kan brukes til både å forutsi proteinstrukturer og å designe nye proteiner."}
 ]
-```
 
 ```{ojs}
 //| echo: false
