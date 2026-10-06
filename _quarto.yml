@@ -23,6 +23,7 @@ book:
     - part: "Del 1: Grunnlaget"
       chapters:
         - kapitler/01-sentrale-begreper.qmd
+        - kapitler/02-kjemiske-prinsipper.ipynb
         - kapitler/01-eksempel.ipynb
         - kapitler/02-interaktiv.qmd
     - part: "Del 2: Biologiske makromolekyler"

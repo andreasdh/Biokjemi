@@ -1,0 +1,151 @@
+```{ojs}
+//| echo: false
+// Glidebryter: fra upolar kovalent via polar kovalent til ionisk binding.
+{
+  const chi = { H: 2.2, C: 2.55, N: 3.04, O: 3.44, Na: 0.93, Cl: 3.16 };
+  const par = [
+    { navn: "C–C", a: "C", b: "C" },
+    { navn: "C–H", a: "H", b: "C" },
+    { navn: "N–H", a: "H", b: "N" },
+    { navn: "C–O", a: "C", b: "O" },
+    { navn: "O–H", a: "H", b: "O" },
+    { navn: "Na–Cl", a: "Na", b: "Cl" },
+  ];
+  const komma = (x) => String(x).replace(".", ",");
+  const typer = [
+    {
+      grense: 0.4,
+      navn: "Upolar kovalent binding",
+      farge: "green",
+      tekst: `Elektronene deles omtrent likt, og det blir ingen delladninger. Slike bindinger
+       kan ikke danne hydrogenbindinger. Eksempler: C–C og C–H i fett, oljer og
+       hydrokarbonkjeder.`,
+    },
+    {
+      grense: 1.7,
+      navn: "Polar kovalent binding",
+      farge: "blue",
+      tekst: `Elektronene deles, men ulikt. Det mest elektronegative atomet blir δ⁻ og det
+       andre δ⁺. Dette er grunnlaget for hydrogenbindinger. Eksempler: O–H, N–H og C=O.`,
+    },
+    {
+      grense: 99,
+      navn: "Ionisk binding",
+      farge: "coral",
+      tekst: `Elektronene er nesten helt overført til det ene atomet, og vi får ioner.
+       Ionene holdes sammen av elektrostatisk tiltrekning, og vann kan løse dem fra
+       hverandre. Eksempel: Na⁺ og Cl⁻.`,
+    },
+  ];
+
+  const slider = Inputs.range([0, 3], { value: 1.24, step: 0.01, label: "Δχ" });
+  let valgt = 4; // O–H som utgangspunkt
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const tegning = html`<div></div>`;
+  const bildetekst = html`<p class="bk-hint bk-sentrert"></p>`;
+  const panel = html`<div class="bk-panel"></div>`;
+  let W = 640;
+
+  function oppdater() {
+    const d = +slider.value;
+    const ionisk = 1 - Math.exp((-d * d) / 4); // Paulings formel
+    const type = typer.find((t) => d < t.grense);
+    const p = valgt === null ? null : par[valgt];
+    const symA = p ? p.a : "A",
+      symB = p ? p.b : "B";
+    const f = 0.5 + 0.42 * ionisk; // hvor skyen har tyngdepunkt (0,5 = midt)
+    const ax = W * 0.3,
+      bx = W * 0.7,
+      y = 100,
+      r = Math.min(42, W * 0.07);
+    const idA = "enA",
+      idB = "enB";
+    const dA = Math.min(1, ionisk * 1.4),
+      dB = Math.min(1, 0.25 + ionisk);
+    const erIon = p && p.navn === "Na–Cl" && d > 1.7;
+
+    tegning.replaceChildren(svg`<svg viewBox="0 0 ${W} 190" class="bk-en" role="img"
+        aria-label="Elektronsky mellom to atomer">
+      <defs>
+        <marker id="enpil" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6"
+          orient="auto"><path d="M0 0 L10 5 L0 10z" fill="currentColor"/></marker>
+        <radialGradient id="${idB}" cx="${f}" cy="0.5" r="0.55">
+          <stop offset="0" stop-color="#e0584d" stop-opacity="0.85"/>
+          <stop offset="1" stop-color="#e0584d" stop-opacity="0"/></radialGradient>
+        <radialGradient id="${idA}">
+          <stop offset="0" stop-color="#3d7ea6" stop-opacity="0.9"/>
+          <stop offset="1" stop-color="#3d7ea6" stop-opacity="0"/></radialGradient>
+      </defs>
+      <ellipse cx="${W / 2}" cy="${y}" rx="${(bx - ax) / 2 + r + 40}" ry="76" fill="url(#${idB})"/>
+      <circle cx="${ax}" cy="${y}" r="${r + 22}" fill="url(#${idA})" opacity="${dA}"/>
+      <line class="bk-binding" x1="${ax + r}" y1="${y}" x2="${bx - r}" y2="${y}"
+        opacity="${Math.max(0.15, 1 - ionisk * 1.2)}"/>
+      <circle cx="${ax}" cy="${y}" r="${r}" class="bk-en-atom"/>
+      <circle cx="${bx}" cy="${y}" r="${r}" class="bk-en-atom"/>
+      <text class="bk-en-sym" x="${ax}" y="${y}" dy="0.35em">${erIon ? "Na⁺" : symA}</text>
+      <text class="bk-en-sym" x="${bx}" y="${y}" dy="0.35em">${erIon ? "Cl⁻" : symB}</text>
+      ${
+        d >= 0.2 && !erIon
+          ? svg`<text class="bk-en-delta" x="${ax}" y="${y - r - 14}"
+          fill="#3d7ea6">δ⁺</text><text class="bk-en-delta" x="${bx}" y="${y - r - 14}"
+          fill="#e0584d">δ⁻</text>`
+          : null
+      }
+      ${
+        d >= 0.2
+          ? svg`<line class="bk-en-pil" x1="${ax}" y1="${y + r + 22}" x2="${bx}" y2="${y + r + 22}"
+          stroke-width="${1.5 + 3 * ionisk}" marker-end="url(#enpil)"/>`
+          : null
+      }
+    </svg>`);
+
+    bildetekst.textContent =
+      d >= 0.2
+        ? "Pilen viser at elektrontettheten forskyves mot det mest elektronegative atomet."
+        : "Elektronene er jevnt fordelt mellom atomene.";
+    const to = (x) => komma(x.toFixed(2));
+    const info = p
+      ? `${p.navn}: Δχ = ${to(Math.abs(chi[p.b] - chi[p.a]))}
+         (χ = ${to(chi[p.a])} og ${to(chi[p.b])}). `
+      : "";
+    panel.className = "bk-panel k-" + type.farge;
+    panel.innerHTML = `<h4>${type.navn}</h4>
+      <p>${info}Δχ = ${komma(d.toFixed(2))} gir en ionisk karakter på omtrent
+      <strong>${Math.round(ionisk * 100)} %</strong> (Paulings formel, en grov
+      tommelfingerregel).</p>
+      <p>${type.tekst}</p>`;
+    chips.querySelectorAll("button").forEach((b, i) => b.classList.toggle("valgt", i === valgt));
+  }
+
+  par.forEach((p, i) => {
+    const b = html`<button class="bk-chip">${p.navn}</button>`;
+    b.onclick = () => {
+      valgt = i;
+      slider.value = Math.abs(chi[p.b] - chi[p.a]);
+      slider.dispatchEvent(new Event("input", { bubbles: true }));
+    };
+    chips.append(b);
+  });
+  slider.addEventListener("input", () => {
+    // flytter brukeren glidebryteren selv, er det ikke lenger et bestemt atompar
+    const d = +slider.value;
+    if (valgt !== null) {
+      const p = par[valgt];
+      if (Math.abs(Math.abs(chi[p.b] - chi[p.a]) - d) > 0.015) valgt = null;
+    }
+    oppdater();
+  });
+  const rot = html`<div class="bk-en-boks">${chips}${slider}${tegning}${bildetekst}${panel}</div>`;
+  oppdater();
+  bkTilpass(
+    rot,
+    640,
+    (w) => {
+      W = w;
+      oppdater();
+    },
+    invalidation,
+  );
+  return rot;
+}
+```

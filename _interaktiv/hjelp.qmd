@@ -1,0 +1,19 @@
+```{ojs}
+//| echo: false
+// Hjelpekode: kjører tegne-funksjonen på nytt når figuren får en annen bredde
+// (f.eks. på mobil), slik at teksten i figurene beholder samme størrelse.
+bkTilpass = (rot, maks, tegn, invalidering) => {
+  let sist = -1;
+  const kjor = () => {
+    const w = Math.max(260, Math.min(maks, Math.round(rot.clientWidth || maks)));
+    if (Math.abs(w - sist) >= 6) {
+      sist = w;
+      tegn(w);
+    }
+  };
+  const obs = new ResizeObserver(kjor);
+  obs.observe(rot);
+  invalidering.then(() => obs.disconnect());
+  kjor();
+};
+```

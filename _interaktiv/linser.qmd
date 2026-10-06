@@ -1,0 +1,166 @@
+```{ojs}
+//| echo: false
+// De tre spørsmålene brukt på åtte eksempler. Øvemodus skjuler forklaringene.
+{
+  const saker = [
+    {
+      navn: "Vann som medium",
+      e: `
+        O (χ = 3,44) trekker hardere i elektronene enn H (2,20). Elektrontettheten forskyves
+        mot O, som blir δ⁻, mens H blir δ⁺. Molekylet er bøyd (ca. 104,5°), så de to
+        bindingsdipolene summerer seg til en netto dipol: vann er polart.`,
+      v: `
+        δ⁺ H og δ⁻ O gir hydrogenbindinger: hvert vannmolekyl kan lage opptil fire (to som
+        donor og to som akseptor). Vann løser ioner (ion–dipol) og polare molekyler
+        (H-bindinger), mens upolare stoffer ikke blandes inn.`,
+      t: `
+        H-bindingene i flytende vann brytes og dannes hele tiden, så nettverket er dynamisk og
+        har høy entropi. Hvor godt noe løser seg, avgjøres av ΔG. Den ordnende effekten vann
+        har på upolare molekyler gir den hydrofobe effekten.`,
+    },
+    {
+      navn: "Baseparing i DNA",
+      e: `
+        I basene har N–H-grupper en δ⁺ H (donor), mens C=O-oksygen og ring-N har δ⁻
+        (akseptorer). Plasseringen av disse stedene er forskjellig for A, T, G og C.`,
+      v: `
+        A–T danner 2 og G–C danner 3 hydrogenbindinger, og bare riktig par passer sammen: det
+        gir spesifisitet. Stablingen av basene oppå hverandre (London-krefter og hydrofob
+        effekt) bidrar faktisk mer til stabiliteten enn selve H-bindingene.`,
+      t: `
+        Å skille trådene krever energi (ΔH > 0), men gir mer frihet (ΔS > 0). Ved høy nok
+        temperatur vinner entropien (TΔS > ΔH), og dobbelthelikset åpner seg. GC-rikt DNA
+        smelter ved høyere temperatur enn AT-rikt DNA.`,
+    },
+    {
+      navn: "Lipid-dobbeltlag",
+      e: `
+        Hydrokarbonhalene (C–H og C–C) har nesten ingen delladninger, siden Δχ er liten.
+        Fosfatgruppen i hodet er derimot ladd og polar.`,
+      v: `
+        Hodene danner H-bindinger og ion–dipol-interaksjoner med vann. Halene kan bare danne
+        svake London-krefter (mellom hverandre), og de kan ikke delta i vannets
+        H-bindingsnettverk.`,
+      t: `
+        Når halene gjemmer seg sammen, frigjøres ordnet vann, og entropien i vannet øker
+        (ΔS > 0). Dermed blir ΔG < 0, og membranen dannes spontant, uten at noe «bygger» den.`,
+    },
+    {
+      navn: "Proteinfolding",
+      e: `
+        Sidekjedene har ulik elektrontetthet: noen er upolare (Leu, Val, Phe), noen polare
+        (Ser, Asn) og noen ladde (Lys⁺, Asp⁻). I ryggraden er C=O δ⁻ og N–H δ⁺.`,
+      v: `
+        Upolare sidekjeder samles i kjernen (hydrofob effekt og London-krefter), mens polare
+        og ladde grupper vender mot vann. Ryggraden danner hydrogenbindinger (α-heliks og
+        β-flak), og ladde grupper kan danne saltbroer.`,
+      t: `
+        Foldingen er bare marginalt gunstig (typisk ΔG ≈ −20 til −60 kJ/mol): kjeden mister
+        konformasjonsentropi, men det oppveies av økt entropi i vannet og av mange svake
+        bindinger. Øker temperaturen nok, «smelter» proteinet.`,
+    },
+    {
+      navn: "Salt som løses i vann",
+      e: `
+        Na (χ = 0,93) og Cl (3,16) har en enorm forskjell: elektronene er overført nesten
+        helt, og vi har ioner i stedet for delte elektronpar.`,
+      v: `
+        Vann orienterer δ⁻ O mot Na⁺ og δ⁺ H mot Cl⁻ (ion–dipol). Hydratiseringen skjermer
+        ionene og gir en energigevinst som kompenserer for å bryte krystallgitteret.`,
+      t: `
+        Oppløsningen er spontan (ΔG < 0) når energien fra hydratiseringen og den økte uordenen
+        (ionene sprer seg i løsningen, ΔS > 0) til sammen er større enn energien som trengs
+        for å bryte krystallen.`,
+    },
+    {
+      navn: "pH og buffer",
+      e: `
+        Når en karboksylgruppe mister H⁺, delokaliseres elektrontettheten over de to
+        oksygenene (COO⁻). En aminogruppe som tar opp H⁺ blir –NH₃⁺. Ladningen endrer seg
+        altså med pH.`,
+      v: `
+        Ladningen avgjør hvilke vekselvirkninger gruppen kan danne: COO⁻ kan danne saltbroer
+        med NH₃⁺ og ta imot H-bindinger. En pH-endring kan derfor forstyrre foldingen og
+        aktiviteten til proteiner og enzymer.`,
+      t: `
+        Syre–base-likevekten (HA ⇌ A⁻ + H⁺) henger sammen med ΔG. En buffer er en blanding av
+        HA og A⁻: tilsatt syre eller base forskyver likevekten litt, men pH endrer seg lite
+        innenfor ca. ±1 enhet fra pKa.`,
+    },
+    {
+      navn: "Fett som smelter",
+      e: `
+        Fettmolekylene (triglyserider) består mest av lange hydrokarbonkjeder, altså nesten
+        upolare C–H- og C–C-bindinger. Bare esterbindingene er litt polare.`,
+      v: `
+        Mellom molekylene virker nesten bare London-krefter: svake per kontakt, men det er
+        mange kontakter langs de lange kjedene.`,
+      t: `
+        Smelting krever varme for å bryte de svake bindingene (ΔH > 0), men gir mer uorden
+        (ΔS > 0). Smeltepunktet er T = ΔH/ΔS. I brunt fettvev går det motsatt vei: forbrenning
+        av fett danner bindinger (ΔH < 0), og energien blir varme.`,
+    },
+    {
+      navn: "ATP og kobling",
+      e: `
+        Trifosfatgruppen i ATP har flere negative ladninger tett sammen (ATP⁴⁻ ved pH 7): mye
+        elektrontetthet på et lite område.`,
+      v: `
+        De negative ladningene frastøter hverandre. Når en fosfatgruppe spaltes av
+        (hydrolyse), minker frastøtningen, og produktene (ADP og fosfat) hydratiseres bedre i
+        vann.`,
+      t: `
+        Hydrolyse av ATP har ΔG°′ ≈ −30 kJ/mol. Cellen kobler denne reaksjonen til reaksjoner
+        med ΔG > 0, slik at summen blir negativ. Dette kommer vi tilbake til i
+        metabolismedelen.`,
+    },
+  ];
+  const linser = [
+    { n: "1", navn: "Elektrontetthet", spm: "Hvor er elektronene?", felt: "e", farge: "blue" },
+    { n: "2", navn: "Vekselvirkninger", spm: "Hva tiltrekker hva?", felt: "v", farge: "green" },
+    { n: "3", navn: "Termodynamikk", spm: "Hva vil skje, og hvorfor?", felt: "t", farge: "amber" },
+  ];
+  let valgt = 0,
+    ove = false;
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const kryss = html`<input type="checkbox">`;
+  const kort = html`<div class="bk-linser"></div>`;
+
+  function oppdater() {
+    const s = saker[valgt];
+    chips.querySelectorAll("button").forEach((b, i) => b.classList.toggle("valgt", i === valgt));
+    kort.replaceChildren(
+      ...linser.map((l) => {
+        const tekst = html`<p>${s[l.felt]}</p>`;
+        const boks = html`<div class="bk-linse k-${l.farge}">
+        <h4><span class="bk-nr">${l.n}</span> ${l.navn}</h4>
+        <p class="bk-linse-spm">${l.spm}</p></div>`;
+        if (ove) {
+          const knapp = html`<button class="bk-knapp">Vis forklaring</button>`;
+          knapp.onclick = () => {
+            knapp.replaceWith(tekst);
+          };
+          boks.append(knapp);
+        } else boks.append(tekst);
+        return boks;
+      }),
+    );
+  }
+  saker.forEach((s, i) => {
+    const b = html`<button class="bk-chip">${s.navn}</button>`;
+    b.onclick = () => {
+      valgt = i;
+      oppdater();
+    };
+    chips.append(b);
+  });
+  kryss.onchange = () => {
+    ove = kryss.checked;
+    oppdater();
+  };
+  oppdater();
+  return html`<div class="bk-linser-boks">${chips}
+    <label class="bk-avkrysning">
+      ${kryss} Øvemodus: skjul forklaringene og prøv selv først</label>${kort}</div>`;
+}
+```

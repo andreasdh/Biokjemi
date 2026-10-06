@@ -1,0 +1,248 @@
+```{ojs}
+//| echo: false
+// Hjelpekode: tegner molekyler med partialladninger (rødt = δ⁻, blått = δ⁺).
+// Bruk:  lagMolekylVisning({ider: ["vann", "metan"], start: "vann", ph: true, steder: false})
+lagMolekylVisning = {
+  const NEG = "#e0584d",
+    POS = "#3d7ea6",
+    GRONN = "#3f8468",
+    GUL = "#c9962f";
+  const komma = (x) => String(x).replace(".", ",");
+  const ladning = (q) => (q > 0 ? "+" : q < 0 ? "−" : "") + komma(Math.abs(q).toFixed(2));
+  let teller = 0;
+
+  function tegn(form, visSteder, valgt, velgAtom, W) {
+    const uid = "mol" + teller++;
+    const at = form.atomer;
+    const synlig = at.map((a, i) => i).filter((i) => !at[i].skjul);
+    const xs = synlig.map((i) => at[i].x),
+      ys = synlig.map((i) => at[i].y);
+    const minx = Math.min(...xs),
+      maxx = Math.max(...xs);
+    const miny = Math.min(...ys),
+      maxy = Math.max(...ys);
+    const H = Math.round(Math.max(190, Math.min(260, W * 0.46))),
+      pad = W < 400 ? 26 : 38;
+    const skala = Math.min(
+      synlig.length <= 5 ? 72 : 46,
+      (W - 2 * pad) / Math.max(maxx - minx, 0.1),
+      (H - 2 * pad) / Math.max(maxy - miny, 0.1),
+    );
+    const px = (i) => W / 2 + (at[i].x - (minx + maxx) / 2) * skala;
+    const py = (i) => H / 2 + (at[i].y - (miny + maxy) / 2) * skala;
+    // karbon får bokstav bare hvis det sitter H-atomer på det som tegnes (f.eks. metan)
+    const harSynligH = (i) =>
+      form.bindinger.some(
+        ([a, b]) =>
+          (a === i && at[b].el === "H" && !at[b].skjul) ||
+          (b === i && at[a].el === "H" && !at[a].skjul),
+      );
+    const merket = (i) => at[i].el !== "C" || harSynligH(i);
+    const kort = (i) => (merket(i) ? 11 : 0);
+
+    const glod = synlig.map((i) => {
+      const q = at[i].q;
+      const a = Math.min(0.9, Math.pow(Math.abs(q) / 0.45, 0.8));
+      const r = at[i].el === "H" ? 17 : 26;
+      return svg`<circle cx="${px(i)}" cy="${py(i)}" r="${r}"
+        fill="url(#${uid}-${q < 0 ? "neg" : "pos"})" opacity="${a}"/>`;
+    });
+
+    const bindinger = form.bindinger
+      .filter(([a, b]) => !at[a].skjul && !at[b].skjul)
+      .flatMap(([a, b, orden]) => {
+        const x1 = px(a),
+          y1 = py(a),
+          x2 = px(b),
+          y2 = py(b);
+        const dx = x2 - x1,
+          dy = y2 - y1,
+          len = Math.hypot(dx, dy);
+        const ux = dx / len,
+          uy = dy / len,
+          nx = -uy,
+          ny = ux;
+        const s1 = kort(a),
+          s2 = kort(b);
+        const offs = orden === 2 ? [-3, 3] : orden === 3 ? [-4, 0, 4] : [0];
+        return offs.map(
+          (o) => svg`<line class="bk-binding"
+        x1="${x1 + ux * s1 + nx * o}" y1="${y1 + uy * s1 + ny * o}"
+        x2="${x2 - ux * s2 + nx * o}" y2="${y2 - uy * s2 + ny * o}"/>`,
+        );
+      });
+
+    const hb = form.hb.map(
+      ([a, b]) => svg`<line class="bk-hb"
+      x1="${px(a)}" y1="${py(a)}" x2="${px(b)}" y2="${py(b)}"/>`,
+    );
+
+    // på smale skjermer og i store figurer utelater vi δ-merkene for å unngå rot
+    const visDelta = W >= 420 || synlig.length <= 6;
+    const atomer = synlig.map((i) => {
+      const a = at[i],
+        x = px(i),
+        y = py(i),
+        q = a.q;
+      const niva = Math.abs(q) < 0.12 ? "nesten nøytral" : q < 0 ? "δ⁻" : "δ⁺";
+      const tittel = `${a.el}: ${niva} (${ladning(q)})`;
+      const delta =
+        visDelta && Math.abs(q) >= 0.12 && a.el !== "Na" && a.el !== "Cl"
+          ? svg`<text class="bk-delta" x="${x + 14}" y="${y - 12}"
+              fill="${q < 0 ? NEG : POS}">${q < 0 ? "δ⁻" : "δ⁺"}</text>`
+          : null;
+      const ring =
+        visSteder && (a.a || a.d)
+          ? svg`<circle class="bk-ring" cx="${x}" cy="${y}" r="${a.el === "H" ? 12 : 16}"
+            stroke="${a.a ? GRONN : GUL}"/>`
+          : null;
+      const fortegn = a.fq > 0 ? "+" : "−";
+      const fq = a.fq ? svg`<text class="bk-fq" x="${x + 9}" y="${y - 7}">${fortegn}</text>` : null;
+      const bokstav = merket(i)
+        ? svg`<circle cx="${x}" cy="${y}" r="9.5" class="bk-bak"/>
+              <text class="bk-bokstav" x="${x}" y="${y}" dy="0.35em">${a.el}</text>${fq}`
+        : svg`<circle cx="${x}" cy="${y}" r="3" class="bk-c"/>`;
+      const klasse = valgt === i ? "bk-atom valgt" : "bk-atom";
+      const g = svg`<g class="${klasse}" tabindex="0"><title>${tittel}</title>
+        <circle cx="${x}" cy="${y}" r="20" fill="transparent"/>${ring}${bokstav}${delta}</g>`;
+      g.addEventListener("click", () => velgAtom(i));
+      g.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          velgAtom(i);
+        }
+      });
+      return g;
+    });
+
+    return svg`<svg viewBox="0 0 ${W} ${H}" class="bk-molsvg" role="img"
+        aria-label="${"Tegning av " + form.navn}">
+      <defs>
+        <radialGradient id="${uid}-neg"><stop offset="0" stop-color="${NEG}" stop-opacity="0.95"/>
+          <stop offset="1" stop-color="${NEG}" stop-opacity="0"/></radialGradient>
+        <radialGradient id="${uid}-pos"><stop offset="0" stop-color="${POS}" stop-opacity="0.95"/>
+          <stop offset="1" stop-color="${POS}" stop-opacity="0"/></radialGradient>
+      </defs>
+      ${glod}${hb}${bindinger}${atomer}
+    </svg>`;
+  }
+
+  return function lagMolekylVisning(opsjoner) {
+    const { ider, start = ider[0], ph = true, steder = false, stedknapp = true } = opsjoner;
+    const poster = ider.map((id) => molekyldata.find((m) => m.id === id));
+    let aktiv = poster.find((m) => m.id === start) || poster[0];
+    let visSteder = steder;
+    let valgtAtom = null;
+    let bredde = 560;
+
+    const rot = html`<div class="bk-mol"></div>`;
+    const chips = poster.length > 1 ? html`<div class="bk-chiprad"></div>` : null;
+    const svgBoks = html`<div></div>`;
+    const kryss = html`<input type="checkbox">`;
+    kryss.checked = steder;
+    const stedKnapp = html`<label class="bk-avkrysning">
+      ${kryss} Vis hydrogenbindingssteder</label>`;
+    const phInput = Inputs.range([0, 14], { value: 7.4, step: 0.1, label: "pH" });
+    const phBoks = html`<div class="bk-phrad">${phInput}</div>`;
+    const forklaring = html`<div class="bk-panel k-blue"></div>`;
+    const legende = html`<div class="bk-legende">
+      <span style="background:#f2c3b4">δ⁻ mye elektrontetthet</span>
+      <span style="background:#a9d0e6">δ⁺ lite elektrontetthet</span>
+      <span class="bk-stedlegende" style="border:2px solid ${GRONN}">akseptor</span>
+      <span class="bk-stedlegende" style="border:2px solid ${GUL}">donor (H)</span></div>`;
+    const stedLegende = legende.querySelectorAll(".bk-stedlegende");
+    const atomInfo = html`<p class="bk-hint">Klikk på et atom for å se partialladningen.</p>`;
+
+    const form = () => {
+      if (!aktiv.pKa) return aktiv;
+      const pH = +phInput.value;
+      return pH > aktiv.pKa ? aktiv.base : aktiv.syre;
+    };
+
+    function oppdater() {
+      const f = form();
+      svgBoks.replaceChildren(
+        tegn(
+          f,
+          visSteder,
+          valgtAtom,
+          (i) => {
+            valgtAtom = i;
+            oppdater();
+          },
+          bredde,
+        ),
+      );
+      let ekstra = "";
+      if (aktiv.pKa) {
+        const pH = +phInput.value;
+        const andelBase = 1 / (1 + Math.pow(10, aktiv.pKa - pH));
+        const andelDom = Math.max(andelBase, 1 - andelBase);
+        const prosent = komma((andelDom * 100).toFixed(andelDom > 0.995 ? 1 : 0));
+        ekstra = `<p><strong>pH ${komma(pH.toFixed(1))}</strong> (pKa = ${komma(aktiv.pKa)}): mest
+          <strong>${f.navn}</strong> (${prosent} %).</p>`;
+      }
+      forklaring.innerHTML = `<h4>${aktiv.navn}</h4><p>${aktiv.tekst}</p>${ekstra}`;
+      phBoks.style.display = aktiv.pKa && ph ? "" : "none";
+      stedLegende.forEach((l) => {
+        l.style.display = visSteder ? "" : "none";
+      });
+      stedKnapp.style.display = stedknapp ? "" : "none";
+      if (chips)
+        chips
+          .querySelectorAll("button")
+          .forEach((b) => b.classList.toggle("valgt", b.dataset.id === aktiv.id));
+      if (valgtAtom !== null && f.atomer[valgtAtom]) {
+        const a = f.atomer[valgtAtom];
+        const type =
+          Math.abs(a.q) < 0.12
+            ? "nesten nøytral"
+            : a.q < 0
+              ? "δ⁻: elektronrik"
+              : "δ⁺: elektronfattig";
+        const rolle = a.a
+          ? " Kan ta imot en hydrogenbinding (akseptor)."
+          : a.d
+            ? " Kan gi en hydrogenbinding (donor)."
+            : "";
+        atomInfo.textContent = `${a.el}: partialladning ≈ ${ladning(a.q)} (${type}).${rolle}`;
+      } else atomInfo.textContent = "Klikk på et atom for å se partialladningen.";
+    }
+
+    if (chips)
+      poster.forEach((m) => {
+        const navn = m.navn.replace(/ \(.*\)$/, "");
+        const b = html`<button class="bk-chip" data-id="${m.id}">${navn}</button>`;
+        b.onclick = () => {
+          aktiv = m;
+          valgtAtom = null;
+          oppdater();
+        };
+        chips.append(b);
+      });
+    kryss.onchange = () => {
+      visSteder = kryss.checked;
+      oppdater();
+    };
+    phInput.addEventListener("input", () => {
+      valgtAtom = null;
+      oppdater();
+    });
+
+    rot.append(
+      ...[chips, svgBoks, legende, atomInfo, stedKnapp, phBoks, forklaring].filter(Boolean),
+    );
+    oppdater();
+    bkTilpass(
+      rot,
+      640,
+      (w) => {
+        bredde = w;
+        oppdater();
+      },
+      invalidation,
+    );
+    return rot;
+  };
+}
+```

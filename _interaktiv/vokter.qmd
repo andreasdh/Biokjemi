@@ -1,0 +1,219 @@
+```{ojs}
+//| echo: false
+// Vokteroppgaven: 4 kriminelle (upolare molekyler) og 20 voktere (vannmolekyler).
+{
+  const W = 640,
+    H = 360,
+    r = 34,
+    RG = 47,
+    gr = 8,
+    TOT = 20,
+    PER = 5;
+  const start = [
+    [110, 100],
+    [260, 260],
+    [430, 95],
+    [540, 250],
+  ];
+  const krim = start.map(([x, y]) => ({ x, y }));
+  const vokt = Array.from({ length: TOT }, (_, i) => ({
+    x: 30 + i * 28,
+    y: 340,
+    fri: false,
+    mx: 0,
+    my: 0,
+  }));
+  let tegnetFri = 0;
+
+  const svgEl = svg`<svg viewBox="0 0 ${W} ${H}" class="bk-vokter" role="img"
+    aria-label="Fire kriminelle og tjue voktere"></svg>`;
+  const lag = (tag, attr) => {
+    const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const [k, v] of Object.entries(attr)) e.setAttribute(k, v);
+    return e;
+  };
+  svgEl.append(
+    lag("rect", { x: 1, y: 1, width: W - 2, height: H - 2, rx: 14, class: "bk-vokter-vann" }),
+  );
+  const voktEl = vokt.map(() => {
+    const c = lag("circle", { cx: 0, cy: 0, r: gr, class: "bk-vokter-v" });
+    svgEl.append(c);
+    return c;
+  });
+  const krimEl = krim.map((k, i) => {
+    const g = lag("g", {
+      class: "bk-vokter-k",
+      tabindex: 0,
+      role: "button",
+      "aria-label": "Kriminell " + (i + 1),
+    });
+    g.append(lag("circle", { cx: 0, cy: 0, r, class: "bk-vokter-krim" }));
+    g.append(lag("text", { x: 0, y: 5, class: "bk-vokter-tekst" }));
+    g.lastChild.textContent = "upolar";
+    svgEl.append(g);
+    return g;
+  });
+
+  const maaler = html`<div class="bk-panel k-blue"></div>`;
+  const knapper = html`<div></div>`;
+
+  function ringPlasser() {
+    const ut = [];
+    krim.forEach((c, i) => {
+      for (let k = 0; k < PER; k++) {
+        const a = (k * 2 * Math.PI) / PER + i * 0.7;
+        const gx = c.x + RG * Math.cos(a),
+          gy = c.y + RG * Math.sin(a);
+        const blokkert = krim.some(
+          (d, j) => j !== i && Math.hypot(gx - d.x, gy - d.y) < r + gr + 1,
+        );
+        if (!blokkert && gx > gr && gx < W - gr && gy > gr && gy < H - gr)
+          ut.push({ x: gx, y: gy });
+      }
+    });
+    const unike = [];
+    ut.forEach((v) => {
+      if (!unike.some((u) => Math.hypot(u.x - v.x, u.y - v.y) < 2 * gr * 1.1)) unike.push(v);
+    });
+    return unike;
+  }
+
+  function nyFriPlass() {
+    for (let t = 0; t < 60; t++) {
+      const x = gr + 6 + Math.random() * (W - 2 * gr - 12),
+        y = gr + 6 + Math.random() * (H - 2 * gr - 12);
+      if (krim.every((c) => Math.hypot(x - c.x, y - c.y) > RG + gr + 8)) return { x, y };
+    }
+    return { x: W / 2, y: H / 2 };
+  }
+
+  function tegn(flytt = true) {
+    const plasser = ringPlasser();
+    const ledig = vokt.map((v, i) => i);
+    const brukt = new Set();
+    plasser.forEach((p) => {
+      let beste = null,
+        bd = 1e9;
+      ledig.forEach((i) => {
+        if (brukt.has(i)) return;
+        const d = Math.hypot(vokt[i].x - p.x, vokt[i].y - p.y) - (vokt[i].fri ? 0 : 100);
+        if (d < bd) {
+          bd = d;
+          beste = i;
+        }
+      });
+      brukt.add(beste);
+      Object.assign(vokt[beste], { x: p.x, y: p.y, fri: false });
+    });
+    vokt.forEach((v, i) => {
+      if (!brukt.has(i)) {
+        if (!v.fri || flytt) {
+          Object.assign(v, nyFriPlass(), { fri: true });
+        }
+      }
+      voktEl[i].style.transform = `translate(${v.x}px, ${v.y}px)`;
+      voktEl[i].setAttribute("class", v.fri ? "bk-vokter-v fri" : "bk-vokter-v");
+    });
+    krim.forEach((k, i) => {
+      krimEl[i].style.transform = `translate(${k.x}px, ${k.y}px)`;
+    });
+    const bundet = plasser.length,
+      fri = TOT - bundet;
+    const kommentar =
+      fri === 0
+        ? "Alle voktere er bundet opp. Vannet har lav entropi."
+        : fri < 6
+          ? "Noen voktere er blitt fri. Entropien i vannet har økt litt."
+          : `Mange voktere er frie. Vannet har mye mer frihet, altså høyere entropi (ΔS > 0),
+             og ΔG blir mer negativ.`;
+    maaler.innerHTML = `<p><strong>${bundet}</strong> voktere må passe på de kriminelle
+      (ordnet vann). <strong>${fri}</strong> voktere kan svirre rundt (fritt vann).</p>
+      <div class="bk-stolpe"><div style="width:${(fri / TOT) * 100}%"></div></div>
+      <p class="bk-hint">${kommentar}</p>`;
+  }
+
+  // dra i de kriminelle
+  krimEl.forEach((g, i) => {
+    let dra = false,
+      dx = 0,
+      dy = 0;
+    const pt = (ev) => {
+      const b = svgEl.getBoundingClientRect();
+      return { x: ((ev.clientX - b.left) / b.width) * W, y: ((ev.clientY - b.top) / b.height) * H };
+    };
+    g.addEventListener("pointerdown", (ev) => {
+      dra = true;
+      g.setPointerCapture(ev.pointerId);
+      const p = pt(ev);
+      dx = krim[i].x - p.x;
+      dy = krim[i].y - p.y;
+      ev.preventDefault();
+    });
+    g.addEventListener("pointermove", (ev) => {
+      if (!dra) return;
+      const p = pt(ev);
+      let x = Math.min(W - r - 2, Math.max(r + 2, p.x + dx)),
+        y = Math.min(H - r - 2, Math.max(r + 2, p.y + dy));
+      krim.forEach((d, j) => {
+        if (j === i) return;
+        const dist = Math.hypot(x - d.x, y - d.y);
+        if (dist < 2 * r) {
+          x = d.x + ((x - d.x) / dist) * 2 * r;
+          y = d.y + ((y - d.y) / dist) * 2 * r;
+        }
+      });
+      krim[i].x = x;
+      krim[i].y = y;
+      tegn(false);
+    });
+    const slipp = () => {
+      dra = false;
+    };
+    g.addEventListener("pointerup", slipp);
+    g.addEventListener("pointercancel", slipp);
+  });
+
+  function animerTil(mal) {
+    const fra = krim.map((k) => ({ x: k.x, y: k.y }));
+    const t0 = performance.now(),
+      varighet = 700;
+    function steg(nå) {
+      const t = Math.min(1, (nå - t0) / varighet),
+        e = t * t * (3 - 2 * t);
+      krim.forEach((k, i) => {
+        k.x = fra[i].x + (mal[i][0] - fra[i].x) * e;
+        k.y = fra[i].y + (mal[i][1] - fra[i].y) * e;
+      });
+      tegn(false);
+      if (t < 1) requestAnimationFrame(steg);
+      else tegn(true);
+    }
+    requestAnimationFrame(steg);
+  }
+  const samle = html`<button class="bk-knapp">Samle de kriminelle</button>`;
+  const spre = html`<button class="bk-knapp">Spre dem</button>`;
+  samle.onclick = () =>
+    animerTil([
+      [320 - r - 0.5, 180 - r - 0.5],
+      [320 + r + 0.5, 180 - r - 0.5],
+      [320 - r - 0.5, 180 + r + 0.5],
+      [320 + r + 0.5, 180 + r + 0.5],
+    ]);
+  spre.onclick = () => animerTil(start);
+  knapper.append(samle, spre);
+
+  tegn(true);
+  const id = setInterval(() => {
+    vokt.forEach((v, i) => {
+      if (v.fri && Math.random() < 0.5) {
+        Object.assign(v, nyFriPlass());
+        voktEl[i].style.transform = `translate(${v.x}px, ${v.y}px)`;
+      }
+    });
+  }, 900);
+  invalidation.then(() => clearInterval(id));
+  return html`<div class="bk-vokter-boks">
+    <p class="bk-hint">Dra i de gule «kriminelle», eller bruk knappene.</p>
+    ${svgEl}${knapper}${maaler}</div>`;
+}
+```

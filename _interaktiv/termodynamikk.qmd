@@ -1,0 +1,179 @@
+```{ojs}
+//| echo: false
+// ΔG = ΔH − TΔS: skyv på ΔH, ΔS og T, og se når en prosess blir spontan.
+{
+  const komma = (x) => String(x).replace(".", ",").replace("-", "−");
+  const heltall = (x) => komma(Math.round(x));
+  const par = (x) => (x < 0 ? "(" + komma(x) + ")" : komma(x));
+  const eksempler = [
+    {
+      navn: "Fett smelter",
+      H: 33,
+      S: 108,
+      T: 298,
+      tekst: `Bryter svake bindinger mellom fettmolekylene (ΔH > 0), men gir mer uorden (ΔS > 0).
+       Ved romtemperatur er TΔS litt for liten til å oppveie ΔH, så fettet er fast. Øk
+       temperaturen og se hvor ΔG krysser null.`,
+    },
+    {
+      navn: "Fett forbrennes",
+      H: -150,
+      S: 50,
+      T: 310,
+      tekst: `Bindinger dannes (ΔH ≪ 0): energien frigjøres som varme. I brunt fettvev brukes
+       dette direkte til å varme kroppen. (Skalert ned. På ekte skala er ΔH flere tusen
+       kJ/mol.)`,
+    },
+    {
+      navn: "Upolare molekyler samles",
+      H: 2,
+      S: 40,
+      T: 310,
+      tekst: `Nesten ingen energi frigjøres, men vannet blir mindre ordnet (ΔS > 0 for
+       systemet totalt). Dette er den hydrofobe effekten: entropidrevet.`,
+    },
+    {
+      navn: "Bygge en DNA-kjede",
+      H: -10,
+      S: -120,
+      T: 310,
+      tekst: `Frie nukleotider blir til én ordnet kjede: entropien synker (ΔS < 0), og ΔG blir
+       positiv. Reaksjonen går ikke av seg selv, og cellen må koble den til en energirik
+       reaksjon (hydrolyse av trifosfat).`,
+    },
+  ];
+  const sH = Inputs.range([-200, 200], { value: 33, step: 1, label: "ΔH (kJ/mol)" });
+  const sS = Inputs.range([-400, 400], { value: 108, step: 1, label: "ΔS (J/(mol·K))" });
+  const sT = Inputs.range([273, 373], { value: 298, step: 1, label: "T (K)" });
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const stolper = html`<div></div>`;
+  const diagram = html`<div></div>`;
+  const panel = html`<div class="bk-panel"></div>`;
+  let valgt = 0;
+  let bredde = 560;
+
+  const G = (H, S, T) => H - (T * S) / 1000;
+
+  function oppdater() {
+    const H = +sH.value,
+      S = +sS.value,
+      T = +sT.value;
+    const g = G(H, S, T),
+      tds = -(T * S) / 1000;
+    // stolper (HTML, slik at de tilpasser seg smale skjermer)
+    const dom = Math.max(30, Math.abs(H), Math.abs(tds), Math.abs(g)) * 1.15;
+    const rad = (navn, verdi, farge) => {
+      const andel = (Math.abs(verdi) / dom) * 50;
+      const stil = verdi >= 0 ? `left:50%;width:${andel}%` : `right:50%;width:${andel}%`;
+      return html`<div class="bk-tg-rad"><span class="bk-tg-navn">${navn}</span>
+        <div class="bk-tg-spor"><div class="bk-tg-midt"></div>
+          <div class="bk-tg-stolpe" style="${stil};background:${farge}"></div></div>
+        <span class="bk-tg-verdi">${komma(verdi.toFixed(1))}</span></div>`;
+    };
+    stolper.replaceChildren(
+      rad("ΔH", H, "#e6b94f"),
+      rad("−TΔS", tds, "#3d7ea6"),
+      rad("ΔG", g, g < 0 ? "#5aa889" : "#d9645a"),
+    );
+
+    // ΔG som funksjon av temperatur
+    const pkt = Array.from({ length: 101 }, (_, i) => ({ T: 273 + i, G: G(H, S, 273 + i) }));
+    const Tm = S !== 0 ? (H * 1000) / S : null;
+    const iOmr = Tm && Tm > 273 && Tm < 373;
+    diagram.replaceChildren(
+      Plot.plot({
+        width: bredde,
+        height: 230,
+        marginLeft: 52,
+        marginBottom: 42,
+        style: { background: "transparent", color: "inherit", fontSize: "12px" },
+        x: { label: "Temperatur (K)", domain: [273, 373] },
+        y: { label: "ΔG (kJ/mol)", grid: true },
+        marks: [
+          Plot.ruleY([0], { stroke: "currentColor", strokeOpacity: 0.6 }),
+          Plot.line(pkt, { x: "T", y: "G", stroke: "#3d7ea6", strokeWidth: 3 }),
+          iOmr
+            ? Plot.ruleX([Tm], { stroke: "#c9962f", strokeDasharray: "4,3", strokeWidth: 2 })
+            : null,
+          iOmr
+            ? Plot.text([{ T: Tm, G: 0 }], {
+                x: "T",
+                y: "G",
+                fontSize: 12,
+                textAnchor: "start",
+                dx: 8,
+                dy: -10,
+                text: () => `ΔG = 0 ved ${heltall(Tm)} K (${heltall(Tm - 273.15)} °C)`,
+              })
+            : null,
+          Plot.dot([{ T, G: g }], {
+            x: "T",
+            y: "G",
+            r: 7,
+            fill: g < 0 ? "#5aa889" : "#d9645a",
+            stroke: "currentColor",
+          }),
+        ].filter(Boolean),
+      }),
+    );
+
+    let spontan = "i likevekt (ΔG ≈ 0)";
+    if (g < -0.05) spontan = "spontan (ΔG < 0)";
+    if (g > 0.05) spontan = "ikke spontan (ΔG > 0)";
+    const hvorfor =
+      H < 0 && S > 0
+        ? "Både energi og uorden drar i riktig retning, så prosessen går ved alle temperaturer."
+        : H > 0 && S < 0
+          ? "Både energi og uorden drar i feil retning, så prosessen går aldri av seg selv."
+          : H < 0 && S < 0
+            ? "Gunstig energi, men tap av uorden: spontan bare ved lav nok temperatur."
+            : H > 0 && S > 0
+              ? "Krever energi, men gir mer uorden: spontan bare ved høy nok temperatur."
+              : "En av leddene er null, så den andre avgjør.";
+    panel.className = "bk-panel k-" + (g < 0 ? "green" : "coral");
+    const eksTekst = valgt !== null ? `<p class="bk-hint">${eksempler[valgt].tekst}</p>` : "";
+    panel.innerHTML = `<h4>ΔG = ΔH − T·ΔS = ${komma(H)} − ${komma(T)} · ${par(S / 1000)}
+      = ${komma(g.toFixed(1))} kJ/mol</h4>
+      <p>Prosessen er <strong>${spontan}</strong> ved ${komma(T)} K
+      (${heltall(T - 273.15)} °C).</p>
+      <p>${hvorfor}</p>${eksTekst}`;
+    chips.querySelectorAll("button").forEach((b, i) => b.classList.toggle("valgt", i === valgt));
+  }
+
+  eksempler.forEach((e, i) => {
+    const b = html`<button class="bk-chip">${e.navn}</button>`;
+    b.onclick = () => {
+      valgt = i;
+      sH.value = e.H;
+      sS.value = e.S;
+      sT.value = e.T;
+      oppdater();
+    };
+    chips.append(b);
+  });
+  [sH, sS, sT].forEach((s) =>
+    s.addEventListener("input", () => {
+      if (valgt !== null) {
+        const e = eksempler[valgt];
+        if (+sH.value !== e.H || +sS.value !== e.S) valgt = null;
+      }
+      oppdater();
+    }),
+  );
+  const rot = html`<div class="bk-tg-boks">
+    <p class="bk-hint">Velg et eksempel, eller still inn verdiene selv. Verdiene er
+      illustrative.</p>
+    ${chips}${sH}${sS}${sT}${stolper}${panel}${diagram}</div>`;
+  oppdater();
+  bkTilpass(
+    rot,
+    560,
+    (w) => {
+      bredde = w;
+      oppdater();
+    },
+    invalidation,
+  );
+  return rot;
+}
+```

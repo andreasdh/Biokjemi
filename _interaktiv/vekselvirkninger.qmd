@@ -1,0 +1,224 @@
+```{ojs}
+//| echo: false
+// Hvem kan binde til hvem? To funksjonelle grupper velges, og reglene for samspillet vises.
+{
+  const grupper = [
+    {
+      id: "alkyl",
+      navn: "Hydrokarbon (–CH₃, –CH₂–)",
+      eks: "alanin, leucin, fettsyrehaler",
+      polar: false,
+      donor: false,
+      akseptor: false,
+      q: 0,
+    },
+    {
+      id: "aromat",
+      navn: "Aromatisk ring (–C₆H₅)",
+      eks: "fenylalanin, basene i DNA",
+      polar: false,
+      donor: false,
+      akseptor: false,
+      q: 0,
+    },
+    {
+      id: "hydroksyl",
+      navn: "Hydroksyl (–OH)",
+      eks: "serin, treonin, sukker",
+      polar: true,
+      donor: true,
+      akseptor: true,
+      q: 0,
+    },
+    {
+      id: "karbonyl",
+      navn: "Karbonyl (C=O i aldehyd/keton)",
+      eks: "pyruvat, åpne sukkerformer",
+      polar: true,
+      donor: false,
+      akseptor: true,
+      q: 0,
+    },
+    {
+      id: "amid",
+      navn: "Amid / peptidbinding (–CO–NH–)",
+      eks: "skjelettet i proteiner",
+      polar: true,
+      donor: true,
+      akseptor: true,
+      q: 0,
+    },
+    {
+      id: "karboksylat",
+      navn: "Karboksylat (–COO⁻)",
+      eks: "aspartat, glutamat",
+      polar: true,
+      donor: false,
+      akseptor: true,
+      q: -1,
+    },
+    {
+      id: "ammonium",
+      navn: "Ammonium (–NH₃⁺)",
+      eks: "lysin, N-terminal",
+      polar: true,
+      donor: true,
+      akseptor: false,
+      q: 1,
+    },
+    {
+      id: "fosfat",
+      navn: "Fosfat (–OPO₃²⁻)",
+      eks: "ryggraden i DNA, ATP",
+      polar: true,
+      donor: false,
+      akseptor: true,
+      q: -2,
+    },
+    {
+      id: "tiol",
+      navn: "Sulfhydryl (–SH)",
+      eks: "cystein",
+      polar: "svak",
+      donor: "svak",
+      akseptor: "svak",
+      q: 0,
+    },
+  ];
+
+  const kortnavn = (g) => g.navn.split(" (")[0];
+
+  function samspill(A, B) {
+    const funn = [];
+    const ion = A.q * B.q;
+    const donorAkseptor = (X, Y) => X.donor === true && Y.akseptor === true;
+    const hb = donorAkseptor(A, B) || donorAkseptor(B, A);
+    const svake = [A.donor, B.donor, A.akseptor, B.akseptor].includes("svak");
+    const svakHb = !hb && svake && A.polar && B.polar;
+
+    if (ion < 0) {
+      const saltbro = hb ? " Sammen med hydrogenbindingen under kalles dette en saltbro." : "";
+      funn.push({
+        type: "Ionebinding",
+        farge: "green",
+        styrke: "ca. 5–25 kJ/mol i vann",
+        tekst: `Motsatte ladninger tiltrekker hverandre. Elektronene er ikke delt, og
+          bindingen er ren elektrostatikk.${saltbro}`,
+      });
+    }
+    if (ion > 0) {
+      funn.push({
+        type: "Frastøtning",
+        farge: "coral",
+        styrke: "ugunstig",
+        tekst: `Like ladninger frastøter hverandre. Slike grupper unngår hverandre, med
+          mindre noe annet (f.eks. et metallion) skjermer ladningene.`,
+      });
+    }
+    if (hb) {
+      const [giver, tar] = donorAkseptor(A, B) ? [A, B] : [B, A];
+      funn.push({
+        type: "Hydrogenbinding",
+        farge: "green",
+        styrke: "ca. 5–30 kJ/mol",
+        tekst: `En δ⁺ H på en donor trekkes mot elektronparene på en akseptor
+          (${kortnavn(giver)} gir H, ${kortnavn(tar)} tar imot).`,
+      });
+    }
+    if (svakHb) {
+      funn.push({
+        type: "Svak polar kontakt",
+        farge: "amber",
+        styrke: "svak",
+        tekst: "S–H er bare svakt polar, så hydrogenbindinger blir svake.",
+      });
+    }
+    if (!ion && !hb && !svakHb && A.polar === true && B.polar === true) {
+      funn.push({
+        type: "Dipol–dipol",
+        farge: "amber",
+        styrke: "svak",
+        tekst: `Begge er polare, men ingen av dem kan gi en H-binding. Delladningene kan
+          likevel tiltrekke hverandre litt.`,
+      });
+    }
+    const upolarPar = A.polar === false && B.polar === false;
+    funn.push({
+      type: "London-krefter",
+      farge: upolarPar ? "amber" : "blue",
+      styrke: "ca. 0,5–4 kJ/mol per kontakt",
+      tekst: upolarPar
+        ? `Det eneste samspillet mellom to upolare grupper. Svakt per kontakt, men mange
+          kontakter gir mye. Det er også her den hydrofobe effekten kommer inn: vann
+          presser upolare grupper sammen.`
+        : `Alle atomer har midlertidige dipoler, så London-krefter finnes alltid, men de
+          er svake.`,
+    });
+    const ettUpolar = (A.polar === false) !== (B.polar === false);
+    if (ettUpolar && !funn.some((f) => ["Ionebinding", "Hydrogenbinding"].includes(f.type))) {
+      funn.push({
+        type: "Ingen gunstig polar kontakt",
+        farge: "coral",
+        styrke: "",
+        tekst: `Den polare gruppen foretrekker vann (H-bindinger og ion–dipol), og den
+          upolare gruppen foretrekker andre upolare grupper.`,
+      });
+    }
+    return funn;
+  }
+
+  const valg = new Map(grupper.map((g) => [g.navn, g.id]));
+  const velgerA = Inputs.select(valg, { value: "karboksylat", label: "Gruppe A" });
+  const velgerB = Inputs.select(valg, { value: "ammonium", label: "Gruppe B" });
+  const resultat = html`<div></div>`;
+
+  function oppdater() {
+    const A = grupper.find((g) => g.id === velgerA.value),
+      B = grupper.find((g) => g.id === velgerB.value);
+    const funn = samspill(A, B);
+    resultat.replaceChildren(
+      ...funn.map(
+        (f) => html`<div class="bk-panel k-${f.farge}">
+      <h4>${f.type} <span class="bk-styrke">${f.styrke}</span></h4><p>${f.tekst}</p></div>`,
+      ),
+    );
+    resultat.append(html`<p class="bk-hint">Husk: i vann må alle disse konkurrere med
+      vannmolekylene, som også kan lage hydrogenbindinger og ion–dipol-interaksjoner. Den reelle
+      gevinsten ved å binde direkte er derfor mindre enn tallene antyder.</p>`);
+  }
+  velgerA.addEventListener("input", oppdater);
+  velgerB.addEventListener("input", oppdater);
+  oppdater();
+
+  // --- Spørsmål fra forelesningen ---
+  const bokser = grupper.map((g) => {
+    const kryss = html`<input type="checkbox">`;
+    return { g, kryss, rad: html`<label class="bk-avkrysning">${kryss} ${g.navn}</label>` };
+  });
+  const svar = html`<div class="bk-hint"></div>`;
+  const sjekk = html`<button class="bk-knapp">Sjekk</button>`;
+  sjekk.onclick = () => {
+    const valgte = bokser.filter((b) => b.kryss.checked).map((b) => b.g.id);
+    const fasit = ["alkyl", "aromat"];
+    const riktig =
+      fasit.every((f) => valgte.includes(f)) &&
+      valgte.every((v) => fasit.includes(v) || v === "tiol");
+    svar.innerHTML = riktig
+      ? `<strong class="rett">✓ Riktig.</strong> Hydrokarbonkjeder og aromatiske ringer har ingen
+         delladninger og kan ikke gi eller ta imot hydrogenbindinger. (Tiolen er et grensetilfelle:
+         S–H er bare svakt polar.)`
+      : `<strong class="feil">Ikke helt.</strong> Tenk på hvilke grupper som mangler både
+         delladninger og full ladning, altså der elektrontettheten er jevnt fordelt. Se på Δχ
+         for
+         bindingene i gruppen.`;
+  };
+
+  return html`<div class="bk-kombo">
+    ${velgerA}${velgerB}${resultat}
+    <h4 class="bk-undertittel">Test deg selv</h4>
+    <p><strong>Hvilke av disse gruppene kan <em>ikke</em> danne polare eller ioniske
+      interaksjoner?</strong></p>
+    ${bokser.map((b) => b.rad)}${sjekk}${svar}
+  </div>`;
+}
+```
