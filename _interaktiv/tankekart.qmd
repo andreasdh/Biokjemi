@@ -4,7 +4,7 @@ emner = [
   {id: "celle", navn: "Cellen og\nmembranene", farge: "blue",
    tekst: "Alt liv er organisert i celler. Vi ser på hvordan cellen er bygget opp, hvordan membraner skiller innsiden fra utsiden, og hvordan celler snakker med omgivelsene sine (biosignalering).",
    ord: ["organeller", "membraner", "transport", "biosignalering"],
-   sporsmal: "Hva ville skjedd hvis alle de kjemiske reaksjonene i kroppen din foregikk i ett eneste "rom"?"},
+   sporsmal: "Hva ville skjedd hvis alle de kjemiske reaksjonene i kroppen din foregikk i ett eneste «rom»?"},
   {id: "biomol", navn: "De fire\nbiomolekylene", farge: "green",
    tekst: "Nukleinsyrer, proteiner, karbohydrater og lipider er livets byggesteiner. Vi ser på hvordan de er bygget opp, og hvorfor akkurat den oppbyggingen gir akkurat den funksjonen.",
    ord: ["nukleinsyrer", "proteiner", "karbohydrater", "lipider"],
