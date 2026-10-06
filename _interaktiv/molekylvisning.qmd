@@ -66,14 +66,14 @@ lagMolekylVisning = {
           s2 = kort(b);
         const offs = orden === 2 ? [-3, 3] : orden === 3 ? [-4, 0, 4] : [0];
         return offs.map(
-          (o) => svg`<line class="bk-binding"
+          (o) => svg`<line class="bk-binding" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
         x1="${x1 + ux * s1 + nx * o}" y1="${y1 + uy * s1 + ny * o}"
         x2="${x2 - ux * s2 + nx * o}" y2="${y2 - uy * s2 + ny * o}"/>`,
         );
       });
 
     const hb = form.hb.map(
-      ([a, b]) => svg`<line class="bk-hb"
+      ([a, b]) => svg`<line class="bk-hb" stroke="#3f8468" stroke-width="2.4" stroke-dasharray="5 4"
       x1="${px(a)}" y1="${py(a)}" x2="${px(b)}" y2="${py(b)}"/>`,
     );
 
@@ -88,20 +88,20 @@ lagMolekylVisning = {
       const tittel = `${a.el}: ${niva} (${ladning(q)})`;
       const delta =
         visDelta && Math.abs(q) >= 0.12 && a.el !== "Na" && a.el !== "Cl"
-          ? svg`<text class="bk-delta" x="${x + 14}" y="${y - 12}"
+          ? svg`<text class="bk-delta" font-size="13" font-weight="700" x="${x + 14}" y="${y - 12}"
               fill="${q < 0 ? NEG : POS}">${q < 0 ? "δ⁻" : "δ⁺"}</text>`
           : null;
       const ring =
         visSteder && (a.a || a.d)
-          ? svg`<circle class="bk-ring" cx="${x}" cy="${y}" r="${a.el === "H" ? 12 : 16}"
+          ? svg`<circle class="bk-ring" fill="none" stroke-width="2.4" cx="${x}" cy="${y}" r="${a.el === "H" ? 12 : 16}"
             stroke="${a.a ? GRONN : GUL}"/>`
           : null;
       const fortegn = a.fq > 0 ? "+" : "−";
-      const fq = a.fq ? svg`<text class="bk-fq" x="${x + 9}" y="${y - 7}">${fortegn}</text>` : null;
+      const fq = a.fq ? svg`<text class="bk-fq" fill="currentColor" font-size="12" x="${x + 9}" y="${y - 7}">${fortegn}</text>` : null;
       const bokstav = merket(i)
-        ? svg`<circle cx="${x}" cy="${y}" r="9.5" class="bk-bak"/>
-              <text class="bk-bokstav" x="${x}" y="${y}" dy="0.35em">${a.el}</text>${fq}`
-        : svg`<circle cx="${x}" cy="${y}" r="3" class="bk-c"/>`;
+        ? svg`<circle cx="${x}" cy="${y}" r="9.5" class="bk-bak" fill="#fff" fill-opacity="0.85"/>
+              <text class="bk-bokstav" fill="currentColor" font-weight="700" font-size="15" text-anchor="middle" x="${x}" y="${y}" dy="0.35em">${a.el}</text>${fq}`
+        : svg`<circle cx="${x}" cy="${y}" r="3" class="bk-c" fill="currentColor" fill-opacity="0.35"/>`;
       const klasse = valgt === i ? "bk-atom valgt" : "bk-atom";
       const g = svg`<g class="${klasse}" tabindex="0"><title>${tittel}</title>
         <circle cx="${x}" cy="${y}" r="20" fill="transparent"/>${ring}${bokstav}${delta}</g>`;
