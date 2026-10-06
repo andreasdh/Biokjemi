@@ -24,3 +24,9 @@ Nye kapitler legges til i `chapters:` i `_quarto.yml`.
 
 Hver push til `main` bygger og publiserer boka via GitHub Actions (`.github/workflows/publish.yml`).
 Slå på én gang: **Settings → Pages → Source: GitHub Actions**.
+
+## Interaktive figurer
+
+Koden til de interaktive figurene (Observable JS) ligger i `_interaktiv/` og hentes inn i kapitlene med
+`{{< include ../_interaktiv/celle.qmd >}}`. Filer og mapper som starter med understrek bygges ikke som egne sider.
+Under bygging kommer det advarsler om «OJS block count mismatch». De er ufarlige og påvirker bare linjenumre i feilmeldinger.

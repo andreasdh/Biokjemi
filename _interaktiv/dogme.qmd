@@ -1,0 +1,86 @@
+```{ojs}
+//| echo: false
+koder = {
+  const baser = "TCAG", aa = "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG";
+  const m = new Map();
+  let i = 0;
+  for (const a of baser) for (const b of baser) for (const c of baser) m.set(a + b + c, aa[i++]);
+  return m;
+}
+
+aaInfo = ({
+  A: ["Ala", "upolar"], V: ["Val", "upolar"], L: ["Leu", "upolar"], I: ["Ile", "upolar"], M: ["Met", "upolar"],
+  F: ["Phe", "upolar"], W: ["Trp", "upolar"], P: ["Pro", "upolar"], G: ["Gly", "upolar"],
+  S: ["Ser", "polar"], T: ["Thr", "polar"], C: ["Cys", "polar"], Y: ["Tyr", "polar"], N: ["Asn", "polar"], Q: ["Gln", "polar"],
+  K: ["Lys", "pluss"], R: ["Arg", "pluss"], H: ["His", "pluss"],
+  D: ["Asp", "minus"], E: ["Glu", "minus"],
+  "*": ["STOPP", "stopp"]
+})
+
+oversett = seq => {
+  const start = seq.indexOf("ATG");
+  if (start < 0) return null;
+  const kodoner = [];
+  for (let i = start; i + 3 <= seq.length; i += 3) kodoner.push(seq.slice(i, i + 3));
+  const aas = kodoner.map(k => koder.get(k));
+  const stopp = aas.indexOf("*");
+  return {start, kodoner, aas, stopp, protein: stopp < 0 ? aas : aas.slice(0, stopp)};
+}
+
+original = "ATGGCTGAATTTAAAGGCTAA"
+```
+
+```{ojs}
+//| echo: false
+viewof eksempel = Inputs.select(new Map([
+  ["Normalt gen (original)", "ATGGCTGAATTTAAAGGCTAA"],
+  ["Stille endring: GCT → GCC", "ATGGCCGAATTTAAAGGCTAA"],
+  ["Én aminosyre byttes: GAA → GTA", "ATGGCTGTATTTAAAGGCTAA"],
+  ["Stoppkodon for tidlig: AAA → TAA", "ATGGCTGAATTTTAAGGCTAA"],
+  ["Én base mangler (rammeskift)", "ATGGCTGATTTAAAGGCTAA"]
+]), {label: "Eksempel"})
+```
+
+```{ojs}
+//| echo: false
+viewof dna = Inputs.text({label: "DNA-sekvens", value: eksempel, width: 480, spellcheck: false, placeholder: "Skriv A, C, G og T"})
+```
+
+```{ojs}
+//| echo: false
+{
+  const seq = dna.toUpperCase().replace(/[^ACGT]/g, "");
+  const r = oversett(seq);
+  if (!r) return html`<p class="bk-hint">Jeg finner ikke noe startkodon (ATG) i sekvensen. Oversettelsen starter alltid ved ATG, som koder for aminosyren metionin.</p>`;
+  const kol = r.kodoner.map((k, i) => {
+    const a = r.aas[i];
+    const [kort, klasse] = aaInfo[a];
+    const etter = r.stopp >= 0 && i > r.stopp;
+    return html`<div class="kol ${etter ? "etter" : ""}"><span>${k}</span><span>${k.replaceAll("T", "U")}</span><span class="aa ${klasse}">${kort}</span></div>`;
+  });
+  const rad = html`<div class="kol rad"><span>DNA</span><span>mRNA</span><span>Protein</span></div>`;
+
+  // Sammenlikn med originalen
+  const o = oversett(original);
+  let melding;
+  const p = r.protein, po = o.protein;
+  const lik = p.length === po.length && p.every((x, i) => x === po[i]);
+  if (seq === original) melding = "Dette er originalsekvensen. Proteinet er Met–Ala–Glu–Phe–Lys–Gly.";
+  else if (lik) melding = "Selv om DNA-sekvensen er endret, blir det akkurat det samme proteinet. Den genetiske koden har flere kodoner per aminosyre, så mange endringer er «stille».";
+  else if (r.stopp < 0) melding = "Her er det ikke noe stoppkodon, så ribosomet ville bare fortsatt å lese. Et ekte protein trenger et sted å stoppe.";
+  else if (p.length < po.length && p.every((x, i) => x === po[i])) melding = "Et stoppkodon kom for tidlig, så proteinet blir kortere enn det skal. Det kalles en nonsens-mutasjon, og ofte blir proteinet ikke funksjonelt.";
+  else if (p.length === po.length && p.filter((x, i) => x !== po[i]).length === 1) {
+    const i = p.findIndex((x, j) => x !== po[j]);
+    melding = `Én aminosyre er byttet ut (plass ${i + 1}: ${aaInfo[po[i]][0]} → ${aaInfo[p[i]][0]}). Av og til er det nok til å endre et proteins funksjon. I hemoglobin gir en lignende utskifting av Glu med Val sigdcelleanemi.`;
+  } else melding = "Her er flere aminosyrer endret. Når en base forsvinner eller kommer til, forskyves hele leserammen, og alle kodonene etter endringen blir lest feil.";
+
+  return html`<div>
+    <div class="bk-dogme">${rad}${kol}</div>
+    <div class="bk-legende">
+      <span class="aa upolar" style="background:#f4dca0">upolar</span><span style="background:#b4dfcd">polar</span>
+      <span style="background:#a9d0e6">positiv</span><span style="background:#f2c3b4">negativ</span><span style="background:#7a95a3;color:#fff">stopp</span>
+    </div>
+    <div class="bk-forklaring">${melding}</div>
+  </div>`;
+}
+```
