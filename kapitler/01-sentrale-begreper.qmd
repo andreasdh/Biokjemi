@@ -13,13 +13,11 @@ Etter dette kapittelet kan du:
 
 :::
 
-Hvordan kan en liten fruktflue, en bakterie og du selv være bygget av nesten de samme molekylene? Og hvordan kan det at du har brune øyne, ligge skrevet i en lang kjede av bare fire ulike byggesteiner?
-
-Før vi dykker ned i detaljene trenger vi et kart. I dette kapittelet får du et overblikk: hva biokjemi egentlig er, hvilke molekyler livet er bygget av, hvordan informasjonen i arvestoffet blir til levende materiale, og hvilke «rom» det hele foregår i. Mye av dette kommer du til å se igjen og igjen, så det gjør ingenting om alt ikke sitter med én gang. Målet nå er å se helheten.
+Før vi dykker ned i detaljene i biokjemi skal vi skaffe oss litt oversikt. I dette kapitlet ser vi på hva biokjemi egentlig er, hvilke molekyler livet er bygget av, hvordan informasjonen i arvestoffet blir til levende materiale, og hvordan livets prosesser organiseres i cellene. Mye av dette kommer du til å se igjen og igjen, så det gjør ingenting om alt ikke sitter med én gang. Målet nå er å se helheten.
 
 ## Kartet over emnet {#sec-kart}
 
-Emnet har mange deler, men de henger tett sammen. Under finner du et tankekart. **Klikk på en av boblene** for å se hva den handler om, og hva du kan begynne å lure på.
+Biokjemi består av mange deler, men de henger tett sammen. Under finner du et tankekart. **Klikk på en av boblene** for å se hva de ulike teamene handler om, og tenk litt over spørsmålet som dukker opp.
 
 {{< include ../_interaktiv/tankekart.qmd >}}
 
@@ -27,10 +25,14 @@ Emnet har mange deler, men de henger tett sammen. Under finner du et tankekart. 
 ## Fire ideer som går igjen
 Hvis du bare skal ta med deg noen få tanker fra hele emnet, så ta med disse:
 
-- **Kjemien i kroppen er den samme kjemien som på laben.** Tidligere trodde man at livet fulgte egne lover. Det gjør det ikke. Det vi kan fra kjemi, gjelder også her.
-- **Regulering og balanse.** Cellen holder hele tiden mange prosesser i likevekt.
-- **Regenerering av energimolekyler.** Viktige molekyler som ATP brukes opp og bygges opp igjen, hele tiden.
-- **Samspillet mellom termodynamikk og kinetikk.** Om noe *kan* skje (spontanitet) er ikke det samme som hvor *fort* det skjer (hastighet).
+1. *Molekylær struktur gir egenskaper som muliggjør biologisk funksjon*
+   Formen, ladningsfordelingen og bevegeligheten til et molekyl påvirker hva det kan gjøre. Dette knytter kjemisk oppbygning til alt fra membraner til enzymkatalyse.
+2. *Biologisk funksjon oppstår gjennom samspill mellom molekyler*
+   Molekyler binder, gjenkjenner og påvirker hverandre gjennom kjemiske vekselvirkninger. Samspillet avhenger av omgivelsene, blant annet pH, temperatur og konsentrasjon.
+3. *Liv er avhengig av energiomsetning og kontroll over kjemiske reaksjoner*
+   Termodynamikk forklarer hvilke prosesser som er gunstige under gitte betingelser, mens kinetikk forklarer hvor raskt de skjer. Reaksjonskobling og enzymer gjør at celler kan drive og regulere nødvendige prosesser.
+4. *Biologiske systemer lagrer, bruker og viderefører informasjon*
+   Informasjon i DNA kommer til uttrykk gjennom RNA og proteiner. Molekylære mekanismer for kopiering, genuttrykk og regulering knytter denne informasjonen til cellens struktur og aktivitet.
 
 Så: tenk konseptuelt, og **tenk kjemi!** Det er ikke meningen at du skal pugge alt. Prøv heller å forstå *hvorfor*.
 
@@ -43,24 +45,29 @@ Så: tenk konseptuelt, og **tenk kjemi!** Det er ikke meningen at du skal pugge 
 
 :::
 
-Det høres kanskje selvsagt ut i dag, men det er ikke så lenge siden dette var en radikal tanke. Lenge trodde man at stoffene i levende organismer var noe helt annet enn «vanlige» stoffer, og at de krevde en egen livskraft for å bli til. Så begynte forskerne å åpne opp, kjemisk analysere og måle. Og gang på gang viste det seg at de samme lovene gjelder inni cellene som i reagensglasset.
+Det høres kanskje selvsagt ut i dag, men det er ikke så lenge siden dette var en radikal tanke. Lenge trodde man at stoffene i levende organismer var noe helt annet enn «vanlige» stoffer, og at de krevde en egen livskraft for å bli til. Etter flere tiår med systematiske eksperimenter viste det seg derimot at de samme lovene gjelder inni cellene som i reagensglasset.
 
-Her er noen av oppdagelsene som har formet faget. **Klikk på et årstall** for å lese mer.
+Her er noen av oppdagelsene som har formet faget gjennom årene. **Klikk på et årstall** for å lese mer.
 
 {{< include ../_interaktiv/tidslinje.qmd >}}
 
 ### Hvordan finner vi ut av det?
 
-Veien fra «hva er dette stoffet?» til «slik ser molekylet ut, atom for atom» går gjennom kjemiske og fysiske metoder. Her er noen av de viktigste. Du møter flere av dem igjen senere.
+Vi bruker mange ulike metoder for å skape ny kunnskap i biokjemi. Relativt enkle forsøksoppsett, med gassoppsamling, veiing og støkiometriske beregninger, står bak historiske bidrag mot å avdekke hvordan levende organismer omsetter ulike stoffer. Ved å undersøke hva som ble forbrukt og dannet, kunne forskere finne mønstre og sammenhenger lenge før de kjente molekylene og mekanismene bak. Ta som eksempel tidlige studier av gjæring, som er en prosess der gjærsopp bruker enzymer til å omdanne sukker til karbondioksid og etanol ved anaerobe forhold. Målinger av hvor mye sukker som ble forbrukt, og hvor mye karbondioksid og etanol som ble dannet, gjorde det mulig å beskrive en samlet stoffomsetning lenge før enzymene og reaksjonstrinnene var kjent.
+
+Nå har vi derimot mange avanserte metoder vi kan bruke 
 
 | Metode | Hva forteller den oss? |
 |---|---|
-| **Røntgenkrystallografi** | 3D-struktur til molekyler som er krystallisert. Brukt for DNA, myoglobin og tusenvis av proteiner siden. |
-| **NMR-spektroskopi** | Struktur og bevegelse til molekyler i løsning. |
-| **Kryo-elektronmikroskopi** | Strukturen til store molekylære komplekser, fryst ned og avbildet. Nobelprisen i kjemi 2017. |
-| **Massespektrometri** | Hvilke molekyler som finnes i en prøve, og hvor tunge de er. |
+| **Røntgenkrystallografi** | 3D-struktur til molekyler som er krystallisert. Har gitt strukturen til blant annet DNA, myoglobin og tusenvis av andre biomolekyler. |
+| **NMR-spektroskopi** | Struktur og bevegelse til biomolekyler, blant annet i løsning. |
+| **Kryo-elektronmikroskopi** | 3D-struktur til blant annet store molekylære komplekser ved avbildning av hurtigfryste prøver. |
+| **Massespektrometri** | Måler ioners masse–ladningsforhold og kan brukes til å identifisere og mengdebestemme molekyler i en prøve. |
 | **DNA-sekvensering** | Rekkefølgen av basene i DNA. |
-| **Beregninger og kunstig intelligens** | Forutsigelse av proteinstruktur fra aminosyresekvens (AlphaFold). |
+| **UV–Vis- og fluorescensspektroskopi** | Konsentrasjoner og endringer i molekylenes omgivelser. Kan brukes til å følge reaksjoner, enzymkinetikk og undersøke molekylært samspill. |
+| **Kromatografi og elektroforese** | Skiller molekyler etter egenskaper som størrelse, ladning og binding til en stasjonær fase. Brukes til å analysere eller rense bestanddelene i en prøve. |
+| **Kalorimetri** | Varme som tas opp eller avgis ved for eksempel molekylær binding og utfolding av proteiner. Gir innsikt i prosessenes termodynamikk. |
+| **Beregninger og kunstig intelligens** | Forutsier strukturer og egenskaper, blant annet proteinstruktur med AlphaFold, og simulerer molekylers bevegelse og vekselvirkninger. Gir modeller som kan testes mot eksperimentelle data. |
 
 : Noen sentrale metoder i biokjemi {.striped}
 
@@ -72,7 +79,7 @@ Hver av disse metodene gir oss en liten brikke. Biokjemi blir først for alvor s
 
 ## Livets byggesteiner {#sec-byggesteiner}
 
-Se på kroppen din som en kjemiker. Noen få grunnstoffer gjør nesten hele jobben: **hydrogen, oksygen og karbon** utgjør rundt 98 % av atomene i kroppen din. Legger vi til nitrogen, fosfor og svovel, har vi nesten alt.
+I kroppen din gjør noen få grunnstoffer nesten hele jobben: **hydrogen, oksygen og karbon** utgjør rundt 98 % av atomene i kroppen din. Legger vi til nitrogen, fosfor og svovel, har vi nesten alt.
 
 Disse atomene er ikke tilfeldig blandet. De er satt sammen til fire hovedtyper **biomolekyler**:
 
@@ -139,13 +146,13 @@ Nå er det din tur. Hvilken gruppe hører hvert molekyl til? Noen er enkle, og n
 
 ::: {.callout-note}
 ## Hva med ATP?
-ATP er cellens «energivaluta». Det er et *nukleotid*, den samme typen byggestein som finnes i RNA, men ett enkelt ATP-molekyl er ikke en nukleinsyre (som er en lang *kjede* av nukleotider). Det er et godt eksempel på at kategoriene våre er praktiske, men at naturen ikke alltid følger skuffene våre.
+ATP er cellens «energivaluta». Det er et *nukleotid*, den samme typen byggestein som finnes i RNA, men ett enkelt ATP-molekyl er ikke en nukleinsyre (som er en lang *kjede* av nukleotider). Det er et godt eksempel på at kategoriene våre er praktiske, men at naturen ikke alltid følger kategoriene våre perfekt.
 
 :::
 
 ## Det sentrale dogmet {#sec-dogme}
 
-Nå vet vi hva molekylene er. Men hvordan vet cellen hvilke proteiner den skal lage? Svaret ligger i et av biologiens viktigste prinsipper:
+Nå har vi sett helt overordnet på de ulike biomolekylene. Men hvordan vet cellen hvordan vi skal bli den vi er? Svaret ligger i et av biologiens viktigste prinsipper:
 
 ::: {.nokkelpunkt}
 **Det sentrale dogmet:** Informasjon flyter fra **DNA → RNA → protein**.
@@ -154,8 +161,8 @@ Nå vet vi hva molekylene er. Men hvordan vet cellen hvilke proteiner den skal l
 
 Tenk på cellen som et kjøkken, og på DNA som en enorm kokebok som oppbevares i et bibliotek (cellekjernen).
 
-- **Replikering** (DNA → DNA): Før en celle deler seg, kopieres hele kokeboka, slik at begge de nye cellene får hver sin.
-- **Transkripsjon** (DNA → RNA): Du skriver av *én* oppskrift fra kokeboka. Kopien er et RNA-molekyl som kan tas med ut av biblioteket.
+- **Replikering** (DNA → DNA): Før en celle deler seg, kopieres hele kokeboka, slik at begge de nye cellene får hver sin kopi av alle oppskriftene.
+- **Transkripsjon** (DNA → RNA): *Én* oppskrift fra kokeboka blir skrevet av. Kopien er et RNA-molekyl som kan tas med ut av biblioteket.
 - **Translasjon** (RNA → protein): På kjøkkenet bruker du oppskriften til å lage selve retten. Ribosomene leser RNA-et og setter sammen aminosyrer til et protein.
 
 En oppskrift kalles et **gen**, og alle genene til en organisme kalles **genomet**. Nesten alle cellene dine har *samme* genom, men ulike celler slår opp på ulike sider. Derfor er en hjertecelle og en nervecelle så forskjellige, selv om de har den samme kokeboka.
@@ -168,7 +175,7 @@ Under kan du se hva som skjer med en kort DNA-sekvens. Hver gruppe på tre baser
 
 ::: {.callout-note}
 ## Litt nøyaktighet
-Her skriver vi inn den ene DNA-tråden (den *kodende* tråden), slik biologer vanligvis gjør. Cellen leser egentlig den komplementære tråden (*malstrengen*), og resultatet blir et mRNA som har *samme* rekkefølge som den kodende tråden, bare med U i stedet for T.
+Her skriver vi inn den ene DNA-tråden (den *kodende* tråden). Cellen leser egentlig den komplementære tråden, og resultatet blir et mRNA som har *samme* rekkefølge som den kodende tråden, bare med U i stedet for T. Dette skal vi se på mer i detalj seinere.
 
 Dogmet sier heller ikke at all informasjon bare går én vei. Noen virus kan for eksempel lage DNA fra RNA. Poenget er at informasjon ikke går tilbake *fra protein* til nukleinsyre.
 
@@ -178,7 +185,7 @@ Dogmet sier heller ikke at all informasjon bare går én vei. Noen virus kan for
 
 Alt dette skjer i **cellen**, livets grunnenhet. Celler vokser, deler seg og samhandler med omgivelsene sine. Noen organismer er bare én enkelt celle, mens kroppen din består av omtrent 40 billioner (4·10¹³) av dem.
 
-Hver celle er avgrenset av en **membran**, som skiller innsiden fra utsiden. Husker du lipidene? Membranen er et **lipid-dobbeltlag**, og det er her fosfolipidene fra figuren over gjør jobben sin.
+Hver celle er avgrenset av en **membran**, som skiller innsiden fra utsiden. Membranen er et **lipid-dobbeltlag**, og det er her fosfolipidene gjør jobben sin.
 
 ### To hovedtyper celler
 
@@ -194,27 +201,26 @@ Eukaryote celler er mer komplekse, og membraner beskytter også indre deler. Cel
 
 ### Utforsk cellen {#sec-celle-utforsk}
 
-**Velg celletype, og klikk deretter på delene** for å se hva de gjør. Tegningene er forenklet og ikke i riktig målestokk.
+**Velg celletype, og klikk deretter på delene** for å se hva de gjør. Modellene er svært forenklet og ikke i riktig målestokk.
 
 {{< include ../_interaktiv/celle.qmd >}}
 
 ### Hvorfor deler vi opp cellen? {#sec-kompartment}
 
-Tenk på et hjem. Ville det vært smart å ha do og kjøkken i samme rom? Neppe. Ulike rom har ulike oppgaver og ulike «regler», og det som skjer i det ene, forstyrrer ikke det andre.
+Tenk på der du bor. Ville det vært smart å ha do og kjøkken i samme rom? Neppe. Håper ikke du har det. Ulike rom har nemlig ulike oppgaver og ulike «regler», og det som skjer i det ene, forstyrrer ikke det andre.
 
-Cellen gjør det samme, og dette kalles **kompartmentalisering**. Cellekjernen beskytter og forvalter arvestoffet. Lysosomene har et surt miljø som kan bryte ned det meste, og det er bra at dette skjer *innpakket*. Mitokondriene har sitt eget miljø der energiproduksjonen kan foregå effektivt.
+Cellen gjør det samme, og dette kalles **kompartmentalisering**. Cellekjernen beskytter og forvalter arvestoffet. Lysosomene har et surt miljø som kan bryte ned de fleste molekyler, og det er bra at dette skjer *innpakket*. Mitokondriene har sitt eget miljø der energiproduksjonen kan foregå effektivt.
 
-Følg et protein fra start til slutt, og du har et fint bilde på hvordan alt henger sammen:
+Følg et eksempelprotein fra start til slutt, og du har et fint bilde på hvordan alt henger sammen:
 
 1. Genet *transkriberes* til mRNA i **kjernen**.
 2. mRNA forlater kjernen gjennom en pore og møter et **ribosom**.
-3. Ribosomet *translaterer* mRNA til et protein. Hvis proteinet skal ut av cellen, skjer dette ved det **ru ER**, der proteinet foldes og modifiseres.
-4. Proteinet pakkes i en **vesikkel** og sendes til **Golgi**, der det får sukkergrupper og sorteres.
-5. Nye vesikler fører proteinet til **plasmamembranen**, og med eksocytose slippes det ut av cellen.
+3. Ribosomet *translaherer* mRNA til et protein. Hvis proteinet skal ut av cellen, skjer dette ved det **ru ER**, der proteinet foldes og modifiseres.
+4. Proteinet pakkes i en **vesikkel** og sendes til **Golgi**, der det blir modifisert med sukkergrupper.
+5. Nye vesikler fører proteinet til **plasmamembranen**, og med eksocytose (sammensmelting av vesiklene med cellemembranen) slippes det ut av cellen.
 
 ## Oppsummering {#sec-oppsummering}
 
-- Noen få atomtyper (**hydrogen, oksygen og karbon**) står for det meste av livets oppbygning, rundt 98 % av atomene.
 - Det finnes fire hovedtyper biomolekyler: **proteiner, nukleinsyrer, lipider og karbohydrater**.
 - **Det sentrale dogmet:** informasjon flyter fra DNA via RNA til protein.
 - **Membraner** definerer cellen. Det finnes to typer celler: **prokaryoter** og **eukaryoter**.
@@ -236,7 +242,7 @@ Proteiner, nukleinsyrer, lipider og karbohydrater. Proteiner har amino- og karbo
 
 ::: {.callout-tip collapse="true"}
 ## Svarforslag
-Vann, ioner (Na⁺, K⁺, Ca²⁺ …), mange vitaminer og små mellomprodukter i metabolismen. Også ATP, som er et enkelt nukleotid og ikke en nukleinsyre.
+Vann, ioner (Na⁺, K⁺, Ca²⁺ …), mange vitaminer og små mellomprodukter i metabolismen. Og ATP, som er et enkelt nukleotid og ikke en nukleinsyre.
 
 :::
 
@@ -248,9 +254,9 @@ Lipider. Kolesterol er stort sett hydrofobt, det er ikke en polymer, og det er e
 
 :::
 
-**Oppgave 4.** Hva er forskjellen på replikering, transkripsjon og translasjon? Bruk kokebokanalogien.
+**Oppgave 4.** Hva er forskjellen på replikering, transkripsjon og translasjon? Bruk gjerne kokebokanalogien!
 
-**Oppgave 5.** Bruk simulatoren: Finn en endring i DNA-sekvensen som *ikke* endrer proteinet. Hvorfor er dette mulig?
+**Oppgave 5.** Bruk simulatoren ovenfor der du kunne skrive inn en genetisk kode og få ut aminosyresekvensen: Finn en endring i DNA-sekvensen som *ikke* endrer proteinet. Hvorfor er dette mulig?
 
 ::: {.callout-tip collapse="true"}
 ## Svarforslag
@@ -266,4 +272,4 @@ I eukaryoter foregår replikering og transkripsjon i cellekjernen, mens translas
 
 :::
 
-**Oppgave 7.** Forklar med egne ord hvorfor det er en fordel for cellen å ha organeller. Bruk gjerne en analogi fra et hjem.
+**Oppgave 7.** Forklar med egne ord hvorfor det er en fordel for cellen å ha organeller.

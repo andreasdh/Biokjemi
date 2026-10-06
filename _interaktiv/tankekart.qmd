@@ -4,23 +4,23 @@ emner = [
   {id: "celle", navn: "Cellen og\nmembranene", farge: "blue",
    tekst: "Alt liv er organisert i celler. Vi ser på hvordan cellen er bygget opp, hvordan membraner skiller innsiden fra utsiden, og hvordan celler snakker med omgivelsene sine (biosignalering).",
    ord: ["organeller", "membraner", "transport", "biosignalering"],
-   sporsmal: "Hva ville skjedd hvis alle de kjemiske reaksjonene i kroppen din foregikk i ett eneste rom?"},
+   sporsmal: "Hva ville skjedd hvis alle de kjemiske reaksjonene i kroppen din foregikk i ett eneste "rom"?"},
   {id: "biomol", navn: "De fire\nbiomolekylene", farge: "green",
    tekst: "Nukleinsyrer, proteiner, karbohydrater og lipider er livets byggesteiner. Vi ser på hvordan de er bygget opp, og hvorfor akkurat den oppbyggingen gir akkurat den funksjonen.",
    ord: ["nukleinsyrer", "proteiner", "karbohydrater", "lipider"],
-   sporsmal: "Hva har sukker, fett og DNA felles, og hva skiller dem?"},
+   sporsmal: "Hva har sukker, fett og DNA til felles, og hva skiller dem?"},
   {id: "protein", navn: "Proteiner:\nstruktur og funksjon", farge: "amber",
    tekst: "Proteiner er de mest allsidige molekylene i cellen. Vi starter med aminosyrene, følger kjeden helt til den ferdige 3D-strukturen, og ser hvordan formen avgjør hva proteinet kan gjøre.",
    ord: ["aminosyrer", "peptidbinding", "foldning", "3D-struktur"],
-   sporsmal: "Hvordan kan en kjede av bare 20 ulike byggesteiner bli til alt fra muskler til antistoffer?"},
+   sporsmal: "Hvordan kan en kjede av bare 20 ulike byggesteiner bli til alt fra muskler til enzymer og antistoffer?"},
   {id: "enzym", navn: "Enzymer og\nkatalyse", farge: "coral",
    tekst: "Reaksjoner som ellers ville tatt år, skjer på sekunder. Vi ser på hvordan enzymer virker, hva som skjer i det aktive setet, og hvordan vi beskriver og måler hastigheten (kinetikk).",
    ord: ["katalyse", "aktivt sete", "kinetikk", "regulering"],
-   sporsmal: "Hvorfor kan kroppen bryte ned maten ved 37 °C, når man i et laboratorium trenger sterke syrer og høy temperatur?"},
+   sporsmal: "Hvorfor kan kroppen bryte ned maten ved 37 °C, når vi i et laboratorium trenger sterke syrer og høy temperatur?"},
   {id: "gen", navn: "Fra gen\ntil egenskap", farge: "blue",
    tekst: "Arvestoffet vårt bestemmer egenskapene våre gjennom proteiner. Vi følger informasjonen fra DNA via RNA til protein.",
    ord: ["DNA", "RNA", "genuttrykk", "mutasjoner"],
-   sporsmal: "Hvordan kan én endret base i DNA gi en sykdom?"},
+   sporsmal: "Hvordan kan én endret base i DNA gi en livsfarlig sykdom?"},
   {id: "metab", navn: "Metabolisme:\nenergi og omsetning", farge: "green",
    tekst: "Cellene bryter ned drivstoff og bygger opp nye molekyler. Vi ser på hovedtrekkene: hvordan energi hentes ut, lagres i ATP og brukes igjen.",
    ord: ["ATP", "nedbrytning", "oppbygging", "regulering"],
@@ -30,7 +30,7 @@ emner = [
    ord: ["proteinkjemi", "enzymkinetikk", "enkel statistikk", "labrapport"],
    sporsmal: "Hvordan kan vi studere molekyler som er mye mindre enn bølgelengden til synlig lys?"},
   {id: "kjemi", navn: "Rød tråd:\nkjemiske prinsipper", farge: "coral",
-   tekst: "Under alt dette ligger grunnleggende kjemi: bindinger og molekylære vekselvirkninger, elektrontetthet, termodynamikk og kinetikk. Det er den samme kjemien som du kjenner fra laben, og den går igjen og igjen.",
+   tekst: "Under alt dette ligger grunnleggende kjemi: bindinger og molekylære vekselvirkninger, elektrontetthet, termodynamikk og kinetikk. Det er den samme kjemien som du kjenner fra andre emner, og den går igjen og igjen.",
    ord: ["vekselvirkninger", "elektrontetthet", "termodynamikk", "kinetikk"],
    sporsmal: "Hva avgjør om en reaksjon kan skje, og hva avgjør hvor fort den går?"}
 ]
@@ -83,7 +83,7 @@ viewof valgtEmne = {
     <h4>${e.navn.replace("\n", " ")}</h4>
     <p>${e.tekst}</p>
     <div class="bk-chips">${e.ord.map(o => html`<span>${o}</span>`)}</div>
-    <p><strong>Å lure på:</strong> ${e.sporsmal}</p>
+    <p><strong>Tenk etter:</strong> ${e.sporsmal}</p>
   </div>`;
 }
 ```

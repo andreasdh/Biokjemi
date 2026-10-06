@@ -5,7 +5,7 @@ sorteringer = [
   {navn: "DNA", fasit: "Nukleinsyre", forkl: "Lang kjede av nukleotider som lagrer arvestoffet."},
   {navn: "Glykogen", fasit: "Karbohydrat", forkl: "Forgrenet kjede av glukose. Energilager i lever og muskler."},
   {navn: "Cellulose", fasit: "Karbohydrat", forkl: "Planters byggemateriale er også en kjede av glukose, koblet litt annerledes enn i stivelse."},
-  {navn: "Kolesterol", fasit: "Lipid", forkl: "Vannfryktende, ikke en polymer, og en del av membraner. Hører til lipidene (et steroid)."},
+  {navn: "Kolesterol", fasit: "Lipid", forkl: "Hydrofob, ikke en polymer, og en del av membraner. Hører til lipidene (et steroid)."},
   {navn: "Insulin", fasit: "Protein", forkl: "Et hormon som er et lite protein."},
   {navn: "mRNA", fasit: "Nukleinsyre", forkl: "Kjede av nukleotider, med baser som A, U, C og G."},
   {navn: "Fosfolipid", fasit: "Lipid", forkl: "Hydrofilt hode og hydrofobe haler. Grunnsteinen i membraner."},
