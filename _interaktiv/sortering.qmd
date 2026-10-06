@@ -1,0 +1,52 @@
+```{ojs}
+//| echo: false
+sorteringer = [
+  {navn: "Hemoglobin", fasit: "Protein", forkl: "Oksygenbæreren i blodet, et protein bygd av aminosyrer."},
+  {navn: "DNA", fasit: "Nukleinsyre", forkl: "Lang kjede av nukleotider som lagrer arvestoffet."},
+  {navn: "Glykogen", fasit: "Karbohydrat", forkl: "Forgrenet kjede av glukose. Energilager i lever og muskler."},
+  {navn: "Cellulose", fasit: "Karbohydrat", forkl: "Planters byggemateriale er også en kjede av glukose, koblet litt annerledes enn i stivelse."},
+  {navn: "Kolesterol", fasit: "Lipid", forkl: "Vannfryktende, ikke en polymer, og en del av membraner. Hører til lipidene (et steroid)."},
+  {navn: "Insulin", fasit: "Protein", forkl: "Et hormon som er et lite protein."},
+  {navn: "mRNA", fasit: "Nukleinsyre", forkl: "Kjede av nukleotider, med baser som A, U, C og G."},
+  {navn: "Fosfolipid", fasit: "Lipid", forkl: "Hydrofilt hode og hydrofobe haler. Grunnsteinen i membraner."},
+  {navn: "Stivelse", fasit: "Karbohydrat", forkl: "Planters energilager, en kjede av glukose."},
+  {navn: "Testosteron", fasit: "Lipid", forkl: "Et steroidhormon, og steroider regnes som lipider."},
+  {navn: "Vann", fasit: "Ingen av disse", forkl: "Det aller viktigste molekylet for livet, men vann er et lite uorganisk molekyl og ikke en av de fire gruppene."},
+  {navn: "Natriumion (Na⁺)", fasit: "Ingen av disse", forkl: "Ioner og små molekyler er ikke biomolekylene vi snakker om her, men livet trenger dem i bøtter og spann."}
+]
+```
+
+```{ojs}
+//| echo: false
+{
+  const valg = ["(velg)", "Protein", "Nukleinsyre", "Lipid", "Karbohydrat", "Ingen av disse"];
+  const rader = sorteringer.map(s => {
+    const sel = html`<select>${valg.map(v => html`<option>${v}</option>`)}</select>`;
+    const resultat = html`<td class="forkl"></td>`;
+    return {s, sel, resultat, rad: html`<tr><td>${s.navn}</td><td>${sel}</td>${resultat}</tr>`};
+  });
+  const poeng = html`<p></p>`;
+  const sjekk = html`<button class="bk-knapp">Sjekk svarene</button>`;
+  const nullstill = html`<button class="bk-knapp">Nullstill</button>`;
+  sjekk.onclick = () => {
+    let riktig = 0;
+    rader.forEach(r => {
+      const v = r.sel.value;
+      if (v === "(velg)") { r.resultat.innerHTML = ""; return; }
+      const ok = v === r.s.fasit;
+      if (ok) riktig++;
+      r.resultat.innerHTML = `<span class="${ok ? "rett" : "feil"}">${ok ? "✓ Riktig." : "✗ Det er " + r.s.fasit.toLowerCase() + "."}</span> ${r.s.forkl}`;
+    });
+    poeng.textContent = `Du har ${riktig} av ${rader.length} riktige.`;
+  };
+  nullstill.onclick = () => {
+    rader.forEach(r => { r.sel.value = "(velg)"; r.resultat.innerHTML = ""; });
+    poeng.textContent = "";
+  };
+  return html`<div class="bk-quiz">
+    <table class="table"><thead><tr><th>Molekyl</th><th>Gruppe</th><th>Tilbakemelding</th></tr></thead>
+    <tbody>${rader.map(r => r.rad)}</tbody></table>
+    ${sjekk}${nullstill}${poeng}
+  </div>`;
+}
+```

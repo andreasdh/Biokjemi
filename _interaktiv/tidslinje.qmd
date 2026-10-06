@@ -1,0 +1,44 @@
+```{ojs}
+//| echo: false
+hendelser = [
+  {aar: 1828, tittel: "Wöhler lager urea", tekst: "Friedrich Wöhler fremstiller urea, et stoff som finnes i urin, fra uorganiske startstoffer. Det viser at molekylene i levende organismer ikke trenger noen mystisk «livskraft». De følger vanlig kjemi."},
+  {aar: 1869, tittel: "Nuklein", tekst: "Friedrich Miescher isolerer et fosforrikt stoff fra cellekjerner i hvite blodceller og kaller det nuklein. Dette er det vi i dag kaller DNA."},
+  {aar: 1897, tittel: "Gjæring uten levende celler", tekst: "Eduard Buchner viser at gjæring av sukker kan skje i et ekstrakt uten levende celler. Det er molekyler, enzymer, og ikke «livet selv» som gjør jobben."},
+  {aar: 1926, tittel: "Enzymer er proteiner", tekst: "James Sumner krystalliserer enzymet urease og viser at det er et protein. Enzymer er altså vanlige molekyler som vi kan rense, krystallisere og studere."},
+  {aar: 1944, tittel: "DNA er arvestoffet", tekst: "Oswald Avery, Colin MacLeod og Maclyn McCarty viser at det er DNA, og ikke proteiner, som bærer arvestoffet."},
+  {aar: 1953, tittel: "Dobbelthelikset", tekst: "James Watson og Francis Crick foreslår strukturen til DNA, bygd på røntgendata fra blant andre Rosalind Franklin og Maurice Wilkins. Strukturen avslører umiddelbart hvordan DNA kan kopieres."},
+  {aar: 1958, tittel: "Første proteinstruktur", tekst: "John Kendrew løser 3D-strukturen til myoglobin med røntgenkrystallografi. For første gang ser vi et protein atom for atom."},
+  {aar: 1966, tittel: "Den genetiske koden", tekst: "Den genetiske koden er knekt: hvilke tre baser som koder for hvilken aminosyre. Dette er sentralt for hvordan arvestoffet blir til proteiner (se «Det sentrale dogmet» lenger ned)."},
+  {aar: 1977, tittel: "DNA-sekvensering", tekst: "Frederick Sanger utvikler en metode for å lese rekkefølgen av basene i DNA."},
+  {aar: 1985, tittel: "PCR", tekst: "Med PCR (polymerasekjedereaksjon), utviklet av Kary Mullis og kolleger, kan en liten bit DNA kopieres millioner av ganger i et rør."},
+  {aar: 2003, tittel: "Menneskets genom", tekst: "Det humane genomet er sekvensert: omtrent tre milliarder basepar."},
+  {aar: 2024, tittel: "Nobelprisen i kjemi", tekst: "David Baker får prisen for å designe helt nye proteiner, og Demis Hassabis og John Jumper for AlphaFold, som bruker kunstig intelligens til å forutsi 3D-strukturen til et protein fra aminosyrerekkefølgen."}
+]
+```
+
+```{ojs}
+//| echo: false
+viewof valgtAar = {
+  const r = Inputs.radio(hendelser.map(h => h.aar), {value: 1953, format: x => String(x)});
+  r.classList.add("bk-tid");
+  return r;
+}
+```
+
+```{ojs}
+//| echo: false
+{
+  const h = hendelser.find(d => d.aar === valgtAar);
+  const plott = Plot.plot({
+    height: 80, marginLeft: 20, marginRight: 20, marginTop: 10, marginBottom: 28,
+    style: {background: "transparent", color: "inherit", fontSize: "12px"},
+    x: {domain: [1815, 2035], tickFormat: "d", label: null, ticks: [1850, 1900, 1950, 2000]},
+    y: {axis: null, domain: [-1, 1]},
+    marks: [
+      Plot.ruleY([0], {stroke: "currentColor", strokeOpacity: 0.3}),
+      Plot.dot(hendelser, {x: "aar", y: 0, r: d => d.aar === valgtAar ? 10 : 5, fill: d => d.aar === valgtAar ? "#5aa889" : "#3d7ea6"})
+    ]
+  });
+  return html`<div>${plott}<div class="bk-panel k-green"><h4>${h.aar}: ${h.tittel}</h4><p>${h.tekst}</p></div></div>`;
+}
+```

@@ -1,0 +1,89 @@
+```{ojs}
+//| echo: false
+emner = [
+  {id: "celle", navn: "Cellen og\nmembranene", farge: "blue",
+   tekst: "Alt liv er organisert i celler. Vi ser på hvordan cellen er bygget opp, hvordan membraner skiller innsiden fra utsiden, og hvordan celler snakker med omgivelsene sine (biosignalering).",
+   ord: ["organeller", "membraner", "transport", "biosignalering"],
+   sporsmal: "Hva ville skjedd hvis alle de kjemiske reaksjonene i kroppen din foregikk i ett eneste rom?"},
+  {id: "biomol", navn: "De fire\nbiomolekylene", farge: "green",
+   tekst: "Nukleinsyrer, proteiner, karbohydrater og lipider er livets byggesteiner. Vi ser på hvordan de er bygget opp, og hvorfor akkurat den oppbyggingen gir akkurat den funksjonen.",
+   ord: ["nukleinsyrer", "proteiner", "karbohydrater", "lipider"],
+   sporsmal: "Hva har sukker, fett og DNA felles, og hva skiller dem?"},
+  {id: "protein", navn: "Proteiner:\nstruktur og funksjon", farge: "amber",
+   tekst: "Proteiner er de mest allsidige molekylene i cellen. Vi starter med aminosyrene, følger kjeden helt til den ferdige 3D-strukturen, og ser hvordan formen avgjør hva proteinet kan gjøre.",
+   ord: ["aminosyrer", "peptidbinding", "foldning", "3D-struktur"],
+   sporsmal: "Hvordan kan en kjede av bare 20 ulike byggesteiner bli til alt fra muskler til antistoffer?"},
+  {id: "enzym", navn: "Enzymer og\nkatalyse", farge: "coral",
+   tekst: "Reaksjoner som ellers ville tatt år, skjer på sekunder. Vi ser på hvordan enzymer virker, hva som skjer i det aktive setet, og hvordan vi beskriver og måler hastigheten (kinetikk).",
+   ord: ["katalyse", "aktivt sete", "kinetikk", "regulering"],
+   sporsmal: "Hvorfor kan kroppen bryte ned maten ved 37 °C, når man i et laboratorium trenger sterke syrer og høy temperatur?"},
+  {id: "gen", navn: "Fra gen\ntil egenskap", farge: "blue",
+   tekst: "Arvestoffet vårt bestemmer egenskapene våre gjennom proteiner. Vi følger informasjonen fra DNA via RNA til protein.",
+   ord: ["DNA", "RNA", "genuttrykk", "mutasjoner"],
+   sporsmal: "Hvordan kan én endret base i DNA gi en sykdom?"},
+  {id: "metab", navn: "Metabolisme:\nenergi og omsetning", farge: "green",
+   tekst: "Cellene bryter ned drivstoff og bygger opp nye molekyler. Vi ser på hovedtrekkene: hvordan energi hentes ut, lagres i ATP og brukes igjen.",
+   ord: ["ATP", "nedbrytning", "oppbygging", "regulering"],
+   sporsmal: "Hvorfor puster vi, og hva skjer egentlig med maten du spiser?"},
+  {id: "metode", navn: "Metoder og\nlaboratoriet", farge: "amber",
+   tekst: "Hvordan vet vi alt dette? Vi ser på eksperimentelle teknikker for å studere og karakterisere biomolekyler, og du får prøve noen av dem selv i laben.",
+   ord: ["proteinkjemi", "enzymkinetikk", "enkel statistikk", "labrapport"],
+   sporsmal: "Hvordan kan vi studere molekyler som er mye mindre enn bølgelengden til synlig lys?"},
+  {id: "kjemi", navn: "Rød tråd:\nkjemiske prinsipper", farge: "coral",
+   tekst: "Under alt dette ligger grunnleggende kjemi: bindinger og molekylære vekselvirkninger, elektrontetthet, termodynamikk og kinetikk. Det er den samme kjemien som du kjenner fra laben, og den går igjen og igjen.",
+   ord: ["vekselvirkninger", "elektrontetthet", "termodynamikk", "kinetikk"],
+   sporsmal: "Hva avgjør om en reaksjon kan skje, og hva avgjør hvor fort den går?"}
+]
+```
+
+```{ojs}
+//| echo: false
+viewof valgtEmne = {
+  const W = 640, H = 450, cx = W / 2, cy = H / 2, rx = 230, ry = 175;
+  const noder = emner.map((e, i) => {
+    const a = -Math.PI / 2 + (i * 2 * Math.PI) / emner.length;
+    return {...e, x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a)};
+  });
+  const rot = svg`<svg viewBox="0 0 ${W} ${H}" class="bk-tankekart" role="group" aria-label="Tankekart over emnet">
+    ${noder.map(d => svg`<line x1=${cx} y1=${cy} x2=${d.x} y2=${d.y} class="bk-linje"/>`)}
+    <g class="bk-sentrum"><ellipse cx=${cx} cy=${cy} rx="64" ry="40"/><text x=${cx} y=${cy + 6}>Biokjemi</text></g>
+    ${noder.map(d => {
+      const linjer = d.navn.split("\n");
+      return svg`<g class="bk-node k-${d.farge}" data-id=${d.id} tabindex="0" role="button" aria-label="${d.navn.replace("\n", " ")}">
+        <rect x=${d.x - 86} y=${d.y - 24} width="172" height="48" rx="14"/>
+        ${linjer.map((l, j) => svg`<text x=${d.x} y=${d.y + (linjer.length === 1 ? 5 : -3 + j * 16)}>${l}</text>`)}
+      </g>`;
+    })}
+  </svg>`;
+  const wrap = html`<div>${rot}</div>`;
+  const noderEl = rot.querySelectorAll(".bk-node");
+  const marker = id => noderEl.forEach(g => g.classList.toggle("valgt", g.dataset.id === id));
+  wrap.value = "celle";
+  marker("celle");
+  const velg = id => {
+    wrap.value = id;
+    marker(id);
+    wrap.dispatchEvent(new CustomEvent("input", {bubbles: true}));
+  };
+  noderEl.forEach(g => {
+    g.addEventListener("click", () => velg(g.dataset.id));
+    g.addEventListener("keydown", ev => {
+      if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); velg(g.dataset.id); }
+    });
+  });
+  return wrap;
+}
+```
+
+```{ojs}
+//| echo: false
+{
+  const e = emner.find(d => d.id === valgtEmne);
+  return html`<div class="bk-panel k-${e.farge}">
+    <h4>${e.navn.replace("\n", " ")}</h4>
+    <p>${e.tekst}</p>
+    <div class="bk-chips">${e.ord.map(o => html`<span>${o}</span>`)}</div>
+    <p><strong>Å lure på:</strong> ${e.sporsmal}</p>
+  </div>`;
+}
+```
