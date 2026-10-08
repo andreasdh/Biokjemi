@@ -15,17 +15,14 @@ hendelser = [
   {aar: 1983, tittel: "RNA kan katalysere reaksjoner", tekst: "Sidney Altman og kolleger viser at RNA-delen av enzymet RNase P kan katalysere en reaksjon uten proteindelen. Sammen med Thomas Cechs arbeid med selvspleisende RNA viser dette at RNA både kan bære informasjon og ha katalytisk funksjon."},
   {aar: 1985, tittel: "PCR", tekst: "Med PCR (polymerasekjedereaksjon), utviklet av Kary Mullis og kolleger, kan et bestemt DNA-område kopieres millioner av ganger i et rør. Dermed kan selv små mengder DNA gi nok materiale til videre undersøkelser."},
   {aar: 2003, tittel: "Menneskets genom", tekst: "Det humane genomprosjektet fullføres og gir en referansesekvens som dekker det meste av menneskets genom på omtrent tre milliarder basepar. Det finnes fortsatt hull, men prosjektet gir et nytt grunnlag for å studere gener, biologisk funksjon og sykdom."},
-  {aar: 2024, tittel: "Nobelprisen i kjemi", tekst: "David Baker får halve prisen for beregningsbasert proteindesign. Demis Hassabis og John Jumper deler den andre halvdelen for prediksjon av proteinstruktur med AlphaFold. Arbeidet viser hvordan beregninger og kunstig intelligens kan brukes til både å forutsi proteinstrukturer og å designe nye proteiner."}
+  {aar: 2024, tittel: "Folding av proteiner på datamaskinen", tekst: "David Baker får halve prisen for beregningsbasert proteindesign. Demis Hassabis og John Jumper deler den andre halvdelen for prediksjon av proteinstruktur med AlphaFold. Arbeidet viser hvordan beregninger og kunstig intelligens kan brukes til både å forutsi proteinstrukturer og å designe nye proteiner."}
 ]
 ```
 
 ```{ojs}
 //| echo: false
-viewof valgtIndeks = {
-  const r = Inputs.radio(hendelser.map((h, i) => i), {
-    value: hendelser.findIndex(h => h.aar === 1953),
-    format: i => `${hendelser[i].aar}: ${hendelser[i].tittel}`
-  });
+viewof valgtAar = {
+  const r = Inputs.radio(hendelser.map(h => h.aar), {value: 1953, format: x => String(x)});
   r.classList.add("bk-tid");
   return r;
 }
@@ -34,52 +31,17 @@ viewof valgtIndeks = {
 ```{ojs}
 //| echo: false
 {
-  const h = hendelser[valgtIndeks];
-
+  const h = hendelser.find(d => d.aar === valgtAar);
   const plott = Plot.plot({
-    height: 80,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    marginBottom: 28,
-    style: {
-      background: "transparent",
-      color: "inherit",
-      fontSize: "12px"
-    },
-    x: {
-      domain: [1815, 2035],
-      tickFormat: "d",
-      label: null,
-      ticks: [1850, 1900, 1950, 2000]
-    },
+    height: 80, marginLeft: 20, marginRight: 20, marginTop: 10, marginBottom: 28,
+    style: {background: "transparent", color: "inherit", fontSize: "12px"},
+    x: {domain: [1815, 2035], tickFormat: "d", label: null, ticks: [1850, 1900, 1950, 2000]},
     y: {axis: null, domain: [-1, 1]},
     marks: [
-      Plot.ruleY([0], {
-        stroke: "currentColor",
-        strokeOpacity: 0.3
-      }),
-      Plot.dot(hendelser, {
-        x: "aar",
-        y: 0,
-        r: 5,
-        fill: "#3d7ea6"
-      }),
-      Plot.dot([h], {
-        x: "aar",
-        y: 0,
-        r: 10,
-        fill: "#5aa889"
-      })
+      Plot.ruleY([0], {stroke: "currentColor", strokeOpacity: 0.3}),
+      Plot.dot(hendelser, {x: "aar", y: 0, r: d => d.aar === valgtAar ? 10 : 5, fill: d => d.aar === valgtAar ? "#5aa889" : "#3d7ea6"})
     ]
   });
-
-  return html`<div>
-    ${plott}
-    <div class="bk-panel k-green">
-      <h4>${h.aar}: ${h.tittel}</h4>
-      <p>${h.tekst}</p>
-    </div>
-  </div>`;
+  return html`<div>${plott}<div class="bk-panel k-green"><h4>${h.aar}: ${h.tittel}</h4><p>${h.tekst}</p></div></div>`;
 }
 ```
