@@ -1,0 +1,238 @@
+```{ojs}
+//| echo: false
+// 3D-modell av Cα med fire substituenter. Brukes til både L/D (Fischer) og R/S (CIP).
+// Bruk:  lagKiralitet("LD")  eller  lagKiralitet("RS")
+lagKiralitet = (modus) => {
+  // ---------- kvaternioner ----------
+  const qMul = (a, b) => [
+    a[0] * b[0] - a[1] * b[1] - a[2] * b[2] - a[3] * b[3],
+    a[0] * b[1] + a[1] * b[0] + a[2] * b[3] - a[3] * b[2],
+    a[0] * b[2] - a[1] * b[3] + a[2] * b[0] + a[3] * b[1],
+    a[0] * b[3] + a[1] * b[2] - a[2] * b[1] + a[3] * b[0],
+  ];
+  const qNorm = (q) => { const n = Math.hypot(...q) || 1; return q.map((x) => x / n); };
+  const kryss = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const prikk = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const rot = (q, v) => {
+    const u = [q[1], q[2], q[3]], t = kryss(u, v).map((x) => 2 * x), c = kryss(u, t);
+    return [v[0] + q[0] * t[0] + c[0], v[1] + q[0] * t[1] + c[1], v[2] + q[0] * t[2] + c[2]];
+  };
+  const qAkse = (akse, vinkel) => { const s = Math.sin(vinkel / 2); return [Math.cos(vinkel / 2), akse[0] * s, akse[1] * s, akse[2] * s]; };
+  const qSlerp = (a, b, t) => {
+    let d = a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+    if (d < 0) { b = b.map((x) => -x); d = -d; }
+    if (d > 0.9995) return qNorm(a.map((x, i) => x + t * (b[i] - x)));
+    const th = Math.acos(d), s = Math.sin(th);
+    return a.map((x, i) => (Math.sin((1 - t) * th) * x + Math.sin(t * th) * b[i]) / s);
+  };
+  const qMellom = (v1, v2) => {
+    const d = prikk(v1, v2);
+    if (d < -0.9999) return qAkse([1, 0, 0], Math.PI);
+    const k = kryss(v1, v2);
+    return qNorm([1 + d, k[0], k[1], k[2]]);
+  };
+
+  // ---------- modell ----------
+  const POS = { topp: [0, 0.95, -0.55], bunn: [0, -0.95, -0.55], venstre: [-0.95, 0, 0.55], hoyre: [0.95, 0, 0.55] };
+  const sidegrupper = [
+    { navn: "Alanin", r: "CH₃", prio: 3, hvorfor: "CH₃ har (H, H, H) på karbonet, mens COOH har (O, O, O). O har høyere atomnummer enn H, så COOH vinner." },
+    { navn: "Serin", r: "CH₂OH", prio: 3, hvorfor: "CH₂OH har (O, H, H), COOH har (O, O, O). Første forskjell er andre atom: O mot H, så COOH vinner." },
+    { navn: "Cystein", r: "CH₂SH", prio: 2, hvorfor: "CH₂SH har (S, H, H), COOH har (O, O, O). Allerede første atom avgjør: S (nr. 16) slår O (nr. 8), så sidegruppa vinner over COOH!" },
+    { navn: "Asparaginsyre", r: "CH₂COOH", prio: 3, hvorfor: "CH₂COOH har (C, H, H), COOH har (O, O, O). O slår C, så COOH vinner." },
+  ];
+  let g = sidegrupper[0];
+  let speil = false; // false = L, true = D
+  const Q_START = qNorm(qMul(qAkse([1, 0, 0], 0.25), qAkse([0, 1, 0], 0.35))); // utgangsvinkel
+  let q = Q_START.slice();
+  let spinn = true, animerer = false, hBak = false;
+  const W0 = 440;
+  let W = W0;
+
+  const delene = () => {
+    const venstreN = !speil;
+    return [
+      { id: "CO", tekst: "COOH", farge: "#e0884d", pos: POS.topp },
+      { id: "R", tekst: g.r, farge: "#d9a62f", pos: POS.bunn },
+      { id: "N", tekst: "NH₂", farge: "#4a90c2", pos: venstreN ? POS.venstre : POS.hoyre },
+      { id: "H", tekst: "H", farge: "#c8d3d9", pos: venstreN ? POS.hoyre : POS.venstre },
+    ];
+  };
+  const prio = (id) => ({ N: 1, H: 4, CO: g.prio === 2 ? 3 : 2, R: g.prio }[id]);
+
+  const tegning = html`<div class="bk-3d"></div>`;
+  const fischer = html`<div class="bk-fischer"></div>`;
+  const panel = html`<div class="bk-panel k-blue"></div>`;
+  const chipsR = html`<div class="bk-chiprad"></div>`;
+  const chipsForm = html`<div class="bk-chiprad"></div>`;
+  const knapper = html`<div class="bk-knapprad"></div>`;
+  const knapp1 = html`<button class="bk-knapp"></button>`;
+  const knapp2 = html`<button class="bk-knapp"></button>`;
+
+  const rotertDel = () => delene().map((d) => ({ ...d, v: rot(q, d.pos) }));
+  const triple = () => {
+    const d = delene().map((x) => ({ ...x, v: rot(q, x.pos), p: prio(x.id) })).sort((a, b) => a.p - b.p);
+    return prikk(kryss(d[0].v, d[1].v), d[2].v); // > 0: mot klokka sett med H bakover => S
+  };
+
+  function tegn() {
+    const S = W * 0.27, cx = W / 2, cy = W * 0.4, H = Math.round(W * 0.78), k = Math.max(0.8, Math.min(1.1, W / 400));
+    const items = rotertDel();
+    const persp = (z) => 1 + 0.16 * z;
+    const pt = (v) => [cx + v[0] * S * persp(v[2]), cy - v[1] * S * persp(v[2])];
+    const sortert = [{ id: "C", v: [0, 0, 0] }, ...items].sort((a, b) => a.v[2] - b.v[2]);
+    let ut = "";
+    sortert.forEach((d) => {
+      const [x, y] = pt(d.v);
+      if (d.id === "C") {
+        ut += `<circle cx="${cx}" cy="${cy}" r="${14 * k}" fill="#6c7a82" stroke="currentColor" stroke-width="1.5"/><text x="${cx}" y="${cy}" dy="0.35em" text-anchor="middle" font-size="12" fill="#fff" font-weight="700">C</text>`;
+        return;
+      }
+      const f = persp(d.v[2]);
+      const r = (d.id === "H" ? 17 : 26) * f * k;
+      // binding fra sentrum (tykkere når den peker mot deg)
+      ut += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="currentColor" stroke-width="${3 + 2.6 * d.v[2]}" stroke-linecap="round"/>`;
+      ut += `<circle cx="${x}" cy="${y}" r="${r}" fill="${d.farge}" stroke="currentColor" stroke-width="1.4" fill-opacity="0.97"/><circle cx="${x - r * 0.32}" cy="${y - r * 0.34}" r="${r * 0.36}" fill="#fff" fill-opacity="0.35"/>`;
+      ut += `<text x="${x}" y="${y}" dy="0.35em" text-anchor="middle" font-size="${(d.id === "H" ? 15 : 13.5) * Math.min(1.15, f) * k}" font-weight="700" fill="#1f2f38">${d.tekst}</text>`;
+      if (modus === "RS") {
+        const p = prio(d.id);
+        ut += `<circle cx="${x + r * 0.78}" cy="${y - r * 0.78}" r="9.5" fill="#fff" stroke="#3f8468" stroke-width="2"/><text x="${x + r * 0.78}" y="${y - r * 0.78}" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#3f8468">${p}</text>`;
+      }
+    });
+    // piler 1→2→3 når H peker bort fra deg
+    const h = items.find((d) => d.id === "H");
+    const hn = Math.hypot(...h.v) || 1;
+    const hBakNå = h.v[2] / hn < -0.93;
+    let tillegg = "";
+    if (modus === "RS" && hBakNå) {
+      const ord = items.filter((d) => d.id !== "H").sort((a, b) => prio(a.id) - prio(b.id));
+      const ps = ord.map((d) => pt(d.v));
+      const pil = (a, b, farge) => {
+        const mx = (a[0] + b[0]) / 2 - cx, my = (a[1] + b[1]) / 2 - cy;
+        const m = Math.hypot(mx, my) || 1;
+        const kx = cx + (mx / m) * (m + 34), ky = cy + (my / m) * (m + 34);
+        let d = "";
+        for (let t = 0.2; t <= 0.8001; t += 0.05) {
+          const x = (1 - t) * (1 - t) * a[0] + 2 * (1 - t) * t * kx + t * t * b[0];
+          const y = (1 - t) * (1 - t) * a[1] + 2 * (1 - t) * t * ky + t * t * b[1];
+          d += (d ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1);
+        }
+        return `<path d="${d}" fill="none" stroke="${farge}" stroke-width="3.4" marker-end="url(#spiss)"/>`;
+      };
+      tillegg = `<defs><marker id="spiss" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3f8468"/></marker></defs>
+        ${pil(ps[0], ps[1], "#3f8468")}${pil(ps[1], ps[2], "#3f8468")}`;
+    }
+    const nær = Math.hypot(q[1], q[2], q[3]) < 0.04;
+    const merke = modus === "LD" && nær ? `<text x="${cx}" y="${H - 8}" text-anchor="middle" font-size="12" fill="#3f8468" font-weight="700">Fischer-visning: vannrett peker mot deg, loddrett peker bort fra deg</text>` : "";
+    tegning.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto;display:block;margin:0 auto;touch-action:none;cursor:grab" role="img" aria-label="Tredimensjonal modell som kan roteres" font-family="inherit">${ut}${tillegg}${merke}</svg>`;
+    return hBakNå;
+  }
+
+  function tegnFischer() {
+    const d = delene();
+    const v = d.find((x) => x.id === "N").pos[0] < 0; // N til venstre?
+    const lbl = (x, y, t, f, anker = "middle") => `<text x="${x}" y="${y}" dy="0.35em" text-anchor="${anker}" font-size="16" font-weight="700" fill="${f}">${t}</text>`;
+    fischer.innerHTML = `<svg viewBox="0 0 230 190" style="width:100%;max-width:230px;height:auto;display:block;margin:0 auto" role="img" aria-label="Fischer-projeksjon" font-family="inherit">
+      <line x1="60" y1="95" x2="170" y2="95" stroke="currentColor" stroke-width="2"/><line x1="115" y1="30" x2="115" y2="160" stroke="currentColor" stroke-width="2"/>
+      ${lbl(115, 16, "COOH", "#e0884d")}${lbl(115, 176, g.r, "#d9a62f")}
+      ${lbl(v ? 42 : 188, 95, "H₂N", "#4a90c2")}${lbl(v ? 188 : 42, 95, "H", "currentColor")}
+      <circle cx="${v ? 42 : 188}" cy="95" r="28" fill="none" stroke="#e0584d" stroke-width="2"/></svg>`;
+  }
+
+  function oppdater() {
+    const hBakNå = tegn();
+    tegnFischer();
+    const L = !speil;
+    if (modus === "LD") {
+      panel.innerHTML = `<h4>${L ? "L" : "D"}-${g.navn.toLowerCase()}</h4>
+        <p>Med COOH øverst og sidegruppa nederst i Fischer-projeksjonen sitter aminogruppa på <strong>${L ? "venstre (laevus) side → L" : "høyre (dexter) side → D"}</strong>.</p>
+        <p>De to formene er speilbilder som ikke kan legges oppå hverandre. Alle aminosyrene i proteiner er L-aminosyrer.</p>`;
+    } else {
+      const s = triple() > 0;
+      const d = delene();
+      panel.innerHTML = `<h4>${hBakNå ? (s ? "S-konfigurasjon" : "R-konfigurasjon") : "Finn prioritetene"}${hBakNå ? ` (${L ? "L" : "D"}-${g.navn.toLowerCase()})` : ""}</h4>
+        <p><strong>Prioritet:</strong> 1 = NH₂ (N, nr. 7), ${g.prio === 2 ? "2 = " + g.r + ", 3 = COOH" : "2 = COOH, 3 = " + g.r}, 4 = H. ${g.hvorfor}</p>
+        <p>${hBakNå ? `Med H bak planet går 1 → 2 → 3 <strong>${s ? "mot klokka → S (sinister)" : "med klokka → R (rectus)"}</strong>.` : "Trykk «Vend H bakover» og se i hvilken retning 1 → 2 → 3 går."}</p>`;
+    }
+    chipsR.querySelectorAll("button").forEach((b) => b.classList.toggle("valgt", b.dataset.id === g.navn));
+    chipsForm.querySelectorAll("button").forEach((b) => b.classList.toggle("valgt", (b.dataset.id === "D") === speil));
+    knapp1.textContent = modus === "LD" ? "Fischer-visning" : "Vend H bakover";
+    knapp2.textContent = modus === "LD" ? (spinn ? "Stopp rotasjon" : "Roter sakte") : "Tilbake til start";
+  }
+
+  const lett = () => (modus === "LD" ? tegn() : oppdater());
+
+  function animerTil(mål, ms = 900) {
+    if (animerer) return;
+    animerer = true; spinn = false;
+    const fra = q.slice(), t0 = performance.now();
+    const steg = (nå) => {
+      const t = Math.min(1, (nå - t0) / ms), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      q = qSlerp(fra, mål, e);
+      lett();
+      if (t < 1) requestAnimationFrame(steg);
+      else { animerer = false; oppdater(); }
+    };
+    requestAnimationFrame(steg);
+  }
+
+  sidegrupper.forEach((s) => {
+    const b = html`<button class="bk-chip" data-id="${s.navn}">${s.navn}</button>`;
+    b.onclick = () => { g = s; oppdater(); };
+    chipsR.append(b);
+  });
+  [["L", "L-form"], ["D", "D-form (speilbilde)"]].forEach(([id, t]) => {
+    const b = html`<button class="bk-chip" data-id="${id}">${t}</button>`;
+    b.onclick = () => { speil = id === "D"; oppdater(); };
+    chipsForm.append(b);
+  });
+  knapp1.onclick = () => {
+    if (modus === "LD") animerTil([1, 0, 0, 0]);
+    else {
+      const h = delene().find((d) => d.id === "H");
+      const v = rot(q, h.pos), n = Math.hypot(...v);
+      animerTil(qNorm(qMul(qMellom(v.map((x) => x / n), [0, 0, -1]), q)));
+    }
+  };
+  knapp2.onclick = () => {
+    if (modus === "LD") { spinn = !spinn; oppdater(); }
+    else animerTil(Q_START);
+  };
+  knapper.append(knapp1, knapp2);
+
+  // dra for å rotere
+  let drar = false, sx = 0, sy = 0;
+  tegning.addEventListener("pointerdown", (e) => { drar = true; spinn = false; sx = e.clientX; sy = e.clientY; tegning.setPointerCapture(e.pointerId); });
+  tegning.addEventListener("pointermove", (e) => {
+    if (!drar || animerer) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy; sx = e.clientX; sy = e.clientY;
+    q = qNorm(qMul(qMul(qAkse([0, 1, 0], dx * 0.011), qAkse([1, 0, 0], dy * 0.011)), q));
+    lett();
+  });
+  const slutt = () => { drar = false; };
+  tegning.addEventListener("pointerup", slutt);
+  tegning.addEventListener("pointercancel", slutt);
+  // rolig automatisk rotasjon i LD-modus til brukeren tar over
+  let forrige = performance.now(), levende = true;
+  const tikk = (nå) => {
+    if (!levende) return;
+    if (spinn && !animerer && modus === "LD" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      q = qNorm(qMul(qAkse([0, 1, 0], (nå - forrige) * 0.0006), q));
+      tegn();
+    }
+    forrige = nå;
+    requestAnimationFrame(tikk);
+  };
+  invalidation.then(() => { levende = false; });
+  const rotElem = html`<div class="bk-aa-boks">
+    <p class="bk-hint">Dra i molekylet for å rotere det.</p>
+    ${chipsR}${chipsForm}
+    <div class="bk-aa-kolonner">${tegning}${modus === "LD" ? fischer : html`<div></div>`}</div>
+    ${knapper}${panel}</div>`;
+  if (modus === "RS") fischer.style.display = "none";
+  if (modus === "RS") spinn = false;
+  oppdater();
+  requestAnimationFrame(tikk);
+  bkTilpass(rotElem, 600, (w) => { W = Math.max(280, Math.min(440, Math.round(w * (modus === "LD" && w > 560 ? 0.6 : 1)))); oppdater(); }, invalidation);
+  return rotElem;
+}
+```

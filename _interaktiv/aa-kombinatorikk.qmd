@@ -1,0 +1,29 @@
+```{ojs}
+//| echo: false
+// Hvor mange ulike proteiner kan 20 aminosyrer gi?
+{
+  const slider = Inputs.range([1, 300], { value: 10, step: 1, label: "Lengde" });
+  const panel = html`<div class="bk-panel k-green"></div>`;
+  const stolpe = html`<div class="bk-kombi"></div>`;
+  function oppdater() {
+    const n = +slider.value;
+    const log = n * Math.log10(20);
+    const eks = Math.floor(log);
+    const mant = Math.pow(10, log - eks);
+    const tall = n <= 4 ? (Math.pow(20, n)).toLocaleString("nb-NO") : `${aaKomma(mant, 1)} × 10<sup>${eks}</sup>`;
+    let sam = "";
+    if (log < 3) sam = "Det er færre enn antall elever på en stor skole.";
+    else if (log < 10) sam = "Det er mange, men du kan fremdeles forestille deg tallet.";
+    else if (log < 20) sam = "Flere enn antall mennesker som noen gang har levd, og mange ganger flere enn stjernene i Melkeveien.";
+    else if (log < 80) sam = "Mer enn antall sandkorn på alle jordas strender (ca. 10¹⁸) og stjerner i det synlige universet (ca. 10²²–10²⁴).";
+    else sam = "Mer enn antall atomer i hele det synlige universet (ca. 10⁸⁰)! Det kan ikke finnes alle mulige proteiner på denne størrelsen.";
+    panel.innerHTML = `<h4>20<sup>${n}</sup> = ${tall} mulige sekvenser</h4><p>${sam}</p>
+      <p class="bk-hint">Et typisk protein har 100–1000 aminosyrer. Naturen har bare «prøvd» en liten brøkdel av mulighetene.</p>`;
+    stolpe.innerHTML = `<div class="bk-kombi-ramme"><i style="width:${Math.min(100, (log / 130) * 100)}%"></i><b style="left:${(80 / 130) * 100}%" title="10⁸⁰ atomer i universet"></b></div>
+      <div class="bk-kombi-tekst"><span>10⁰</span><span>↑ 10⁸⁰ = atomer i universet</span><span>10¹³⁰</span></div>`;
+  }
+  slider.addEventListener("input", oppdater);
+  oppdater();
+  return html`<div class="bk-aa-boks">${slider}${stolpe}${panel}</div>`;
+}
+```

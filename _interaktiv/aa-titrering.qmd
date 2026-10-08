@@ -1,0 +1,80 @@
+```{ojs}
+//| echo: false
+// Titreringskurve, ladningstilstander og isoelektrisk punkt (pI) for en valgt aminosyre.
+{
+  let aa = BKAA.finn("ala");
+  let W = 480;
+  const grid = html`<div class="bk-flisgrid"></div>`;
+  const phInput = Inputs.range([0, 14], { value: 7.4, step: 0.1, label: "pH" });
+  const kurve = html`<div></div>`;
+  const tilstander = html`<div class="bk-tilstander"></div>`;
+  const panel = html`<div class="bk-panel k-green"></div>`;
+
+  function oppdater() {
+    const pH = +phInput.value;
+    const g = BKAA.kjemi.grupper(aa).sort((a, b) => a.pK - b.pK);
+    const n = g.length;
+    const Q0 = g.reduce((s, x) => s + x.q0, 0);
+    const pts = BKAA.kjemi.titrering(aa).filter((p) => p[0] <= n + 0.001);
+    const H = Math.round(W * 0.62), l = 44, r = 14, t = 14, b = 38;
+    const X = (x) => l + (x / n) * (W - l - r);
+    const Y = (p) => t + ((14 - p) / 14) * (H - t - b);
+    const xAv = (pH) => g.reduce((s, x) => s + BKAA.kjemi.andelDeprot(x.pK, pH), 0);
+    const sti = pts.map((p, i) => (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1)).join("");
+    const pI = BKAA.kjemi.pI(aa);
+    let ut = "";
+    for (let p = 0; p <= 14; p += 2)
+      ut += `<line x1="${l}" x2="${W - r}" y1="${Y(p)}" y2="${Y(p)}" stroke="currentColor" stroke-opacity="0.12"/><text x="${l - 7}" y="${Y(p)}" dy="0.35em" text-anchor="end" font-size="11" fill="currentColor">${p}</text>`;
+    for (let x = 0; x <= n; x++)
+      ut += `<text x="${X(x)}" y="${H - b + 15}" text-anchor="middle" font-size="11" fill="currentColor">${x}</text>`;
+    ut += `<text x="${(l + W - r) / 2}" y="${H - 4}" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.75">OH⁻-ekvivalenter tilsatt</text>`;
+    ut += `<text x="12" y="${(t + H - b) / 2}" font-size="11" fill="currentColor" opacity="0.75" transform="rotate(-90 12 ${(t + H - b) / 2})" text-anchor="middle">pH</text>`;
+    // pI
+    ut += `<line x1="${l}" x2="${W - r}" y1="${Y(pI)}" y2="${Y(pI)}" stroke="#3f8468" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="${W - r - 4}" y="${Y(pI) - 6}" text-anchor="end" font-size="12" font-weight="700" fill="#3f8468">pI = ${aaKomma(pI, 2)}</text>`;
+    ut += `<path d="${sti}" fill="none" stroke="#8a5fb3" stroke-width="3"/>`;
+    // pKa-merker
+    g.forEach((x, i) => {
+      const xx = X(xAv(x.pK));
+      ut += `<line x1="${xx}" x2="${xx}" y1="${Y(x.pK) - 9}" y2="${Y(x.pK) + 9}" stroke="currentColor" stroke-width="4"/>
+        <text x="${xx + 8}" y="${Y(x.pK) + 15}" font-size="11" fill="currentColor">pKₐ${i + 1} = ${aaKomma(x.pK, 2)}</text>`;
+    });
+    // gjeldende pH
+    const cx = X(xAv(pH)), cy = Y(pH);
+    ut += `<line x1="${l}" x2="${cx}" y1="${cy}" y2="${cy}" stroke="#e0584d" stroke-dasharray="3 3"/><circle cx="${cx}" cy="${cy}" r="7" fill="#e0584d" stroke="#fff" stroke-width="2"/>`;
+    kurve.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto;display:block;margin:0 auto" role="img" aria-label="Titreringskurve for ${aa.navn}" font-family="inherit">${ut}</svg>`;
+
+    // tilstander langs kurven: k grupper er deprotonert
+    const aktiv = g.filter((x) => pH > x.pK).length;
+    tilstander.innerHTML = "";
+    for (let k = 0; k <= n; k++) {
+      const tilst = {};
+      g.slice(0, k).forEach((x) => (tilst[x.s] = true));
+      const q = Q0 - k;
+      const kort = html`<div class="bk-tilstand${k === aktiv ? " aktiv" : ""}"><div></div><strong>Ladning ${q > 0 ? "+" + q : q < 0 ? "−" + Math.abs(q) : "0"}</strong></div>`;
+      kort.querySelector("div").innerHTML = BKAA.tegn(aa, { bredde: 200, maksBinding: 30, fs: 11, minHoyde: 90, tilstand: tilst, sidegruppe: BKAA.gruppeFarge[aa.gruppe] }).svg;
+      tilstander.append(kort);
+    }
+    // pI-utregning
+    const k0 = Q0;
+    const pa = g[k0 - 1].pK, pb = g[k0].pK;
+    const qNå = BKAA.kjemi.ladning(aa, pH);
+    const retning = Math.abs(qNå) < 0.15 ? "står nesten stille (nær pI)" : qNå > 0 ? "vandrer mot minuspolen (katoden)" : "vandrer mot plusspolen (anoden)";
+    panel.innerHTML = `<h4>${aa.navn}: pI = ${aaKomma(pI, 2)}</h4>
+      <p>pI er pH-verdien der molekylet i gjennomsnitt er nøytralt: pI = (pKₐ${k0} + pKₐ${k0 + 1}) / 2 = (${aaKomma(pa, 2)} + ${aaKomma(pb, 2)}) / 2 = <strong>${aaKomma((pa + pb) / 2, 2)}</strong>.
+      Vi tar gjennomsnittet av de to pKₐ-verdiene som ligger på hver side av den nøytrale formen.</p>
+      <p>Ved pH ${aaKomma(pH, 1)} er nettoladningen ≈ <strong>${aaKomma(qNå, 2)}</strong>. I et elektrisk felt (elektroforese) ${retning}.</p>`;
+    grid.querySelectorAll("button").forEach((b) => b.classList.toggle("valgt", b.dataset.id === aa.id));
+  }
+  BKAA.data.aminosyrer.forEach((a) => {
+    const b = html`<button class="bk-flis ${a.gruppe}" data-id="${a.id}" title="${a.navn}"><strong>${a.tre}</strong></button>`;
+    b.onclick = () => { aa = a; oppdater(); };
+    grid.append(b);
+  });
+  phInput.addEventListener("input", oppdater);
+  const rot = html`<div class="bk-aa-boks">${grid}${phInput}${kurve}${tilstander}${panel}</div>`;
+  oppdater();
+  bkTilpass(rot, 560, (w) => { W = Math.max(280, Math.min(520, w)); oppdater(); }, invalidation);
+  return rot;
+}
+```

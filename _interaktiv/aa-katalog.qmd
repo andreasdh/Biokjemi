@@ -1,0 +1,91 @@
+```{ojs}
+//| echo: false
+// Aminosyrekatalog: velg en aminosyre og se struktur, gruppe, pKa og ladning ved ulike pH-verdier.
+// Bruk:  lagAAKatalog({ider: ["gly", "ala"], filter: true, ph: true, start: "gly"})
+lagAAKatalog = (opsjoner = {}) => {
+  const alle = BKAA.data.aminosyrer.map((a) => a.id);
+  const { ider = alle, filter = true, ph = true, start = ider[0] } = opsjoner;
+  const poster = ider.map(BKAA.finn);
+  let aktiv = BKAA.finn(start);
+  let filt = "alle";
+  let W = 360;
+  const filtre = [
+    ["alle", "Alle"], ["upolar", "Upolare"], ["polar", "Polare"], ["negativ", "Negative"],
+    ["positiv", "Positive"], ["essensiell", "Essensielle"],
+  ];
+  const erMed = (a) => filt === "alle" || (filt === "essensiell" ? a.essensiell : a.gruppe === filt);
+
+  const filterRad = html`<div class="bk-chiprad"></div>`;
+  const rutenett = html`<div class="bk-flisgrid"></div>`;
+  const tegning = html`<div class="bk-aa-tegning"></div>`;
+  const info = html`<div class="bk-aa-info"></div>`;
+  const phInput = Inputs.range([0, 14], { value: 7.4, step: 0.1, label: "pH" });
+  const phBoks = html`<div class="bk-phrad">${phInput}</div>`;
+  const panel = html`<div class="bk-panel k-blue"></div>`;
+  const legende = html`<div class="bk-legende">
+    <span style="background:#f4dca0">upolar</span><span style="background:#b4dfcd">polar</span>
+    <span style="background:#f2c3b4">negativ</span><span style="background:#a9d0e6">positiv</span>
+    <span style="background:transparent;border:1px dashed currentColor">★ essensiell</span></div>`;
+
+  function oppdater() {
+    const a = aktiv;
+    const pH = +phInput.value;
+    const harPka = !!a.pka;
+    const t = harPka && ph ? BKAA.kjemi.tilstand(a, pH) : harPka ? BKAA.kjemi.tilstand(a, 7.4) : {};
+    const farge = BKAA.gruppeFarge[a.gruppe];
+    tegning.innerHTML = BKAA.tegn(a, {
+      bredde: W, maksBinding: 54, fs: 16, minHoyde: 180, tilstand: t,
+      sidegruppe: harPka ? farge : null,
+      alt: "Strukturformel for " + a.navn,
+    }).svg;
+    panel.style.setProperty("--ks", farge);
+    let rad = "";
+    if (harPka) {
+      const g = BKAA.kjemi.grupper(a);
+      const pk = g.map((x) => `<strong>${aaKomma(x.pK)}</strong> (${x.navn === "sidegruppe" ? "sidegruppe" : x.navn})`).join(" · ");
+      const q = BKAA.kjemi.ladning(a, ph ? pH : 7.4);
+      const kd = a.kd, pos = ((kd + 4.5) / 9) * 100;
+      rad = `<p class="bk-aa-linje"><span>Gruppe</span> ${BKAA.gruppeNavn[a.gruppe]}${a.essensiell ? " · <strong>★ essensiell</strong>" : ""}</p>
+        <p class="bk-aa-linje"><span>Konfigurasjon</span> ${a.cip ? a.cip + " (L-form)" : "ikke kiral (to like H på Cα)"}</p>
+        <p class="bk-aa-linje"><span>Molekylmasse</span> ${aaKomma(a.mw, 1)} g/mol</p>
+        <p class="bk-aa-linje"><span>pKₐ</span> ${pk}</p>
+        <p class="bk-aa-linje"><span>pI</span> ${aaKomma(BKAA.kjemi.pI(a), 2)}</p>
+        <div class="bk-kd"><span>hydrofil</span><div><i style="left:${pos}%"></i></div><span>hydrofob</span></div>
+        <p class="bk-hint">Hydropatiindeks (Kyte–Doolittle): ${aaKomma(kd, 1)}</p>`;
+      if (ph) rad += `<p class="bk-aa-ladning">Ved pH ${aaKomma(pH, 1)} er nettoladningen omtrent <strong>${aaKomma(q, 2)}</strong> (mest: ${BKAA.kjemi.heltallsladning(a, pH) > 0 ? "+" : ""}${BKAA.kjemi.heltallsladning(a, pH) < 0 ? "−" + Math.abs(BKAA.kjemi.heltallsladning(a, pH)) : BKAA.kjemi.heltallsladning(a, pH)}).</p>`;
+    } else {
+      rad = `<p class="bk-aa-linje"><span>Molekylmasse</span> ${aaKomma(a.mw, 1)} g/mol</p>`;
+    }
+    const koder = a.tre ? `${a.tre}${a.en ? " · " + a.en : ""}` : "";
+    info.innerHTML = `<h4>${a.navn}${koder ? ` <small>(${koder})</small>` : ""}</h4>${rad}`;
+    panel.innerHTML = `<p>${a.tekst}</p>` +
+      (a.tagger ? `<div class="bk-chips">${a.tagger.map((x) => `<span style="--kf:${aaFarger[a.gruppe]}">${x}</span>`).join("")}</div>` : "");
+    phBoks.style.display = harPka && ph ? "" : "none";
+    rutenett.querySelectorAll("button").forEach((b) => {
+      b.classList.toggle("valgt", b.dataset.id === a.id);
+      const p = BKAA.finn(b.dataset.id);
+      b.classList.toggle("dempet", !erMed(p));
+    });
+    filterRad.querySelectorAll("button").forEach((b) => b.classList.toggle("valgt", b.dataset.id === filt));
+  }
+
+  filtre.forEach(([id, navn]) => {
+    const b = html`<button class="bk-chip" data-id="${id}">${navn}</button>`;
+    b.onclick = () => { filt = id; oppdater(); };
+    filterRad.append(b);
+  });
+  poster.forEach((a) => {
+    const b = html`<button class="bk-flis ${a.gruppe}" data-id="${a.id}" title="${a.navn}">
+      <strong>${a.tre || a.navn.slice(0, 3)}</strong><span>${a.en || ""}${a.essensiell ? "★" : ""}</span></button>`;
+    b.onclick = () => { aktiv = a; oppdater(); };
+    rutenett.append(b);
+  });
+  phInput.addEventListener("input", oppdater);
+  const rot = html`<div class="bk-katalog">
+    ${filter ? filterRad : ""}${rutenett}${filter ? legende : ""}
+    <div class="bk-aa-kolonner"><div>${tegning}</div><div>${info}${phBoks}</div></div>${panel}</div>`;
+  oppdater();
+  bkTilpass(rot, 760, (w) => { W = Math.max(260, Math.min(400, Math.round(w * (w > 560 ? 0.52 : 1)))); oppdater(); }, invalidation);
+  return rot;
+}
+```
