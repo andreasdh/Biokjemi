@@ -238,3 +238,11 @@ main table th, main table td { padding: 0.4rem 0.55rem; }
 .bk-tg-stolpe { border-radius: 0.2rem; bottom: 3px; position: absolute; top: 3px; transition: width 0.12s; }
 .bk-tg-verdi { flex: 0 0 3.8rem; font-variant-numeric: tabular-nums; }
 .bk-legende .bk-stedlegende { color: inherit; }
+
+/*Sitat*/
+.sitat {
+  margin: 2rem auto; max-width: 36rem; padding-left: 1.2rem;
+  border-left: 3px solid #2a9d8f; font-style: italic; font-size: 1.1rem;
+}
+.sitat .kilde { display: block; text-align: right; font-style: normal; font-size: 0.9rem; opacity: 0.75; }
+.sitat .kilde::before { content: "— "; }

@@ -58,6 +58,7 @@ format:
     fig-align: center
     callout-appearance: simple
     html-math-method: mathjax
+    from: markdown+emoji
 
 execute:
   enabled: true  # kjør også .ipynb-kapitler ved bygging
