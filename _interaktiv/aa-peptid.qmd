@@ -1,0 +1,138 @@
+```{ojs}
+//| echo: false
+// Peptidbygger: skriv en sekvens (for eksempel navnet ditt) og se kjeden, ladningen og massen.
+{
+  const gyldig = BKAA.data.aminosyrer.map((a) => a.en).join("");
+  const tekst = html`<input type="text" class="bk-tekstfelt" value="ANDREAS" maxlength="30"
+    aria-label="Sekvens i ettbokstavskode" spellcheck="false" autocomplete="off">`;
+  const rad = html`<div class="bk-flisgrid bk-flis-liten"></div>`;
+  const knappTilfeldig = html`<button class="bk-knapp">Tilfeldig peptid</button>`;
+  const knappSlett = html`<button class="bk-knapp">Slett siste</button>`;
+  const phInput = Inputs.range([0, 14], { value: 7.4, step: 0.1, label: "pH" });
+  const tegning = html`<div class="bk-peptid-tegning"></div>`;
+  const graf = html`<div></div>`;
+  const panel = html`<div class="bk-panel k-green"></div>`;
+  let seq = "ANDREAS";
+  let Bpx = 560;
+
+  function ren(s) {
+    const store = s.toUpperCase().replace(/[^A-ZÆØÅ]/g, "");
+    const ok = store.split("").filter((c) => gyldig.includes(c)).join("");
+    const bort = [...new Set(store.split("").filter((c) => !gyldig.includes(c)))];
+    return { ok, bort };
+  }
+
+  function tegn() {
+    const n = seq.length;
+    const aas = seq.split("").map((c) => BKAA.kjemi.fraEn(c));
+    const u = Math.max(20, Math.min(30, Math.floor((Bpx - 100) / (3 * n + 1)))), pad = 40;
+    const bredde = Math.max(320, pad * 2 + n * 3 * u + u);
+    const H = 230, yOpp = 105, yNed = 135;
+    const pH = +phInput.value;
+    let ut = "", lag2 = "", drops = "";
+    const atomer = [];
+    // atomposisjoner langs en sikksakk-ryggrad: N, Cα, C per rest
+    for (let i = 0; i < n; i++)
+      for (let k = 0; k < 3; k++) {
+        const idx = i * 3 + k;
+        atomer.push({ x: pad + idx * u + u / 2, y: idx % 2 === 0 ? yNed : yOpp, k, i });
+      }
+    // bindinger
+    atomer.forEach((a, j) => {
+      if (j === 0) return;
+      const b = atomer[j - 1];
+      const pept = a.k === 0; // C(i-1)–N(i)
+      ut += `<line x1="${b.x}" y1="${b.y}" x2="${a.x}" y2="${a.y}" stroke="${pept ? "#e0584d" : "currentColor"}" stroke-width="${pept ? 4.5 : 2}" stroke-linecap="round"/>`;
+      if (pept) {
+        const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+        const opp = my < H / 2;
+        drops += `<g class="bk-dryss" style="animation-delay:${(a.i * 0.35).toFixed(2)}s"><text x="${mx}" y="${opp ? my - 24 : my + 30}" text-anchor="middle" font-size="12" font-weight="700" fill="#3d7ea6">H₂O</text></g>`;
+      }
+    });
+    // atomer og sidekjeder
+    atomer.forEach((a) => {
+      const aa = aas[a.i];
+      const opp = a.y < H / 2;
+      const dy = opp ? -1 : 1;
+      if (a.k === 1) {
+        const rx = a.x, ry = a.y + dy * 52;
+        ut += `<line x1="${a.x}" y1="${a.y}" x2="${rx}" y2="${ry - dy * 14}" stroke="currentColor" stroke-width="2"/>`;
+        lag2 += `<g><circle cx="${rx}" cy="${ry}" r="17" fill="${aaFarger[aa.gruppe]}" stroke="${BKAA.gruppeFarge[aa.gruppe]}" stroke-width="2"/>
+          <text x="${rx}" y="${ry}" dy="0.35em" text-anchor="middle" font-size="11" font-weight="700" fill="#1f2f38">${aa.tre}</text></g>`;
+        lag2 += `<circle cx="${a.x}" cy="${a.y}" r="3.5" fill="currentColor"/>`;
+      } else if (a.k === 0) {
+        lag2 += `<g><circle cx="${a.x}" cy="${a.y}" r="11" fill="#fff" stroke="#4a90c2" stroke-width="2"/><text x="${a.x}" y="${a.y}" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#4a90c2">N</text></g>`;
+        lag2 += `<text x="${a.x}" y="${a.y + dy * 22}" text-anchor="middle" font-size="10" fill="#4a90c2">${a.i === 0 ? "" : "H"}</text>`;
+      } else {
+        lag2 += `<circle cx="${a.x}" cy="${a.y}" r="3.5" fill="currentColor"/>`;
+        // karbonyl-O
+        const oy = a.y + dy * 28;
+        ut += `<line x1="${a.x - 2}" y1="${a.y}" x2="${a.x - 2}" y2="${oy - dy * 8}" stroke="currentColor" stroke-width="1.6"/><line x1="${a.x + 2}" y1="${a.y}" x2="${a.x + 2}" y2="${oy - dy * 8}" stroke="currentColor" stroke-width="1.6"/>`;
+        lag2 += `<text x="${a.x}" y="${oy}" dy="0.35em" text-anchor="middle" font-size="12" font-weight="700" fill="#e0584d">O</text>`;
+      }
+    });
+    // endegrupper
+    const f = atomer[0], l = atomer[atomer.length - 1];
+    const nTekst = pH < BKAA.kjemi.PKA_PEPTID.nTerm ? "H₃⁺" : "H₂";
+    const cTekst = pH > BKAA.kjemi.PKA_PEPTID.cTerm ? "O⁻" : "OH";
+    ut += `<text x="${f.x - 15}" y="${f.y}" dy="0.35em" text-anchor="end" font-size="13" font-weight="700" fill="#4a90c2">${nTekst}</text>`;
+    const nesteY = l.y < H / 2 ? yNed : yOpp;
+    ut += `<line x1="${l.x}" y1="${l.y}" x2="${l.x + u}" y2="${nesteY}" stroke="currentColor" stroke-width="2"/>`;
+    ut += `<text x="${l.x + u + 3}" y="${nesteY}" dy="0.35em" text-anchor="start" font-size="13" font-weight="700" fill="#e0584d">${cTekst}</text>`;
+    ut += `<text x="${pad - 8}" y="${H - 6}" font-size="11" fill="currentColor" opacity="0.7">N-terminal</text><text x="${bredde - pad + 8}" y="${H - 6}" text-anchor="end" font-size="11" fill="currentColor" opacity="0.7">C-terminal</text>`;
+    tegning.innerHTML = `<div class="bk-peptid-rull"><svg viewBox="0 0 ${bredde} ${H}" width="${bredde}" height="${H}" role="img" aria-label="Peptidkjede" font-family="inherit">${ut}${drops}${lag2}</svg></div>`;
+  }
+
+  function oppdater() {
+    const { ok, bort } = ren(tekst.value);
+    seq = ok;
+    const pH = +phInput.value;
+    if (seq.length === 0) {
+      tegning.innerHTML = '<p class="bk-hint">Skriv inn bokstaver (A, C, D, E, F, G, H, I, K, L, M, N, P, Q, R, S, T, V, W, Y).</p>';
+      graf.innerHTML = "";
+      panel.innerHTML = "";
+      return;
+    }
+    tegn();
+    const q = BKAA.kjemi.peptidLadning(seq, pH);
+    const pI = BKAA.kjemi.peptidPI(seq);
+    const m = BKAA.kjemi.peptidMasse(seq);
+    const n = seq.length;
+    const tre = seq.split("").map((c) => BKAA.kjemi.fraEn(c).tre).join("–");
+    graf.innerHTML = aaLadningsGraf((p) => BKAA.kjemi.peptidLadning(seq, p), pH, pI, 420);
+    panel.innerHTML = `<h4>${n} aminosyre${n === 1 ? "" : "r"} → ${n - 1} peptidbinding${n === 2 ? "" : "er"} + ${n - 1} H₂O</h4>
+      <p><strong>${tre}</strong></p>
+      <p>Molekylmasse ≈ <strong>${aaKomma(m, 1)} Da</strong> · pI ≈ <strong>${aaKomma(pI, 1)}</strong> · nettoladning ved pH ${aaKomma(pH, 1)} ≈ <strong>${aaKomma(q, 1)}</strong></p>
+      ${bort.length ? `<p class="bk-hint">Ignorerte bokstaver (ikke blant de 20): ${bort.join(", ")}</p>` : ""}
+      <p class="bk-hint">Hver peptidbinding dannes i en kondensasjonsreaksjon der vann spaltes av. Verdiene for pKₐ er typiske verdier for aminosyrer i proteiner, så ladningen er veiledende.</p>`;
+    rad.querySelectorAll("button").forEach((b) => b.classList.toggle("dempet", false));
+  }
+
+  BKAA.data.aminosyrer.forEach((a) => {
+    const b = html`<button class="bk-flis ${a.gruppe}" title="${a.navn}"><strong>${a.en}</strong></button>`;
+    b.onclick = () => {
+      if (tekst.value.length < 30) tekst.value += a.en;
+      oppdater();
+    };
+    rad.append(b);
+  });
+  knappTilfeldig.onclick = () => {
+    const n = 6 + Math.floor(Math.random() * 6);
+    tekst.value = Array.from({ length: n }, () => gyldig[Math.floor(Math.random() * 20)]).join("");
+    oppdater();
+  };
+  knappSlett.onclick = () => {
+    tekst.value = tekst.value.slice(0, -1);
+    oppdater();
+  };
+  tekst.addEventListener("input", oppdater);
+  phInput.addEventListener("input", oppdater);
+  const rot = html`<div class="bk-aa-boks">
+    <p class="bk-hint">Skriv navnet ditt (eller et annet ord), eller klikk på aminosyrene. Bokstaver som ikke er aminosyrer, blir hoppet over.</p>
+    <div class="bk-tekstrad">${tekst}${knappSlett}${knappTilfeldig}</div>
+    ${rad}${tegning}${phInput}${graf}${panel}</div>`;
+  oppdater();
+  bkTilpass(rot, 640, (w) => { Bpx = w; if (seq.length) tegn(); }, invalidation);
+  return rot;
+}
+```

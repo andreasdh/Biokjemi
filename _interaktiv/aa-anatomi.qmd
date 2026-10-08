@@ -1,0 +1,131 @@
+```{ojs}
+//| echo: false
+// Anatomien til en aminosyre: klikk på delene, og flytt protonet for å lage et zwitterion.
+{
+  const mol = {
+    navn: "Generell aminosyre",
+    atomer: [
+      { el: "N", x: -1.3, y: -0.75, h: 3, q: 1, site: "n" },
+      { el: "C", x: 0, y: 0, h: 1, q: 0 },
+      { el: "C", x: 1.3, y: -0.75, h: 0, q: 0 },
+      { el: "O", x: 2.6, y: 0, h: 0, q: 0 },
+      { el: "O", x: 1.3, y: -2.25, h: 1, q: 0, site: "a" },
+      { el: "R", x: 0, y: 1.5, h: 0, q: 0 },
+    ],
+    bindinger: [[0, 1, 1, 0], [1, 2, 1, 0], [2, 3, 2, 0], [2, 4, 1, 0], [1, 5, 1, 0]],
+  };
+  const deler = {
+    amino: { navn: "Aminogruppe", atomer: [0], farge: "#3d7ea6" },
+    karboksyl: { navn: "Karboksylgruppe", atomer: [2, 3, 4], farge: "#e0884d" },
+    alfa: { navn: "α-karbon (Cα)", atomer: [1], farge: "#5aa889" },
+    side: { navn: "Sidegruppe (R)", atomer: [5], farge: "#d9534f" },
+  };
+  const tekster = (zw) => ({
+    amino: zw
+      ? "Aminogruppen er en base og har tatt opp et proton: <strong style=\"white-space:nowrap\">–NH₃⁺</strong>. Den har ladning +1."
+      : "Aminogruppen i uladd form: <strong style=\"white-space:nowrap\">–NH₂</strong>. Nitrogenet har et ledig elektronpar og kan ta opp et proton.",
+    karboksyl: zw
+      ? "Karboksylgruppen er en syre og har avgitt et proton: <strong style=\"white-space:nowrap\">–COO⁻</strong>. Den har ladning −1."
+      : "Karboksylgruppen i uladd form: <strong style=\"white-space:nowrap\">–COOH</strong>. Den kan avgi et proton fra O–H.",
+    alfa: "Cα er karbonet i midten. Det binder aminogruppen, karboksylgruppen, sidegruppen og et hydrogen. Fordi alle fire er ulike, er Cα et <strong>kiralt senter</strong> (unntatt i glysin).",
+    side: "Sidegruppen (R) er det eneste som er forskjellig mellom de 20 aminosyrene. Den bestemmer om aminosyren er upolar, polar, positiv eller negativ.",
+  });
+
+  let zw = true,
+    valgt = "amino";
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const tegning = html`<div class="bk-aa-tegning"></div>`;
+  const panel = html`<div class="bk-panel k-blue"></div>`;
+  const knapp = html`<button class="bk-knapp"></button>`;
+  const status = html`<p class="bk-hint bk-sentrert"></p>`;
+  let W = 520,
+    anim = false;
+
+  function tegn() {
+    const u = deler[valgt];
+    const t = BKAA.tegn(mol, {
+      bredde: W,
+      maksBinding: 62,
+      fs: 20,
+      minHoyde: 210,
+      tilstand: { a: zw, n: !zw },
+      uthev: [{ atomer: u.atomer, farge: u.farge }],
+      merker: [{ atom: 1, dx: 0, dy: 34, tekst: "Cα" }],
+      alt: "Generell aminosyre med aminogruppe, α-karbon, karboksylgruppe og sidegruppe R",
+    });
+    tegning.innerHTML = t.svg;
+    tegning.dataset.o = JSON.stringify({ n: [t.px(0), t.py(0)], o: [t.px(4), t.py(4)] });
+  }
+  function oppdater() {
+    tegn();
+    const u = deler[valgt];
+    panel.style.setProperty("--ks", u.farge);
+    panel.innerHTML = `<h4>${u.navn}</h4><p>${tekster(zw)[valgt]}</p>`;
+    knapp.textContent = zw ? "Flytt protonet tilbake (uladd form)" : "Flytt protonet (lag zwitterion)";
+    status.innerHTML = zw
+      ? "Zwitterion: <strong>total ladning 0</strong> (+1 og −1). Slik finnes aminosyrer i vann ved pH ≈ 7."
+      : "Uladd form (COOH og NH₂). Den finnes nesten ikke i vann: syren og basen reagerer med hverandre.";
+    chips.querySelectorAll("button").forEach((b) => b.classList.toggle("valgt", b.dataset.id === valgt));
+  }
+  Object.entries(deler).forEach(([id, d]) => {
+    const b = html`<button class="bk-chip" data-id="${id}">${d.navn}</button>`;
+    b.onclick = () => {
+      valgt = id;
+      oppdater();
+    };
+    chips.append(b);
+  });
+  knapp.onclick = () => {
+    if (anim) return;
+    anim = true;
+    const o = JSON.parse(tegning.dataset.o);
+    const fra = zw ? o.n : o.o,
+      til = zw ? o.o : o.n;
+    const svgEl = tegning.querySelector("svg");
+    const ns = "http://www.w3.org/2000/svg";
+    const dot = document.createElementNS(ns, "circle");
+    dot.setAttribute("r", 7);
+    dot.setAttribute("fill", "#e0584d");
+    const txt = document.createElementNS(ns, "text");
+    txt.textContent = "H⁺";
+    txt.setAttribute("font-size", 11);
+    txt.setAttribute("font-weight", 700);
+    txt.setAttribute("text-anchor", "middle");
+    txt.setAttribute("dy", "0.35em");
+    txt.setAttribute("fill", "#fff");
+    svgEl.append(dot, txt);
+    const t0 = performance.now(),
+      varighet = 1300;
+    const bue = (t) => {
+      const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      const mx = (fra[0] + til[0]) / 2,
+        my = Math.min(fra[1], til[1]) - 60;
+      const x = (1 - e) * (1 - e) * fra[0] + 2 * (1 - e) * e * mx + e * e * til[0];
+      const y = (1 - e) * (1 - e) * fra[1] + 2 * (1 - e) * e * my + e * e * til[1];
+      return [x, y];
+    };
+    const steg = (nå) => {
+      const t = Math.min(1, (nå - t0) / varighet);
+      const [x, y] = bue(t);
+      dot.setAttribute("cx", x);
+      dot.setAttribute("cy", y);
+      txt.setAttribute("x", x);
+      txt.setAttribute("y", y);
+      if (t < 1) requestAnimationFrame(steg);
+      else {
+        zw = !zw;
+        anim = false;
+        oppdater();
+      }
+    };
+    requestAnimationFrame(steg);
+  };
+  const rot = html`<div class="bk-aa-boks">${chips}${tegning}${status}${knapp}${panel}</div>`;
+  oppdater();
+  bkTilpass(rot, 520, (w) => {
+    W = w;
+    if (!anim) oppdater();
+  }, invalidation);
+  return rot;
+}
+```

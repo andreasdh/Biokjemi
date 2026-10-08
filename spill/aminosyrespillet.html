@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aminosyrespillet</title>
+<style>
+:root {
+  --bg: #f7fafb; --kort: #ffffff; --tekst: #1f2f38; --dempet: #5b6f7a; --linje: #d3e0e6;
+  --blaa: #3d7ea6; --groenn: #3f8468; --koral: #c8553f; --gul: #b88a2a;
+  --rett: #d8efe5; --feil: #f8d9d0; --knapp: #e9f1f6;
+}
+:root[data-tema="mork"] {
+  --bg: #14201f; --kort: #1c2c2f; --tekst: #e8eff2; --dempet: #9fb4bf; --linje: #2f4650;
+  --blaa: #6bb2da; --groenn: #6fc1a0; --koral: #f08a74; --gul: #e0b858;
+  --rett: #1d4636; --feil: #4d2a24; --knapp: #26393f;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--tekst); line-height: 1.45; }
+main { max-width: 760px; margin: 0 auto; padding: 14px 16px 40px; }
+h1 { font-size: 1.5rem; margin: 0.2rem 0 0.2rem; }
+h2 { font-size: 1.15rem; margin: 1rem 0 0.4rem; }
+p { margin: 0.4rem 0; }
+.dempet { color: var(--dempet); font-size: 0.9rem; }
+.kort { background: var(--kort); border: 1px solid var(--linje); border-radius: 14px; padding: 14px 16px; margin: 10px 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.knapp { background: var(--blaa); color: #fff; border: 0; border-radius: 10px; padding: 9px 18px; font-weight: 600; }
+.knapp:hover { filter: brightness(1.08); }
+.knapp.sek { background: var(--knapp); color: var(--tekst); font-weight: 500; }
+.knapp:disabled { opacity: 0.5; cursor: default; }
+.modus { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.modus button { text-align: left; background: var(--kort); border: 2px solid var(--linje); border-radius: 12px; padding: 12px 14px; }
+.modus button strong { display: block; font-size: 1.05rem; }
+.modus button span { color: var(--dempet); font-size: 0.85rem; }
+.modus button.valgt { border-color: var(--blaa); background: color-mix(in srgb, var(--blaa) 12%, var(--kort)); }
+.rad { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.brikke { background: var(--knapp); border: 2px solid transparent; border-radius: 20px; padding: 4px 14px; font-size: 0.92rem; }
+.brikke.valgt { background: var(--blaa); color: #fff; }
+label.sjekk { display: inline-flex; gap: 6px; align-items: center; font-size: 0.92rem; margin: 3px 12px 3px 0; }
+input[type=text] { font: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--linje); background: var(--kort); color: var(--tekst); }
+.topp { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 0.95rem; }
+.topp b { font-variant-numeric: tabular-nums; }
+.stolpe { height: 8px; background: var(--linje); border-radius: 4px; overflow: hidden; margin: 6px 0 10px; }
+.stolpe i { display: block; height: 100%; background: var(--groenn); transition: width 0.15s linear; }
+.stolpe.rask i { background: var(--koral); }
+.spm { font-size: 1.1rem; font-weight: 600; margin: 4px 0 6px; }
+.figur { max-width: 380px; margin: 4px auto 8px; color: var(--tekst); }
+.valg { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 8px; }
+.valg.figurer { grid-template-columns: repeat(2, 1fr); }
+.valg button { background: var(--knapp); border: 2px solid var(--linje); border-radius: 12px; padding: 11px 10px; font-size: 1.02rem; text-align: center; color: var(--tekst); }
+.valg button:hover:not(:disabled) { border-color: var(--blaa); }
+.valg button .nr { display: inline-block; width: 1.4em; opacity: 0.55; font-size: 0.8em; }
+.valg button.rett { background: var(--rett); border-color: var(--groenn); }
+.valg button.feil { background: var(--feil); border-color: var(--koral); }
+.valg button:disabled { cursor: default; }
+.valg.figurer button { padding: 4px; }
+.forklaring { margin-top: 10px; padding: 10px 14px; border-left: 5px solid var(--groenn); background: color-mix(in srgb, var(--groenn) 12%, var(--kort)); border-radius: 0 10px 10px 0; font-size: 0.95rem; }
+.forklaring.feil { border-left-color: var(--koral); background: color-mix(in srgb, var(--koral) 12%, var(--kort)); }
+.stor { font-size: 2.6rem; font-weight: 800; color: var(--groenn); line-height: 1.1; }
+.statrad { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin: 10px 0; }
+.stat { background: var(--knapp); border-radius: 10px; padding: 8px 10px; text-align: center; }
+.stat b { display: block; font-size: 1.25rem; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+td, th { padding: 5px 8px; border-bottom: 1px solid var(--linje); text-align: left; }
+.kode { font-family: ui-monospace, monospace; font-size: 1.15rem; letter-spacing: 0.08em; background: var(--knapp); padding: 3px 10px; border-radius: 8px; }
+.skjult { display: none !important; }
+.feilkort { border-left: 4px solid var(--koral); padding: 4px 10px; margin: 8px 0; }
+@media (prefers-reduced-motion: reduce) { .stolpe i { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>🧪 Aminosyrespillet</h1>
+  <p class="dempet">Kjenn igjen og klassifiser aminosyrer. Velg modus og nivå, og start.</p>
+
+  <section id="start">
+    <div class="kort">
+      <h2>1. Modus</h2>
+      <div class="modus" id="modusvalg">
+        <button data-m="ovelse" class="valgt"><strong>📘 Øvelse</strong><span>Ingen tidspress. Du får forklaring på hvert svar.</span></button>
+        <button data-m="tid"><strong>⏱️ Tid</strong><span>60 sekunder. Så mange riktige du klarer. Feil svar koster 5 sekunder.</span></button>
+        <button data-m="konk"><strong>🏆 Konkurranse</strong><span>10 spørsmål, poeng for fart. Del koden og sammenlign med andre.</span></button>
+      </div>
+      <h2>2. Nivå</h2>
+      <div class="rad" id="nivaavalg">
+        <button class="brikke valgt" data-n="1">Nivå 1: grunnleggende</button>
+        <button class="brikke" data-n="2">Nivå 2: videre</button>
+        <button class="brikke" data-n="3">Nivå 3: avansert</button>
+      </div>
+      <p class="dempet" id="nivaatekst"></p>
+      <div id="emnedel">
+        <h2>3. Emner (kan tilpasses)</h2>
+        <div id="emner"></div>
+      </div>
+      <div id="kodedel" class="skjult">
+        <h2>3. Utfordringskode</h2>
+        <p class="dempet">La feltet stå tomt for en ny tilfeldig runde, eller skriv inn en kode du har fått av en medstudent for å få nøyaktig de samme spørsmålene.</p>
+        <div class="rad"><input type="text" id="kodefelt" placeholder="f.eks. 2-K7QXM" maxlength="12" autocomplete="off" aria-label="Utfordringskode"></div>
+      </div>
+      <p style="margin-top:14px"><button class="knapp" id="startknapp">Start spillet</button></p>
+    </div>
+    <div class="kort" id="toppliste-start"></div>
+  </section>
+
+  <section id="spill" class="skjult">
+    <div class="topp"><span id="fremdrift"></span><span id="poeng"></span><span id="klokke"></span></div>
+    <div class="stolpe" id="tidstolpe"><i style="width:100%"></i></div>
+    <div class="kort">
+      <div class="spm" id="spm"></div>
+      <div class="figur" id="figur"></div>
+      <div class="valg" id="valg"></div>
+      <div id="tilbake"></div>
+      <p style="margin-top:10px"><button class="knapp skjult" id="nesteknapp">Neste →</button></p>
+    </div>
+    <p class="dempet"><button class="knapp sek" id="avslutt">Avslutt</button> <span class="dempet">Tips: bruk tastene 1–4 for å svare, og Enter for å gå videre.</span></p>
+  </section>
+
+  <section id="resultat" class="skjult"></section>
+</main>
+
+<script src="aminosyredata.js"></script>
+<script src="aminosyrekjemi.js"></script>
+<script>
+(function () {
+  "use strict";
+  // ---------------- tema (følger boka hvis vi ligger i en iframe) ----------------
+  function settTema() {
+    let mork = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    try {
+      if (window.parent !== window && window.parent.document.body) {
+        mork = window.parent.document.body.classList.contains("quarto-dark");
+      }
+    } catch (e) {}
+    document.documentElement.dataset.tema = mork ? "mork" : "lys";
+  }
+  settTema();
+  try {
+    if (window.parent !== window) new MutationObserver(settTema).observe(window.parent.document.body, { attributes: true, attributeFilter: ["class"] });
+  } catch (e) {}
+  if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", settTema);
+
+  const $ = (id) => document.getElementById(id);
+  const AA = BKAA.data.aminosyrer;
+  const komma = (x, d = 1) => (typeof x === "number" ? x.toFixed(d) : String(x)).replace(".", ",").replace("-", "−");
+  const gruppeNavn = { upolar: "Upolar", polar: "Polar (uladd)", negativ: "Negativ", positiv: "Positiv" };
+  const gruppeTekst = { upolar: "upolar", polar: "polar og uladd", negativ: "negativt ladd", positiv: "positivt ladd" };
+
+  // formler for sidegruppene (brukes i Fischer-projeksjonene)
+  const RFORM = { ala: "CH₃", ser: "CH₂OH", cys: "CH₂SH", val: "CH(CH₃)₂", leu: "CH₂CH(CH₃)₂", asp: "CH₂COOH", glu: "CH₂CH₂COOH",
+    asn: "CH₂CONH₂", gln: "CH₂CH₂CONH₂", met: "CH₂CH₂SCH₃", lys: "(CH₂)₄NH₂", phe: "CH₂C₆H₅", tyr: "CH₂C₆H₄OH" };
+  const FISCHER_IDER = Object.keys(RFORM);
+
+  // ---------------- hjelpefunksjoner for tilfeldighet ----------------
+  let rng = Math.random;
+  const pick = (arr) => arr[Math.floor(rng() * arr.length)];
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+  const kodeTegn = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const nyKode = (n) => n + "-" + Array.from({ length: 5 }, () => kodeTegn[Math.floor(Math.random() * kodeTegn.length)]).join("");
+
+  // ---------------- tegning ----------------
+  function strukturSvg(aa, o = {}) {
+    const t = BKAA.kjemi.tilstand(aa, 7.4);
+    return BKAA.tegn(aa, { bredde: o.bredde || 340, maksBinding: o.maks || 54, fs: o.fs || 16, minHoyde: o.hoyde || 180, tilstand: t,
+      sidegruppe: o.uthev ? "#8aa0ad" : null, alt: "Strukturformel av en aminosyre" }).svg;
+  }
+  function fischerSvg(id, nVenstre, snudd) {
+    const R = RFORM[id];
+    let topp = "COOH", bunn = R, venstre = nVenstre ? "H₂N" : "H", hoyre = nVenstre ? "H" : "H₂N";
+    if (snudd) { [topp, bunn] = [bunn, topp]; [venstre, hoyre] = [hoyre, venstre]; }
+    const t = (x, y, s) => `<text x="${x}" y="${y}" dy="0.35em" text-anchor="middle" font-size="18" font-weight="700" fill="currentColor">${s}</text>`;
+    return `<svg viewBox="0 0 280 220" style="width:100%;max-width:280px;display:block;margin:0 auto" role="img" aria-label="Fischer-projeksjon">
+      <line x1="70" y1="110" x2="210" y2="110" stroke="currentColor" stroke-width="2.4"/><line x1="140" y1="42" x2="140" y2="180" stroke="currentColor" stroke-width="2.4"/>
+      ${t(140, 22, topp)}${t(140, 200, bunn)}${t(42, 110, venstre)}${t(238, 110, hoyre)}</svg>`;
+  }
+
+  // ---------------- spørsmålstyper ----------------
+  let sist = [];
+  function nyAA(liste) {
+    const kandidater = (liste || AA).filter((a) => !sist.includes(a.id));
+    const a = pick(kandidater.length ? kandidater : liste || AA);
+    sist.push(a.id); if (sist.length > 5) sist.shift();
+    return a;
+  }
+  function valgMedRiktig(riktigKey, riktigLabel, andre) {
+    const ant = Math.min(4, andre.length + 1);
+    const alt = shuffle(andre.filter((x) => x.key !== riktigKey)).slice(0, ant - 1);
+    return shuffle([{ key: riktigKey, label: riktigLabel }, ...alt]);
+  }
+  const aaValg = (a, mal) => ({ key: a.id, label: a[mal || "navn"] });
+
+  const TYPER = {
+    gruppe(n) {
+      const a = nyAA();
+      return { spm: "Hvilken gruppe hører denne aminosyren til?", figur: strukturSvg(a, { uthev: n === 1 }),
+        valg: ["upolar", "polar", "negativ", "positiv"].map((g) => ({ key: g, label: gruppeNavn[g] })), riktig: a.gruppe,
+        forklaring: `<strong>${a.navn}</strong> er ${gruppeTekst[a.gruppe]}. ${a.tekst}`,
+        sammendrag: `Gruppe til ${a.navn}` };
+    },
+    navn(n) {
+      const a = nyAA();
+      const andre = (n >= 2 ? AA.filter((x) => x.gruppe === a.gruppe && x.id !== a.id) : AA.filter((x) => x.id !== a.id));
+      const mer = andre.length >= 3 ? andre : AA.filter((x) => x.id !== a.id);
+      return { spm: "Hvilken aminosyre er dette?", figur: strukturSvg(a, { uthev: n === 1 }),
+        valg: valgMedRiktig(a.id, a.navn, shuffle(mer).map((x) => aaValg(x))), riktig: a.id,
+        forklaring: `Dette er <strong>${a.navn}</strong> (${a.tre}, ${a.en}). ${a.tekst}`, sammendrag: "Navn på aminosyre fra struktur" };
+    },
+    struktur() {
+      const a = nyAA();
+      const andre = shuffle(AA.filter((x) => x.gruppe === a.gruppe && x.id !== a.id)).slice(0, 3);
+      const alle = shuffle([a, ...(andre.length === 3 ? andre : shuffle(AA.filter((x) => x.id !== a.id)).slice(0, 3))]);
+      return { spm: `Hvilken struktur er ${a.navn}?`, figur: "", figurer: true,
+        valg: alle.map((x) => ({ key: x.id, html: strukturSvg(x, { bredde: 250, maks: 38, fs: 13, hoyde: 120 }) })), riktig: a.id,
+        forklaring: `<strong>${a.navn}</strong>: ${a.tekst}`, sammendrag: `Struktur av ${a.navn}` };
+    },
+    kode() {
+      const a = nyAA();
+      if (rng() < 0.5) {
+        const alt = valgMedRiktig(a.en, a.en, shuffle(AA.filter((x) => x.id !== a.id)).map((x) => ({ key: x.en, label: x.en })));
+        return { spm: `Hva er ettbokstavskoden til ${a.navn}?`, figur: "", valg: alt, riktig: a.en,
+          forklaring: `${a.navn} = ${a.tre} = <strong>${a.en}</strong>.`, sammendrag: `Ettbokstavskoden til ${a.navn}` };
+      }
+      return { spm: `Hvilken aminosyre har ettbokstavskoden ${a.en}?`, figur: "",
+        valg: valgMedRiktig(a.id, a.navn, shuffle(AA.filter((x) => x.id !== a.id)).map((x) => aaValg(x))), riktig: a.id,
+        forklaring: `${a.en} = ${a.tre} = <strong>${a.navn}</strong>.`, sammendrag: `Hvilken aminosyre er ${a.en}?` };
+    },
+    essensiell() {
+      const a = nyAA(rng() < 0.5 ? AA.filter((x) => x.essensiell) : AA.filter((x) => !x.essensiell));
+      return { spm: `Er ${a.navn} en essensiell aminosyre for mennesker?`, figur: "",
+        valg: [{ key: "ja", label: "Ja, må tilføres med kosten" }, { key: "nei", label: "Nei, kroppen lager den selv" }],
+        riktig: a.essensiell ? "ja" : "nei",
+        forklaring: `De ni essensielle er His, Ile, Leu, Lys, Met, Phe, Thr, Trp og Val. <strong>${a.navn}</strong> er ${a.essensiell ? "en av dem" : "ikke blant dem"}.`,
+        sammendrag: `Er ${a.navn} essensiell?` };
+    },
+    egenskap() {
+      const F = [
+        ["Hvilken aminosyre er ikke kiral?", "gly", "Glysin har to hydrogenatomer på Cα, så Cα er ikke kiralt."],
+        ["Hvilken aminosyre kan danne disulfidbroer (–S–S–)?", "cys", "Tiolgruppen (–SH) i cystein kan oksideres, og to cysteiner danner da en kovalent disulfidbro."],
+        ["Hvilken aminosyre har en sidegruppe som er koblet til aminogruppa i en ring?", "pro", "Prolin er stiv og bøyer kjeden."],
+        ["Hvilken aminosyre er R (ikke S) i naturlig L-form?", "cys", "CH₂SH har høyere prioritet enn COOH fordi S har høyere atomnummer enn O."],
+        ["Hvilken aminosyre har høyest pI (mest basisk)?", "arg", "Guanidiniumgruppa er svært basisk, og pI er ca. 10,8."],
+        ["Hvilken aminosyre har lavest pI (mest sur)?", "asp", "Asparaginsyre: pI = (1,88 + 3,65)/2 ≈ 2,8."],
+        ["Hvilken aminosyre har en pKₐ nær fysiologisk pH og virker ofte som syre/base i enzymer?", "his", "Imidazolringen i histidin har pKₐ ≈ 6."],
+        ["Hvilken aminosyre har en benzenring med en OH-gruppe?", "tyr", "Tyrosin er aromatisk og polar (fenol)."],
+        ["Hvilken er den største aminosyren (indolring)?", "trp", "Tryptofan har en indolring."],
+        ["Hvilken aminosyre koder startkodonet AUG for?", "met", "Metionin, som har en tioeter (–S–CH₃) i sidegruppa."],
+        ["Hvilken aminosyre har en guanidiniumgruppe i sidegruppa?", "arg", "Arginin: –(CH₂)₃–NH–C(=NH₂⁺)–NH₂."],
+        ["Hvilken negative aminosyre har bare én CH₂-gruppe mellom Cα og COO⁻?", "asp", "Asparaginsyre. Glutaminsyre har to CH₂."],
+        ["Hvilken polar aminosyre har en amidgruppe og bare én CH₂-gruppe?", "asn", "Asparagin: –CH₂–CO–NH₂. Glutamin har to CH₂."],
+        ["Hvilken aminosyre har en hydroksylgruppe og to kirale sentre?", "thr", "Treonin: –CH(OH)–CH₃ gir et ekstra kiralt senter."],
+        ["Hvilken upolar aminosyre har en forgrenet sidegruppe og er den mest hydrofobe?", "ile", "Isoleucin har høyest hydropatiindeks (4,5)."],
+        ["Hvilken er den minste aminosyren?", "gly", "Sidegruppa er bare et hydrogenatom."],
+      ];
+      const [q, id, forkl] = pick(F);
+      const a = BKAA.finn(id);
+      return { spm: q, figur: "", valg: valgMedRiktig(id, a.navn, shuffle(AA.filter((x) => x.id !== id)).map((x) => aaValg(x))), riktig: id,
+        forklaring: forkl, sammendrag: q };
+    },
+    ladning() {
+      const a = nyAA();
+      const pks = BKAA.kjemi.grupper(a).map((g) => g.pK);
+      const phs = [1, 2.6, 5, 6.5, 7.4, 9.3, 11, 12, 13].filter((p) => pks.every((k) => Math.abs(k - p) > 0.6));
+      const pH = pick(phs);
+      const q = BKAA.kjemi.heltallsladning(a, pH);
+      const alt = [];
+      for (let k = -3; k <= 3; k++) if (k !== q && Math.abs(k - q) <= 2) alt.push({ key: String(k), label: fmtQ(k) });
+      const g = BKAA.kjemi.grupper(a).sort((x, y) => x.pK - y.pK);
+      const del = g.map((x) => `${x.navn} (pKₐ ${komma(x.pK, 2)}): ${pH > x.pK ? "deprotonert" : "protonert"}`).join("; ");
+      return { spm: `Hva er nettoladningen til ${a.navn} ved pH ${komma(pH, 1)}?`, figur: "",
+        valg: valgMedRiktig(String(q), fmtQ(q), alt).sort((x, y) => +x.key - +y.key), riktig: String(q),
+        forklaring: `Når pH er høyere enn pKₐ, er gruppa deprotonert. ${del}. Total ladning: <strong>${fmtQ(q)}</strong>.`,
+        sammendrag: `Ladning til ${a.navn} ved pH ${komma(pH, 1)}` };
+    },
+    ld() {
+      const a = BKAA.finn(pick(FISCHER_IDER));
+      const L = rng() < 0.5, snudd = rng() < 0.45;
+      // i standardorientering (COOH øverst): L = NH₂ til venstre
+      const nVenstreStd = L;
+      const nVenstre = snudd ? !nVenstreStd : nVenstreStd;
+      return { spm: `Fischer-projeksjon av ${a.navn.toLowerCase()}. Er det L eller D?`, figur: fischerSvg(a.id, nVenstre, snudd),
+        valg: [{ key: "L", label: "L" }, { key: "D", label: "D" }], riktig: L ? "L" : "D",
+        forklaring: `${snudd ? "Roter figuren 180° i planet slik at COOH kommer øverst. " : ""}Med COOH øverst sitter H₂N på ${L ? "venstre side → <strong>L</strong>" : "høyre side → <strong>D</strong>"}.`,
+        sammendrag: `L eller D (${a.navn})` };
+    },
+    rs() {
+      const a = BKAA.finn(pick(["ala", "ser", "cys", "cys", "val", "asp", "lys", "phe"]));
+      const L = rng() < 0.6;
+      const cys = a.id === "cys";
+      // L-aminosyre er S, unntatt cystein (R). D er motsatt.
+      const erS = (L && !cys) || (!L && cys);
+      return { spm: `Fischer-projeksjon (COOH øverst) av ${a.navn.toLowerCase()}. Er konfigurasjonen R eller S?`, figur: fischerSvg(a.id, L, false),
+        valg: [{ key: "R", label: "R (med klokka)" }, { key: "S", label: "S (mot klokka)" }], riktig: erS ? "S" : "R",
+        forklaring: `Dette er ${L ? "L" : "D"}-${a.navn.toLowerCase()}. Prioritet: NH₂ (1), ${cys ? "CH₂SH (2), COOH (3)" : "COOH (2), " + RFORM[a.id] + " (3)"}, H (4). ${cys ? "S slår O, så sidegruppa har høyere prioritet. " : ""}Naturlig L-${a.navn.toLowerCase()} er ${cys ? "R" : "S"}, så dette er <strong>${erS ? "S" : "R"}</strong>.`,
+        sammendrag: `R eller S (${a.navn})` };
+    },
+  };
+  function fmtQ(q) { return q > 0 ? "+" + q : q < 0 ? "−" + Math.abs(q) : "0"; }
+
+  const EMNER = [
+    ["gruppe", "Gruppe (upolar, polar, negativ, positiv)", 1], ["navn", "Navn fra struktur", 1], ["struktur", "Struktur fra navn", 2],
+    ["kode", "Ettbokstavskoder", 2], ["essensiell", "Essensielle aminosyrer", 2], ["egenskap", "Egenskaper og fakta", 2],
+    ["ladning", "Ladning ved gitt pH", 3], ["ld", "L eller D (Fischer)", 3], ["rs", "R eller S", 3],
+  ];
+  const NIVAATEKST = { 1: "Struktur med uthevet sidegruppe. Grupper og navn.", 2: "Uten hjelp: også strukturer, koder, essensielle og fakta.", 3: "Alt, inkludert ladning ved pH, L/D og R/S." };
+
+  // ---------------- tilstand og spillflyt ----------------
+  let modus = "ovelse", nivaa = 1, valgteEmner = new Set(), kode = "", sp = null, tikker = null;
+  const MODI = { ovelse: { navn: "Øvelse" }, tid: { navn: "Tid" }, konk: { navn: "Konkurranse" } };
+
+  function tegnStart() {
+    document.querySelectorAll("#modusvalg button").forEach((b) => b.classList.toggle("valgt", b.dataset.m === modus));
+    document.querySelectorAll("#nivaavalg button").forEach((b) => b.classList.toggle("valgt", +b.dataset.n === nivaa));
+    $("nivaatekst").textContent = NIVAATEKST[nivaa];
+    $("emnedel").classList.toggle("skjult", modus !== "ovelse");
+    $("kodedel").classList.toggle("skjult", modus !== "konk");
+    $("emner").innerHTML = "";
+    EMNER.forEach(([id, navn]) => {
+      const l = document.createElement("label"); l.className = "sjekk";
+      const c = document.createElement("input"); c.type = "checkbox"; c.checked = valgteEmner.has(id);
+      c.onchange = () => { c.checked ? valgteEmner.add(id) : valgteEmner.delete(id); };
+      l.append(c, " " + navn); $("emner").append(l);
+    });
+    tegnTopp("toppliste-start");
+  }
+  function standardEmner() { valgteEmner = new Set(EMNER.filter((e) => e[2] <= nivaa).map((e) => e[0])); }
+
+  function tegnTopp(mål) {
+    const liste = lesTopp(modus === "tid" ? "tid" : "konk", nivaa);
+    const navn = { tid: "Tid", konk: "Konkurranse", ovelse: "" }[modus];
+    if (modus === "ovelse") { $(mål).innerHTML = '<p class="dempet">Velg modus «Tid» eller «Konkurranse» for å komme på resultatlista (den lagres bare på denne enheten).</p>'; return; }
+    $(mål).innerHTML = `<h2>Din toppliste: ${navn}, nivå ${nivaa}</h2>` + (liste.length
+      ? `<table><tr><th>#</th><th>Navn</th><th>Poeng</th><th>Riktige</th></tr>${liste.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.navn)}</td><td>${r.poeng}</td><td>${r.riktig}/${r.antall}</td></tr>`).join("")}</table>`
+      : '<p class="dempet">Ingen resultater ennå.</p>');
+  }
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  function lesTopp(m, n) { try { return (JSON.parse(localStorage.getItem("bkaa-topp") || "{}")[m + n]) || []; } catch (e) { return []; } }
+  function lagreTopp(m, n, rad) {
+    try {
+      const alle = JSON.parse(localStorage.getItem("bkaa-topp") || "{}");
+      const l = (alle[m + n] || []).concat([rad]).sort((a, b) => b.poeng - a.poeng).slice(0, 10);
+      alle[m + n] = l; localStorage.setItem("bkaa-topp", JSON.stringify(alle));
+    } catch (e) {}
+  }
+
+  function start() {
+    let seed = "";
+    if (modus === "konk") {
+      const k = $("kodefelt").value.trim().toUpperCase();
+      if (/^[123]-[A-Z0-9]{3,8}$/.test(k)) { nivaa = +k[0]; seed = k; } else seed = nyKode(nivaa);
+      kode = seed;
+      rng = BKAA.rng(seed);
+    } else { rng = Math.random; kode = ""; }
+    const emner = modus === "ovelse" ? [...valgteEmner] : EMNER.filter((e) => e[2] <= nivaa).map((e) => e[0]);
+    if (!emner.length) { alert("Velg minst ett emne."); return; }
+    sist = [];
+    sp = { modus, nivaa, emner, nr: 0, poeng: 0, riktige: 0, antall: 0, serie: 0, besteSerie: 0, feil: [], tider: [],
+      tidIgjen: 60, antallSpm: modus === "konk" ? 10 : Infinity, q: null, besvart: false, qStart: 0, qMaks: 20, slutt: false };
+    $("start").classList.add("skjult"); $("resultat").classList.add("skjult"); $("spill").classList.remove("skjult");
+    nesteSpm();
+    clearInterval(tikker);
+    tikker = setInterval(tikk, 100);
+  }
+
+  function nesteSpm() {
+    if (sp.nr >= sp.antallSpm) return avslutt();
+    const emne = pick(sp.emner);
+    sp.q = TYPER[emne](sp.nivaa);
+    sp.nr++; sp.besvart = false; sp.qStart = performance.now();
+    $("spm").innerHTML = sp.q.spm;
+    $("figur").innerHTML = sp.q.figur || "";
+    $("figur").classList.toggle("skjult", !sp.q.figur);
+    const v = $("valg"); v.innerHTML = ""; v.className = "valg" + (sp.q.figurer ? " figurer" : "");
+    sp.q.valg.forEach((o, i) => {
+      const b = document.createElement("button");
+      b.dataset.key = o.key;
+      b.innerHTML = (o.html ? "" : `<span class="nr">${i + 1}</span>`) + (o.html || o.label);
+      b.onclick = () => svar(o.key);
+      v.append(b);
+    });
+    $("tilbake").innerHTML = "";
+    $("nesteknapp").classList.add("skjult");
+    tegnTopplinje();
+  }
+
+  function svar(key) {
+    if (sp.besvart || sp.slutt) return;
+    sp.besvart = true;
+    const brukt = (performance.now() - sp.qStart) / 1000;
+    const rett = key === sp.q.riktig;
+    sp.antall++; sp.tider.push(brukt);
+    let poeng = 0;
+    if (rett) {
+      sp.riktige++; sp.serie++; sp.besteSerie = Math.max(sp.besteSerie, sp.serie);
+      if (sp.modus === "konk") poeng = 100 + Math.round(100 * Math.max(0, 1 - brukt / sp.qMaks)) + Math.min(5, sp.serie - 1) * 10;
+      else if (sp.modus === "tid") poeng = 10 + Math.min(5, sp.serie - 1) * 2;
+    } else {
+      sp.serie = 0;
+      if (sp.modus === "tid") sp.tidIgjen -= 5;
+      sp.feil.push({ spm: sp.q.sammendrag, svar: svarTekst(key), riktig: svarTekst(sp.q.riktig), forklaring: sp.q.forklaring });
+    }
+    sp.poeng += poeng;
+    markerSvar(key, rett);
+    if (sp.modus === "tid") {
+      setTimeout(() => { if (!sp.slutt) nesteSpm(); }, rett ? 450 : 1100);
+    } else {
+      $("tilbake").innerHTML = `<div class="forklaring ${rett ? "" : "feil"}"><strong>${rett ? "Riktig!" : key === "tom" ? "Tiden gikk ut." : "Ikke helt."}</strong>${sp.modus === "konk" && rett ? ` +${poeng} poeng.` : ""} ${sp.q.forklaring}</div>`;
+      $("nesteknapp").textContent = sp.nr >= sp.antallSpm ? "Se resultatet →" : "Neste →";
+      $("nesteknapp").classList.remove("skjult"); $("nesteknapp").focus();
+    }
+    tegnTopplinje();
+  }
+  function svarTekst(key) {
+    const o = sp.q.valg.find((x) => String(x.key) === String(key));
+    return o ? (o.label || "(struktur)") : "Ingen svar";
+  }
+  function markerSvar(key, rett) {
+    document.querySelectorAll("#valg button").forEach((b) => {
+      b.disabled = true;
+      if (b.dataset.key === String(sp.q.riktig)) b.classList.add("rett");
+      else if (b.dataset.key === String(key)) b.classList.add("feil");
+    });
+  }
+
+  function tegnTopplinje() {
+    $("fremdrift").textContent = sp.modus === "konk" ? `Spørsmål ${Math.min(sp.nr, 10)} / 10` : `Spørsmål ${sp.nr}`;
+    $("poeng").innerHTML = sp.modus === "ovelse" ? `Riktige: <b>${sp.riktige}</b> av ${sp.antall}` : `Poeng: <b>${sp.poeng}</b>`;
+    if (sp.modus === "tid") $("klokke").innerHTML = `⏱️ <b>${Math.max(0, Math.ceil(sp.tidIgjen))} s</b>`;
+    else if (sp.modus === "konk") $("klokke").innerHTML = `⏱️ <b>${Math.max(0, Math.ceil(sp.qMaks - (performance.now() - sp.qStart) / 1000))} s</b>`;
+    else $("klokke").innerHTML = sp.serie > 1 ? `🔥 Serie: <b>${sp.serie}</b>` : "";
+    $("tidstolpe").classList.toggle("skjult", sp.modus === "ovelse");
+  }
+  function tikk() {
+    if (!sp || sp.slutt) return;
+    if (sp.modus === "tid") {
+      sp.tidIgjen -= 0.1;
+      $("tidstolpe").firstElementChild.style.width = Math.max(0, (sp.tidIgjen / 60) * 100) + "%";
+      $("tidstolpe").classList.toggle("rask", sp.tidIgjen < 10);
+      if (sp.tidIgjen <= 0) return avslutt();
+    } else if (sp.modus === "konk" && !sp.besvart) {
+      const t = (performance.now() - sp.qStart) / 1000;
+      $("tidstolpe").firstElementChild.style.width = Math.max(0, (1 - t / sp.qMaks) * 100) + "%";
+      $("tidstolpe").classList.toggle("rask", sp.qMaks - t < 5);
+      if (t >= sp.qMaks) svar("tom");
+    }
+    if (sp.modus !== "ovelse") tegnTopplinje();
+  }
+
+  function avslutt() {
+    sp.slutt = true; clearInterval(tikker);
+    $("spill").classList.add("skjult"); $("resultat").classList.remove("skjult");
+    const nøy = sp.antall ? Math.round((100 * sp.riktige) / sp.antall) : 0;
+    const snitt = sp.tider.length ? sp.tider.reduce((a, b) => a + b, 0) / sp.tider.length : 0;
+    let navnFelt = "", kodeDel = "", nokkel = "";
+    if (sp.modus !== "ovelse") {
+      let sistNavn = ""; try { sistNavn = localStorage.getItem("bkaa-navn") || ""; } catch (e) {}
+      navnFelt = `<p>Navn til resultatlista: <input type="text" id="navnfelt" value="${esc(sistNavn)}" maxlength="20" placeholder="Navn eller kallenavn"> <button class="knapp" id="lagreknapp">Lagre</button></p><p id="lagretmelding" class="dempet"></p>`;
+    }
+    if (sp.modus === "konk") kodeDel = `<p>Utfordringskode: <span class="kode">${esc(kode)}</span> <button class="knapp sek" id="kopierknapp">Kopier resultat</button></p><p class="dempet">Gi koden til en medstudent. Velg «Konkurranse» og skriv inn koden for å få nøyaktig de samme spørsmålene.</p>`;
+    $("resultat").innerHTML = `<div class="kort"><h2>${MODI[sp.modus].navn}: ferdig!</h2>
+      <div class="stor">${sp.modus === "ovelse" ? sp.riktige + " / " + sp.antall : sp.poeng + " poeng"}</div>
+      <div class="statrad"><div class="stat"><b>${sp.riktige}/${sp.antall}</b>riktige</div><div class="stat"><b>${nøy} %</b>nøyaktighet</div>
+      <div class="stat"><b>${komma(snitt, 1)} s</b>per spørsmål</div><div class="stat"><b>${sp.besteSerie}</b>lengste serie</div></div>
+      ${kodeDel}${navnFelt}
+      <p><button class="knapp" id="igjen">Spill igjen</button> <button class="knapp sek" id="tilstart">Til start</button></p></div>
+      ${sp.feil.length ? `<div class="kort"><h2>Dette kan du øve mer på</h2>${sp.feil.map((f) => `<div class="feilkort"><strong>${f.spm}</strong><br>Du svarte: ${esc(f.svar)} · Riktig: <strong>${esc(f.riktig)}</strong><div class="dempet">${f.forklaring}</div></div>`).join("")}</div>` : '<div class="kort"><p>🎉 Ingen feil! Prøv et høyere nivå.</p></div>'}
+      <div class="kort" id="toppliste-slutt"></div>`;
+    $("igjen").onclick = () => start();
+    $("tilstart").onclick = () => { $("resultat").classList.add("skjult"); $("start").classList.remove("skjult"); tegnStart(); };
+    if (sp.modus !== "ovelse") {
+      const m = sp.modus === "tid" ? "tid" : "konk";
+      let lagret = false;
+      $("lagreknapp").onclick = () => {
+        if (lagret) return;
+        const navn = ($("navnfelt").value.trim() || "Anonym").slice(0, 20);
+        try { localStorage.setItem("bkaa-navn", navn); } catch (e) {}
+        lagreTopp(m, sp.nivaa, { navn, poeng: sp.poeng, riktig: sp.riktige, antall: sp.antall });
+        lagret = true; $("lagretmelding").textContent = "Lagret på denne enheten."; visTopp(m);
+      };
+      visTopp(m);
+    } else $("toppliste-slutt").classList.add("skjult");
+    if (sp.modus === "konk") $("kopierknapp").onclick = () => {
+      const tekst = `Aminosyrespillet, nivå ${sp.nivaa}, kode ${kode}: ${sp.poeng} poeng (${sp.riktige}/${sp.antall} riktige)`;
+      (navigator.clipboard ? navigator.clipboard.writeText(tekst) : Promise.reject()).then(() => { $("kopierknapp").textContent = "Kopiert!"; }, () => { prompt("Kopier teksten:", tekst); });
+    };
+  }
+  function visTopp(m) {
+    const liste = lesTopp(m, sp.nivaa);
+    $("toppliste-slutt").innerHTML = `<h2>Din toppliste: ${m === "tid" ? "Tid" : "Konkurranse"}, nivå ${sp.nivaa}</h2>` + (liste.length
+      ? `<table><tr><th>#</th><th>Navn</th><th>Poeng</th><th>Riktige</th></tr>${liste.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.navn)}</td><td>${r.poeng}</td><td>${r.riktig}/${r.antall}</td></tr>`).join("")}</table>`
+      : '<p class="dempet">Ingen lagrede resultater ennå. Skriv inn navnet ditt og trykk «Lagre».</p>');
+  }
+
+  // ---------------- hendelser ----------------
+  document.querySelectorAll("#modusvalg button").forEach((b) => (b.onclick = () => { modus = b.dataset.m; tegnStart(); }));
+  document.querySelectorAll("#nivaavalg button").forEach((b) => (b.onclick = () => { nivaa = +b.dataset.n; standardEmner(); tegnStart(); }));
+  $("startknapp").onclick = start;
+  $("nesteknapp").onclick = nesteSpm;
+  $("avslutt").onclick = () => { if (sp && sp.antall > 0 && sp.modus !== "ovelse") { avslutt(); } else { sp.slutt = true; clearInterval(tikker); $("spill").classList.add("skjult"); $("start").classList.remove("skjult"); tegnStart(); } };
+  document.addEventListener("keydown", (e) => {
+    if (!sp || sp.slutt || $("spill").classList.contains("skjult") || e.target.tagName === "INPUT") return;
+    if (/^[1-9]$/.test(e.key) && !sp.besvart) { const o = sp.q.valg[+e.key - 1]; if (o) svar(o.key); }
+    else if ((e.key === "Enter" || e.key === " ") && sp.besvart && sp.modus !== "tid") { e.preventDefault(); nesteSpm(); }
+  });
+  standardEmner();
+  tegnStart();
+  window.__aaspill = { TYPER, start, get sp() { return sp; }, set rng(f) { rng = f; } };
+})();
+</script>
+</body>
+</html>

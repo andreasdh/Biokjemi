@@ -1,0 +1,74 @@
+```{ojs}
+//| echo: false
+// Hvordan miljøet rundt sidegruppa endrer pKₐ (eksempel: glutaminsyre i et protein).
+{
+  const glu = BKAA.finn("glu");
+  const miljoer = [
+    { id: "vann", navn: "I vann", pK: 4.1, farge: "#3d7ea6",
+      tekst: "Vann stabiliserer den negative ladningen med ion–dipol-vekselvirkninger. Karboksylgruppa avgir lett protonet: vanlig pKₐ (4,1)." },
+    { id: "neg", navn: "Nær en negativ ladning", pK: 5.4, farge: "#e0584d",
+      tekst: "Den negative naboen frastøter en ny negativ ladning. Det koster energi å lage COO⁻, så gruppa holder på protonet lenger: <strong>høyere pKₐ</strong>." },
+    { id: "pos", navn: "Nær en positiv ladning", pK: 3.1, farge: "#3f8468",
+      tekst: "Den positive naboen tiltrekker og stabiliserer COO⁻ (en saltbro). Det blir lettere å avgi protonet: <strong>lavere pKₐ</strong>." },
+    { id: "upolar", navn: "I et upolart miljø", pK: 6.8, farge: "#b88a2a",
+      tekst: "Uten vann finnes det ingen ion–dipol-vekselvirkninger til å stabilisere en ladning, og ladninger er ugunstige her. Gruppa vil heller være uladd: <strong>høyere pKₐ</strong>." },
+  ];
+  let m = miljoer[0];
+  let W = 460;
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const phInput = Inputs.range([0, 10], { value: 5, step: 0.1, label: "pH" });
+  const scene = html`<div></div>`;
+  const graf = html`<div></div>`;
+  const panel = html`<div class="bk-panel"></div>`;
+
+  function oppdater() {
+    const pH = +phInput.value;
+    const dep = pH > m.pK;
+    const t = BKAA.tegn(glu, { bredde: W, maksBinding: 40, fs: 14, minHoyde: 190, tilstand: { a: true, n: false, r: dep }, sidegruppe: BKAA.gruppeFarge.negativ });
+    const i = glu.atomer.findIndex((a) => a.site === "r");
+    const x = t.px(i), y = t.py(i);
+    let dekor = "";
+    const sirkel = (cx, cy, tegn, farge) => `<circle cx="${cx}" cy="${cy}" r="15" fill="${farge}" fill-opacity="0.25" stroke="${farge}" stroke-width="2"/><text x="${cx}" y="${cy}" dy="0.35em" text-anchor="middle" font-size="20" font-weight="700" fill="${farge}">${tegn}</text>`;
+    const nx = Math.min(W - 30, x + 90), ny = y + 6;
+    if (m.id === "vann") {
+      [[48, -22], [60, 14], [92, -2], [84, 36], [34, 38]].forEach(([dx, dy]) => {
+        dekor += `<text x="${x + dx}" y="${y + dy}" font-size="12" font-weight="700" fill="#3d7ea6">H₂O</text>`;
+      });
+    } else if (m.id === "neg") dekor = sirkel(nx - 10, ny, "−", "#e0584d") + `<text x="${nx - 10}" y="${ny + 30}" text-anchor="middle" font-size="11" fill="currentColor">nabo (COO⁻)</text>`;
+    else if (m.id === "pos") dekor = sirkel(nx - 10, ny, "+", "#3d7ea6") + `<text x="${nx - 10}" y="${ny + 30}" text-anchor="middle" font-size="11" fill="currentColor">nabo (NH₃⁺)</text>`;
+    else dekor = `<rect x="${x + 28}" y="${y - 30}" width="${Math.min(110, W - x - 40)}" height="76" rx="14" fill="#8aa0ad" fill-opacity="0.22" stroke="#8aa0ad" stroke-dasharray="4 3"/><text x="${x + 28 + Math.min(110, W - x - 40) / 2}" y="${y + 6}" text-anchor="middle" font-size="12" fill="currentColor">upolart</text><text x="${x + 28 + Math.min(110, W - x - 40) / 2}" y="${y + 22}" text-anchor="middle" font-size="12" fill="currentColor">(ingen vann)</text>`;
+    scene.innerHTML = t.svg.replace("</svg>", dekor + "</svg>");
+
+    // kurver: andel deprotonert som funksjon av pH for alle miljøer
+    const Hg = Math.round(W * 0.42), l = 36, r = 12, tt = 10, b = 30;
+    const X = (p) => l + (p / 10) * (W - l - r), Y = (f) => tt + (1 - f) * (Hg - tt - b);
+    let g = "";
+    [0, 0.5, 1].forEach((f) => (g += `<line x1="${l}" x2="${W - r}" y1="${Y(f)}" y2="${Y(f)}" stroke="currentColor" stroke-opacity="0.12"/><text x="${l - 5}" y="${Y(f)}" dy="0.35em" text-anchor="end" font-size="11" fill="currentColor">${f * 100} %</text>`));
+    for (let p = 0; p <= 10; p += 2) g += `<text x="${X(p)}" y="${Hg - 12}" text-anchor="middle" font-size="11" fill="currentColor">${p}</text>`;
+    miljoer.forEach((e) => {
+      let d = "";
+      for (let p = 0; p <= 10.001; p += 0.2) d += (p ? "L" : "M") + X(p).toFixed(1) + " " + Y(BKAA.kjemi.andelDeprot(e.pK, p)).toFixed(1);
+      g += `<path d="${d}" fill="none" stroke="${e.farge}" stroke-width="${e.id === m.id ? 4 : 1.6}" stroke-opacity="${e.id === m.id ? 1 : 0.45}"/>`;
+    });
+    const f = BKAA.kjemi.andelDeprot(m.pK, pH);
+    g += `<circle cx="${X(pH)}" cy="${Y(f)}" r="6" fill="${m.farge}" stroke="#fff" stroke-width="2"/><text x="${W / 2}" y="${Hg - 0}" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">pH</text>`;
+    graf.innerHTML = `<svg viewBox="0 0 ${W} ${Hg}" style="width:100%;max-width:${W}px;height:auto;display:block;margin:0 auto" role="img" aria-label="Andel deprotonert som funksjon av pH i ulike miljøer" font-family="inherit">${g}</svg>`;
+
+    panel.style.setProperty("--ks", m.farge);
+    panel.innerHTML = `<h4>${m.navn}: pKₐ ≈ ${aaKomma(m.pK, 1)}</h4><p>${m.tekst}</p>
+      <p>Ved pH ${aaKomma(pH, 1)} er <strong>${aaKomma(f * 100, 0)} %</strong> av sidegruppene deprotonert (COO⁻) → sidegruppa er mest <strong>${dep ? "negativt ladd" : "uladd (COOH)"}</strong>.</p>
+      <p class="bk-hint">Tallene er illustrasjoner. I virkelige proteiner kan pKₐ forskyves enda mer.</p>`;
+    chips.querySelectorAll("button").forEach((bt) => bt.classList.toggle("valgt", bt.dataset.id === m.id));
+  }
+  miljoer.forEach((e) => {
+    const b = html`<button class="bk-chip" data-id="${e.id}">${e.navn}</button>`;
+    b.onclick = () => { m = e; oppdater(); };
+    chips.append(b);
+  });
+  phInput.addEventListener("input", oppdater);
+  const rot = html`<div class="bk-aa-boks"><p class="bk-hint">Sidegruppa til glutaminsyre (Glu) i ulike omgivelser. Hvordan flytter pKₐ seg?</p>${chips}${scene}${phInput}${graf}${panel}</div>`;
+  oppdater();
+  bkTilpass(rot, 520, (w) => { W = Math.max(280, Math.min(460, w)); oppdater(); }, invalidation);
+  return rot;
+}
+```

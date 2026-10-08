@@ -78,12 +78,12 @@
       </defs>
       <ellipse cx="${W / 2}" cy="${y}" rx="${(bx - ax) / 2 + r + 40}" ry="76" fill="url(#${idB})"/>
       <circle cx="${ax}" cy="${y}" r="${r + 22}" fill="url(#${idA})" opacity="${dA}"/>
-      <line class="bk-binding" x1="${ax + r}" y1="${y}" x2="${bx - r}" y2="${y}"
+      <line class="bk-binding" stroke="currentColor" stroke-width="3" x1="${ax + r}" y1="${y}" x2="${bx - r}" y2="${y}"
         opacity="${Math.max(0.15, 1 - ionisk * 1.2)}"/>
-      <circle cx="${ax}" cy="${y}" r="${r}" class="bk-en-atom"/>
-      <circle cx="${bx}" cy="${y}" r="${r}" class="bk-en-atom"/>
-      <text class="bk-en-sym" x="${ax}" y="${y}" dy="0.35em">${erIon ? "Na⁺" : symA}</text>
-      <text class="bk-en-sym" x="${bx}" y="${y}" dy="0.35em">${erIon ? "Cl⁻" : symB}</text>
+      <circle cx="${ax}" cy="${y}" r="${r}" class="bk-en-atom" fill="#fff" stroke="currentColor" stroke-width="2"/>
+      <circle cx="${bx}" cy="${y}" r="${r}" class="bk-en-atom" fill="#fff" stroke="currentColor" stroke-width="2"/>
+      <text class="bk-en-sym" fill="currentColor" font-size="26" font-weight="700" text-anchor="middle" x="${ax}" y="${y}" dy="0.35em">${erIon ? "Na⁺" : symA}</text>
+      <text class="bk-en-sym" fill="currentColor" font-size="26" font-weight="700" text-anchor="middle" x="${bx}" y="${y}" dy="0.35em">${erIon ? "Cl⁻" : symB}</text>
       ${
         d >= 0.2 && !erIon
           ? svg`<text class="bk-en-delta" x="${ax}" y="${y - r - 14}"
@@ -93,7 +93,7 @@
       }
       ${
         d >= 0.2
-          ? svg`<line class="bk-en-pil" x1="${ax}" y1="${y + r + 22}" x2="${bx}" y2="${y + r + 22}"
+          ? svg`<line class="bk-en-pil" stroke="currentColor" x1="${ax}" y1="${y + r + 22}" x2="${bx}" y2="${y + r + 22}"
           stroke-width="${1.5 + 3 * ionisk}" marker-end="url(#enpil)"/>`
           : null
       }

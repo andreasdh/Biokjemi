@@ -1,6 +1,8 @@
 project:
   type: book
   output-dir: _book
+  resources:
+    - spill/
 
 book:
   title: "Biokjemi"
@@ -24,6 +26,7 @@ book:
       chapters:
         - kapitler/01-sentrale-begreper.qmd
         - kapitler/02-kjemiske-prinsipper.ipynb
+        - kapitler/03-aminosyrer.ipynb
         - kapitler/01-eksempel.ipynb
         - kapitler/02-interaktiv.qmd
     - part: "Del 2: Biologiske makromolekyler"
