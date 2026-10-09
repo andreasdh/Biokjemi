@@ -14,7 +14,7 @@ quarto render         # bygger hele boka til _book/
 | Fil | Innhold |
 |---|---|
 | `_quarto.yml` | Bokoppsett, kapitler og format |
-| `custom.scss`, `custom-dark.scss` | Fargepalett og typografi |
+| `custom.scss`, `custom-dark.scss` | Fargepalett og typografi (også sitater: skriv `> tekst` i markdown) |
 | `styles.css` | Egne bokser (`.nokkelpunkt`, `.simulering`, `.laeringsmal`) |
 | `kapitler/` | Kapitler (`.ipynb` eller `.qmd`) |
 | `_interaktiv/` | Kode til interaktive figurer (Observable JS), hentes inn i kapitlene |

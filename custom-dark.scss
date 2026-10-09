@@ -19,3 +19,12 @@ $border-color: #2c4048;
 .callout-warning   { background: #332c18; }
 .cell-output pre   { background: #172b38; }
 thead th { background: #173028; color: #9fd1e8; }
+
+blockquote, .blockquote {
+  background: linear-gradient(135deg, rgba(111, 193, 160, 0.14), rgba(107, 178, 218, 0.10));
+  border-left-color: #6fc1a0;
+  color: #bfe0f0;
+  box-shadow: none;
+  &::before { color: rgba(111, 193, 160, 0.7); }
+  cite, footer, .blockquote-footer { color: #9fb4bf; }
+}

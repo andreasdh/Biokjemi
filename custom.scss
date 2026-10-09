@@ -74,6 +74,52 @@ div.sourceCode, pre {
 .callout-important { border-left-color: #c9826b   !important; background: #fbf0ec; }
 .callout-warning   { border-left-color: #d4a84b   !important; background: #fbf5e6; }
 
+// Sitater (> tekst i markdown): grønn kant, myk bakgrunn, serif-kursiv og stort anførselstegn
+blockquote, .blockquote {
+  position: relative;
+  margin: 1.8rem 0;
+  padding: 1.1rem 1.4rem 1.1rem 3.6rem;
+  border-left: 5px solid $bk-green;
+  border-radius: 0 0.9rem 0.9rem 0;
+  background: linear-gradient(135deg, rgba($bk-green, 0.13), rgba($bk-blue, 0.09));
+  box-shadow: 0 1px 4px rgba($bk-ink, 0.06);
+  font-family: $headings-font-family;
+  font-style: italic;
+  font-size: 1.12rem;
+  line-height: 1.6;
+  color: $bk-blue-dark;
+
+  &::before {
+    content: "\00AB";
+    position: absolute;
+    left: 0.75rem;
+    top: 0.1rem;
+    font-family: $headings-font-family;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 3.4rem;
+    line-height: 1;
+    color: rgba($bk-green, 0.6);
+  }
+  > :first-child { margin-top: 0; }
+  > :last-child  { margin-bottom: 0; }
+  p { margin-bottom: 0.6rem; }
+  // kilde/forfatter: skriv f.eks. «— Navn» på en egen linje, eller bruk <cite>
+  cite, footer, .blockquote-footer {
+    display: block;
+    margin-top: 0.5rem;
+    font-family: $font-family-sans-serif;
+    font-style: normal;
+    font-size: 0.9rem;
+    color: #5b7380;
+    &::before { content: "\2014\00A0"; }
+  }
+  @media (max-width: 576px) {
+    padding: 0.9rem 1rem 0.9rem 2.8rem;
+    &::before { left: 0.5rem; font-size: 2.8rem; }
+  }
+}
+
 // Tabeller
 table { border-radius: 0.5rem; overflow: hidden; }
 thead th { background: $bk-mint; color: $bk-blue-dark; border-bottom: 2px solid $bk-green !important; }
