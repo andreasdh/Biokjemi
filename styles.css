@@ -207,6 +207,7 @@ body.quarto-dark .sidebar-logo { background: #f7fafb; padding: 0.4rem; }
 .bk-hp { display: block; height: auto; margin: 0.6rem 0; max-width: 560px; width: 100%; }
 .bk-hp .bk-hp-binding { stroke: currentColor; stroke-width: 2.5; opacity: 0.7; }
 .bk-hp .bk-hp-kontakt { stroke: #c9962f; stroke-dasharray: 4 3; stroke-width: 2; }
+.bk-hp .bk-hp-flytt { fill: none; stroke: #e0584d; stroke-width: 2.5; opacity: 0.85; }
 .bk-hp .bk-hp-h { fill: #f4dca0; stroke: #b88a2a; stroke-width: 2; }
 .bk-hp .bk-hp-p { fill: #b4dfcd; stroke: #3f8468; stroke-width: 2; }
 .bk-bufferbar { border-radius: 0.5rem; display: flex; height: 2.2rem; margin: 0.8rem 0; overflow: hidden; }
