@@ -291,3 +291,125 @@ body.quarto-dark .bk-kd i { background: #fff; }
 .bk-spillboks { border: 1px solid rgba(127,170,190,0.5); border-radius: 0.8rem; overflow: hidden; margin: 1rem 0; }
 .bk-spillboks iframe { width: 100%; height: 720px; border: 0; display: block; background: transparent; }
 @media (max-width: 600px) { .bk-spillboks iframe { height: 820px; } }
+
+/* ---------- Stoffskifte og glykolyse ---------- */
+.gl-boks { margin: 0.8rem 0 1.6rem; }
+.gl-akter { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.45rem; margin-bottom: 0.5rem; }
+.gl-akt, .gl-akt.btn-quarto {
+  display: flex; flex-direction: column; gap: 0.1rem; text-align: left; cursor: pointer; padding: 0.5rem 0.7rem;
+  border-radius: 0.7rem; border: 2px solid transparent; background: color-mix(in srgb, var(--f) 12%, transparent); color: inherit;
+}
+.gl-akt strong { color: var(--f); font-size: 0.95rem; }
+.gl-akt span { font-size: 0.8rem; opacity: 0.75; }
+.gl-akt em { font-style: normal; font-size: 0.8rem; opacity: 0.85; line-height: 1.3; }
+.gl-akt.aktiv { border-color: var(--f); background: color-mix(in srgb, var(--f) 22%, transparent); }
+.gl-prikker { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.5rem 0 0.8rem; }
+.gl-prikk, .gl-prikk.btn-quarto {
+  width: 2.1rem; height: 2.1rem; border-radius: 50%; border: 2px solid var(--f); background: transparent; color: inherit;
+  font-weight: 700; font-size: 0.85rem; cursor: pointer; padding: 0; line-height: 1;
+}
+.gl-prikk.besokt { background: color-mix(in srgb, var(--f) 25%, transparent); }
+.gl-prikk.naa { background: var(--f); color: #fff; transform: scale(1.12); }
+.gl-kort { border: 1px solid rgba(127, 170, 190, 0.45); border-radius: 0.9rem; padding: 0.8rem 1rem 1rem; outline: none; background: rgba(127, 170, 190, 0.06); }
+.gl-kort:focus-visible { box-shadow: 0 0 0 3px rgba(61, 126, 166, 0.35); }
+.gl-kort h4 { margin: 0 0 0.6rem; font-size: 1.12rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.gl-kort h4 small { font-weight: 400; font-size: 0.82rem; opacity: 0.7; padding: 0.05rem 0.6rem; border-radius: 1rem; background: rgba(127, 170, 190, 0.2); }
+.gl-kort h5 { margin: 0.7rem 0 0.2rem; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.65; }
+.gl-nr { display: inline-flex; width: 1.7rem; height: 1.7rem; border-radius: 50%; align-items: center; justify-content: center; color: #fff; font-size: 0.9rem; }
+.gl-rx { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.3rem; align-items: center; }
+.gl-rx.smal { grid-template-columns: 1fr; justify-items: center; }
+.gl-side { display: flex; flex-direction: column; align-items: center; }
+.gl-mol { text-align: center; max-width: 100%; }
+.gl-molnavn { font-size: 0.8rem; opacity: 0.75; margin-top: -0.2rem; }
+.gl-pluss { font-weight: 700; opacity: 0.6; margin: 0.1rem 0; }
+.gl-pil { display: flex; flex-direction: column; align-items: center; min-width: 7.5rem; max-width: 12rem; gap: 0.15rem; }
+.gl-pil-top, .gl-pil-bunn { display: flex; flex-wrap: wrap; gap: 0.2rem; justify-content: center; min-height: 1.5rem; }
+.gl-pil-linje { position: relative; width: 100%; text-align: center; border-bottom: 3px solid var(--f); padding: 0.15rem 0 0.25rem; font-size: 0.78rem; font-weight: 600; line-height: 1.2; }
+.gl-pil-linje::after { content: ""; position: absolute; right: -2px; bottom: -8px; border: 6px solid transparent; border-left: 10px solid var(--f); }
+.gl-rx.smal .gl-pil { max-width: 18rem; }
+.gl-rx.smal .gl-pil-linje { border-bottom: 0; width: auto; padding: 0.1rem 0.5rem 0; }
+.gl-rx.smal .gl-pil-linje::after { content: "▼"; position: static; display: block; border: 0; color: var(--f); font-size: 1.15rem; line-height: 1.1; }
+.gl-chip { font-size: 0.76rem; padding: 0.02rem 0.5rem; border-radius: 1rem; background: rgba(127, 170, 190, 0.22); white-space: nowrap; }
+.gl-chip.gl-bruk, .gl-pille.gl-bruk { background: #f2c3b4; color: #5a2b1d; }
+.gl-chip.gl-lager, .gl-pille.gl-lager { background: #b4dfcd; color: #1d4a36; }
+.gl-pille.gl-nadh { background: #a9d0e6; color: #1b4560; }
+.gl-x2 { text-align: center; font-size: 0.82rem; opacity: 0.8; margin-top: 0.3rem; }
+.gl-hva p, .gl-hvorfor p { margin: 0.2rem 0; }
+.gl-hvorfor { border-left: 5px solid var(--bs-info, #3d7ea6); padding: 0.1rem 0.8rem 0.3rem; margin-top: 0.5rem; background: rgba(61, 126, 166, 0.08); border-radius: 0 0.6rem 0.6rem 0; }
+.gl-tenkknapp, .gl-tenkknapp.btn-quarto { display: block; width: 100%; margin-top: 0.7rem; padding: 0.7rem 0.9rem; text-align: left; border-radius: 0.7rem; border: 2px dashed rgba(61, 126, 166, 0.55); background: transparent; color: inherit; cursor: pointer; font-size: 0.95rem; }
+.gl-tenkknapp:hover { background: rgba(61, 126, 166, 0.1); }
+.gl-videre { margin-top: 0.5rem; padding: 0.4rem 0.8rem; border-radius: 0.6rem; background: rgba(90, 168, 137, 0.14); font-size: 0.93rem; }
+.gl-energi { margin-top: 0.8rem; padding: 0.5rem 0.8rem; border-radius: 0.6rem; background: rgba(201, 150, 47, 0.12); font-size: 0.9rem; }
+.gl-energi h5 { margin-top: 0; }
+.gl-eform { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.4rem; font-size: 1.05rem; }
+.gl-eform span { display: inline-flex; flex-direction: column; align-items: center; min-width: 4rem; padding: 0.1rem 0.5rem; border-radius: 0.5rem; background: rgba(127, 170, 190, 0.2); font-weight: 600; }
+.gl-eform span small { font-size: 0.7rem; font-weight: 400; opacity: 0.7; }
+.gl-eform span.res { background: rgba(201, 150, 47, 0.3); }
+.gl-eform b { padding-bottom: 0.2rem; opacity: 0.6; }
+.gl-eform em { padding-bottom: 0.2rem; opacity: 0.7; font-size: 0.85rem; }
+.gl-eq { font-size: 0.82rem; opacity: 0.85; margin-top: 0.35rem; }
+.gl-eq span { opacity: 0.7; }
+.gl-ebar { position: relative; height: 8px; margin: 0.6rem 0 0.4rem; border-radius: 4px; background: linear-gradient(90deg, #8fcfb4, rgba(127,170,190,0.25) 50%, #f2c3b4); }
+.gl-ebar b { position: absolute; left: 50%; top: -4px; width: 2px; height: 16px; background: currentColor; opacity: 0.5; }
+.gl-ebar i { position: absolute; top: -5px; width: 12px; height: 18px; margin-left: -6px; border-radius: 4px; background: #1f2f38; border: 2px solid #fff; }
+body.quarto-dark .gl-ebar i { background: #fff; border-color: #1c2c2f; }
+.gl-estatus { font-size: 0.85rem; }
+.gl-estatus.irr { color: #b0452f; font-weight: 600; }
+body.quarto-dark .gl-estatus.irr { color: #f0a08c; }
+.gl-regnskap { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.4rem 1rem; margin-top: 0.8rem; font-size: 0.85rem; }
+.gl-rtekst { display: block; opacity: 0.65; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.gl-pille { display: inline-block; padding: 0 0.5rem; border-radius: 1rem; margin: 0.1rem 0.15rem 0.1rem 0; font-size: 0.78rem; font-weight: 600; }
+.gl-null { opacity: 0.5; }
+.gl-netto { grid-column: 1 / -1; }
+.gl-mer { margin-top: 0.6rem; font-size: 0.9rem; }
+.gl-mer summary { cursor: pointer; opacity: 0.8; }
+.gl-nav { display: flex; justify-content: space-between; gap: 0.5rem; margin: 0.4rem 0; }
+.gl-nav .bk-knapp { margin: 0.2rem 0; }
+.bk-uthev { animation: gl-puls 2.2s ease-in-out infinite; }
+@keyframes gl-puls { 0%, 100% { opacity: 0.18; } 50% { opacity: 0.42; } }
+@media (prefers-reduced-motion: reduce) { .bk-uthev { animation: none; } }
+.gl-glutsvg { width: 100%; max-width: 560px; height: auto; display: block; margin: 0.5rem auto; border-radius: 0.7rem; border: 1px solid rgba(127,170,190,0.4); }
+.gl-regkort { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.5rem; margin: 0.6rem 0; }
+.gl-reg { border: 1px solid rgba(127,170,190,0.45); border-radius: 0.7rem; padding: 0.5rem 0.7rem; font-size: 0.88rem; }
+.gl-reg h4 { margin: 0 0 0.3rem; font-size: 1rem; }
+.gl-reg h4 small { font-weight: 400; opacity: 0.65; font-size: 0.78rem; }
+.gl-reg ul { list-style: none; padding: 0; margin: 0.3rem 0 0; }
+.gl-reg li { opacity: 0.4; padding: 0.05rem 0; }
+.gl-reg li.paa { opacity: 1; font-weight: 600; color: #b0452f; }
+body.quarto-dark .gl-reg li.paa { color: #f0a08c; }
+.gl-akt-bar { height: 8px; background: rgba(127,170,190,0.25); border-radius: 4px; overflow: hidden; }
+.gl-akt-bar i { display: block; height: 100%; background: #3f8468; transition: width 0.15s; }
+.gl-akt-tekst { font-size: 0.78rem; opacity: 0.7; }
+.gl-flyt-boks { margin: 0.6rem 0; }
+.gl-flyt { width: 100%; max-width: 560px; height: auto; display: block; margin: 0 auto; color: inherit; }
+.gl-niva { display: grid; grid-template-columns: minmax(8rem, 15rem) 1fr; gap: 0.5rem; align-items: center; font-size: 0.8rem; margin: 0.15rem 0; }
+.gl-niva > div { height: 8px; background: rgba(127,170,190,0.25); border-radius: 4px; overflow: hidden; }
+.gl-niva i { display: block; height: 100%; transition: width 0.15s; }
+.gl-nadregn { display: grid; gap: 0.6rem; margin: 0.6rem 0; }
+.gl-celler { display: flex; gap: 0.25rem; margin-top: 0.15rem; }
+.gl-celle { width: 1.7rem; height: 1.7rem; border-radius: 50%; border: 2px solid rgba(127,170,190,0.7); transition: background 0.3s; }
+.gl-teller { font-size: 0.92rem; }
+.gl-teller b { font-size: 1.05rem; }
+.gl-stopp { padding: 0.5rem 0.8rem; border-radius: 0.6rem; background: #f2c3b4; color: #5a2b1d; font-weight: 600; }
+.gl-tarn { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 0.6rem 0; }
+.gl-node { padding: 0.35rem 1rem; border-radius: 0.7rem; background: rgba(61,126,166,0.15); border: 2px solid rgba(61,126,166,0.5); font-weight: 600; font-size: 0.92rem; text-align: center; }
+.gl-node.ende { background: rgba(232,195,90,0.3); border-color: #c9962f; }
+.gl-kant { display: flex; align-items: center; gap: 0.5rem; padding: 0.2rem 0.8rem; font-size: 0.85rem; border-left: 3px solid rgba(127,170,190,0.6); margin: 0; min-height: 2.1rem; flex-wrap: wrap; justify-content: center; text-align: center; }
+.gl-kant.irr { border-left-color: #e0584d; background: rgba(224,88,77,0.1); cursor: pointer; border-radius: 0.4rem; }
+.gl-kant.omvei { border-left-color: #e0884d; background: rgba(224,136,77,0.14); }
+.gl-kant em { font-size: 0.75rem; opacity: 0.8; width: 100%; }
+.gl-retning { opacity: 0.7; }
+.gl-velg { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin: 0.4rem 0; font-size: 0.9rem; }
+.gl-select { max-width: 100%; padding: 0.25rem 0.4rem; border-radius: 0.4rem; border: 1px solid rgba(127,170,190,0.6); background: transparent; color: inherit; }
+body.quarto-dark .gl-select option { background: #1c2c2f; }
+.gl-oks { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.4rem, 1fr)); gap: 0.4rem; margin: 0.5rem 0; }
+.gl-okskort { text-align: center; padding: 0.4rem 0.2rem; border-radius: 0.7rem; border: 2px solid transparent; background: rgba(127,170,190,0.1); cursor: pointer; font-size: 0.82rem; }
+.gl-okskort.valgt { border-color: #c8553f; background: rgba(224,88,77,0.1); }
+.gl-okskort.forbi { opacity: 0.65; }
+.gl-sky { margin: 0 auto 0.2rem; width: 3.3rem; height: 3.3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #1f2f38; background: radial-gradient(circle, rgba(232,195,90,calc(0.25 + 0.7 * var(--t))) 0%, rgba(232,195,90,0) 72%); transform: scale(calc(0.7 + 0.45 * var(--t))); }
+.gl-formel { font-size: 1.05rem; font-weight: 700; }
+.gl-oksnavn { opacity: 0.8; }
+.gl-oksnr { font-size: 0.72rem; opacity: 0.65; }
+.gl-energibar { height: 6px; border-radius: 3px; background: rgba(127,170,190,0.25); margin: 0.3rem 0.4rem 0.1rem; overflow: hidden; }
+.gl-energibar i { display: block; height: 100%; background: #e0884d; }
+.gl-energitekst { font-size: 0.72rem; opacity: 0.75; }

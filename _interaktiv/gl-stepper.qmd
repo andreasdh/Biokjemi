@@ -1,0 +1,126 @@
+```{ojs}
+//| echo: false
+// Glykolysen trinn for trinn: ett trinn om gangen, med strukturer, forklaring og løpende energiregnskap.
+{
+  const G = GL.gl;
+  const steg = G.steg;
+  let n = 0;
+  let tenkForst = true;
+  const avslort = new Set();
+  const besokt = new Set([0]);
+  let Wc = 600;
+
+  const akter = html`<div class="gl-akter"></div>`;
+  const prikker = html`<div class="gl-prikker" role="tablist" aria-label="Trinn i glykolysen"></div>`;
+  const kort = html`<div class="gl-kort" tabindex="0"></div>`;
+  const nav = html`<div class="gl-nav"></div>`;
+  const forrige = html`<button class="bk-knapp">← Forrige</button>`;
+  const neste = html`<button class="bk-knapp">Neste →</button>`;
+  const tenk = html`<label class="bk-avkrysning"><input type="checkbox" checked> Tenk først: skjul «hvorfor» til jeg trykker</label>`;
+  nav.append(forrige, neste);
+
+  const kof = (liste, ut, laget) =>
+    liste.map((t) => `<span class="gl-chip ${laget && t === "ATP" ? "gl-lager" : t === "ATP" ? "gl-bruk" : ""}">${t}</span>`).join("");
+
+  function mol(id, s, bredde) {
+    const m = G.molekyler[id];
+    const hl = (s.hl[id] || []).map((t) => m.tags[t]).filter((i) => i !== undefined);
+    const t = GL.tegn(m, {
+      bredde, maksBinding: 46, fs: 13, minHoyde: 90,
+      uthev: hl.length ? [{ atomer: hl, farge: glFarge[s.akt] }] : [], alt: m.navn,
+    });
+    return `<div class="gl-mol"><div>${t.svg}</div><div class="gl-molnavn">${m.navn}</div></div>`;
+  }
+
+  function regnskap(k) {
+    let brukt = 0, laget = 0, nadh = 0;
+    if (k >= 1) brukt++;
+    if (k >= 3) brukt++;
+    if (k >= 6) nadh += 2;
+    if (k >= 7) laget += 2;
+    if (k >= 10) laget += 2;
+    const pill = (c, t, antall) => Array.from({ length: antall }, () => `<span class="gl-pille ${c}">${t}</span>`).join("");
+    return `<div class="gl-regnskap"><div><span class="gl-rtekst">ATP brukt</span>${pill("gl-bruk", "−ATP", brukt) || '<span class="gl-null">0</span>'}</div>
+      <div><span class="gl-rtekst">ATP laget</span>${pill("gl-lager", "+ATP", laget) || '<span class="gl-null">0</span>'}</div>
+      <div><span class="gl-rtekst">NADH laget</span>${pill("gl-nadh", "NADH", nadh) || '<span class="gl-null">0</span>'}</div>
+      <div class="gl-netto">Netto ATP så langt: <strong>${laget - brukt >= 0 ? "+" : "−"}${Math.abs(laget - brukt)}</strong> <span class="gl-null">(per glukose)</span></div></div>`;
+  }
+
+  function energi(s) {
+    const r = G.dG(s, G.konc);
+    const irr = r.dG < -10;
+    const rad = Math.max(-40, Math.min(40, r.dG)), pos = 50 + (rad / 40) * 50;
+    const Q = G.Q(s, G.konc);
+    const qtxt = Q < 0.001 || Q > 1000 ? Q.toExponential(1).replace("e", " × 10^").replace("^-", "^−").replace(".", ",") : glKomma(Q, Q < 0.1 ? 3 : 2);
+    return `<div class="gl-energi"><h5>Energi i cellen</h5>
+      <div class="gl-eform"><span><small>ΔG°′</small>${glKomma(r.dG0)}</span><b>+</b><span><small>RT ln Q</small>${glKomma(r.rtlnq)}</span><b>=</b><span class="res"><small>ΔG</small>${glKomma(r.dG)}</span><em>kJ/mol</em></div>
+      <div class="gl-eq">${glQuttrykk(s)} ≈ ${qtxt} <span>(typiske konsentrasjoner i røde blodceller)</span></div>
+      <div class="gl-ebar"><i style="left:${pos}%"></i><b></b></div>
+      <div class="gl-estatus ${irr ? "irr" : "lik"}">${irr ? "Svært gunstig i cellen: går bare én vei, og er et kontrollpunkt." : "Nær likevekt i cellen: går begge veier avhengig av konsentrasjonene."}</div></div>`;
+  }
+
+  function tegn() {
+    const s = steg[n];
+    const smal = Wc < 640;
+    const mb = smal ? Math.min(Wc - 30, 300) : Math.round((Wc - 60) * 0.36);
+    const subs = s.sub.map((id) => mol(id, s, mb)).join('<div class="gl-pluss">+</div>');
+    const prods = s.prod.map((id) => mol(id, s, mb)).join('<div class="gl-pluss">+</div>');
+    const laget = s.ut.includes("ATP");
+    const pil = `<div class="gl-pil"><div class="gl-pil-top">${kof(s.inn, false, laget)}</div>
+      <div class="gl-pil-linje" style="--f:${glFarge[s.akt]}"><span>${s.navn}</span></div>
+      <div class="gl-pil-bunn">${kof(s.ut, true, laget)}</div></div>`;
+    const dobbelt = s.dobbel ? '<div class="gl-x2">Skjer 2 ganger per glukose (én per G3P)</div>' : "";
+    const vist = !tenkForst || avslort.has(n);
+    const hvorfor = vist
+      ? `<div class="gl-hvorfor"><h5>Hvorfor?</h5>${s.hvorfor.map((t) => `<p>${t}</p>`).join("")}</div>`
+      : `<button class="gl-tenkknapp" data-vis>Hvorfor tror du cellen gjør dette? Tenk et øyeblikk, og trykk for å se forklaringen.</button>`;
+    kort.innerHTML = `<h4><span class="gl-nr" style="background:${glFarge[s.akt]}">${s.nr}</span> ${s.navn} <small>${s.type}</small></h4>
+      <div class="gl-rx${smal ? " smal" : ""}"><div class="gl-side">${subs}</div>${pil}<div class="gl-side">${prods}</div></div>${dobbelt}
+      <div class="gl-hva"><h5>Hva skjer?</h5><p>${s.hva}</p></div>
+      ${hvorfor}
+      ${vist && s.videre ? `<div class="gl-videre"><strong>Videre:</strong> ${s.videre}</div>` : ""}
+      ${s.reg && vist ? `<div class="gl-videre"><strong>Regulering:</strong> ${s.reg}</div>` : ""}
+      ${energi(s)}
+      ${regnskap(s.nr)}
+      <details class="gl-mer"><summary>Mer om enzymet</summary><p>${s.mer}</p></details>`;
+    const b = kort.querySelector("[data-vis]");
+    if (b) b.onclick = () => { avslort.add(n); tegn(); };
+    // akter og prikker
+    akter.querySelectorAll("button").forEach((a, i) => a.classList.toggle("aktiv", i + 1 === s.akt));
+    prikker.querySelectorAll("button").forEach((p, i) => {
+      p.classList.toggle("naa", i === n);
+      p.classList.toggle("besokt", besokt.has(i));
+    });
+    forrige.disabled = n === 0;
+    neste.disabled = n === steg.length - 1;
+    neste.textContent = n === steg.length - 1 ? "Ferdig ✓" : "Neste →";
+  }
+  function gaa(i) {
+    n = Math.max(0, Math.min(steg.length - 1, i));
+    besokt.add(n);
+    tegn();
+  }
+
+  G.akter.forEach((a) => {
+    const b = html`<button class="gl-akt" style="--f:${a.farge}"><strong>Akt ${a.nr}: ${a.navn}</strong><span>Trinn ${a.trinn[0]}${a.trinn[1] > a.trinn[0] ? "–" + a.trinn[1] : ""}</span><em>${a.tekst}</em></button>`;
+    b.onclick = () => gaa(a.trinn[0] - 1);
+    akter.append(b);
+  });
+  steg.forEach((s, i) => {
+    const b = html`<button class="gl-prikk" style="--f:${glFarge[s.akt]}" title="${s.navn}" aria-label="Trinn ${s.nr}: ${s.navn}">${s.nr}</button>`;
+    b.onclick = () => gaa(i);
+    prikker.append(b);
+  });
+  forrige.onclick = () => gaa(n - 1);
+  neste.onclick = () => gaa(n + 1);
+  tenk.querySelector("input").onchange = (e) => { tenkForst = e.target.checked; tegn(); };
+  kort.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") { e.preventDefault(); gaa(n + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); gaa(n - 1); }
+  });
+  const rot = html`<div class="gl-boks">${akter}${prikker}${kort}${nav}${tenk}</div>`;
+  tegn();
+  bkTilpass(rot, 760, (w) => { Wc = w; tegn(); }, invalidation);
+  return rot;
+}
+```

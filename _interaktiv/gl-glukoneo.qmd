@@ -1,0 +1,54 @@
+```{ojs}
+//| echo: false
+// Glykolyse nedover og glukoneogenese oppover. De tre irreversible trinnene må omgås med andre enzymer.
+{
+  const rader = [
+    { fra: "Glukose", kinase: "Heksokinase (ATP → ADP)", omvei: "Glukose-6-fosfatase (H₂O → Pᵢ)", irr: true, kost: "Glukoneogenese: ingen ATP, men fosfatet slippes som Pᵢ. (Bare lever og nyre har dette enzymet.)" },
+    { fra: "Glukose-6-fosfat", kinase: "Fosfoglukose-isomerase", irr: false },
+    { fra: "Fruktose-6-fosfat", kinase: "PFK-1 (ATP → ADP)", omvei: "Fruktose-1,6-bisfosfatase (H₂O → Pᵢ)", irr: true, kost: "Glukoneogenese: fosfatet fjernes med vann (hydrolyse), uten å lage ATP." },
+    { fra: "Fruktose-1,6-bisfosfat", kinase: "Aldolase og TIM (2 triosefosfater)", irr: false },
+    { fra: "Glyseraldehyd-3-fosfat (2×)", kinase: "GAPDH, PGK, PGM, enolase (nær likevekt)", irr: false },
+    { fra: "Fosfoenolpyruvat (PEP) (2×)", kinase: "Pyruvatkinase (ADP → ATP)", omvei: "Pyruvat-karboksylase (ATP, HCO₃⁻) → oksaloacetat, så PEP-karboksykinase (GTP)", irr: true, kost: "Glukoneogenese: to trinn som koster ATP og GTP per pyruvat." },
+    { fra: "Pyruvat (2×)", irr: false, slutt: true },
+  ];
+  let retning = "ned", valgt = null;
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const tegning = html`<div class="gl-tarn"></div>`;
+  const panel = html`<div class="bk-panel k-amber"></div>`;
+  const visRad = retning === "ned" ? rader : rader;
+
+  function oppdater() {
+    const ned = retning === "ned";
+    const liste = ned ? rader : rader.slice().reverse();
+    let h = "";
+    liste.forEach((r, i) => {
+      const idx = rader.indexOf(r);
+      h += `<div class="gl-node ${r.slutt || idx === 0 ? "ende" : ""}">${r.fra}</div>`;
+      const neste = liste[i + 1];
+      if (neste) {
+        const kant = ned ? r : neste; // trinnet mellom r og neste
+        const bruker = !ned && kant.irr ? kant.omvei : kant.kinase;
+        h += `<div class="gl-kant ${kant.irr ? "irr" : ""} ${!ned && kant.irr ? "omvei" : ""}" data-i="${rader.indexOf(kant)}">
+          <span class="gl-retning">${ned ? "▼" : "▲"}</span><span class="gl-enz">${bruker}</span>
+          ${kant.irr ? `<em>${ned ? "irreversibelt trinn (kontrollpunkt)" : "omgår det irreversible trinnet"}</em>` : ""}</div>`;
+      }
+    });
+    tegning.innerHTML = h;
+    tegning.querySelectorAll(".gl-kant.irr").forEach((e) => (e.onclick = () => { valgt = +e.dataset.i; oppdater(); }));
+    const v = valgt !== null ? rader[valgt] : null;
+    panel.innerHTML = ned
+      ? `<p><strong>Glykolyse (glukose → pyruvat).</strong> Tre trinn (rød) er så gunstige at de ikke kan gå baklengs. De er kontrollpunktene. Resultat: netto 2 ATP og 2 NADH per glukose.</p>`
+      : `<p><strong>Glukoneogenese (pyruvat → glukose).</strong> De syv trinnene i midten (hvor ΔG er nær 0) brukes baklengs av de samme enzymene. De tre irreversible trinnene må omgås med andre enzymer (oransje). Det koster <strong>4 ATP + 2 GTP + 2 NADH</strong> å lage én glukose fra to pyruvat, mens glykolysen gir 2 ATP. Prisen er det som skal til for å gjøre den totale ΔG gunstig.</p>`
+      + (v && v.omvei ? `<p><strong>${v.fra}:</strong> ${ned ? "Glykolysen bruker " + v.kinase + "." : "Glukoneogenesen bruker " + v.omvei + ". " + v.kost}</p>` : '<p class="bk-hint">Trykk på et rødt/oransje trinn for detaljer.</p>');
+    chips.querySelectorAll("button").forEach((b) => b.classList.toggle("valgt", b.dataset.r === retning));
+  }
+  [["ned", "Glykolyse (nedover)"], ["opp", "Glukoneogenese (oppover)"]].forEach(([r, n]) => {
+    const b = html`<button class="bk-chip" data-r="${r}">${n}</button>`;
+    b.onclick = () => { retning = r; valgt = null; oppdater(); };
+    chips.append(b);
+  });
+  const rot = html`<div class="bk-aa-boks">${chips}${tegning}${panel}</div>`;
+  oppdater();
+  return rot;
+}
+```

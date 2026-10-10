@@ -50,11 +50,13 @@ book:
     - part: "Del 6: Metabolisme"
       chapters:
         - kapitler/16-karbohydrater.qmd
-        - kapitler/17-stoffskiftet-og-glykolysen.qmd
-        - kapitler/18-sitronsyresyklusen.qmd
-        - kapitler/19-elektrontransportkjeden.qmd
-        - kapitler/20-fotosyntese.qmd
-        - kapitler/21-fettsyresyntese.qmd
+        - kapitler/17-stoffskiftet.ipynb
+        - kapitler/18-glykolysen.ipynb
+        - kapitler/19-sitronsyresyklusen.qmd
+        - kapitler/20-elektrontransportkjeden.qmd
+        - kapitler/21-fotosyntese.qmd
+        - kapitler/22-fettsyresyntese.qmd
+
   appendices:
     - kapitler/ordliste.qmd
 
