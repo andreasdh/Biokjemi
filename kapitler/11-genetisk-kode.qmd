@@ -1,0 +1,16 @@
+---
+title: "Genetisk kode og proteinsyntese"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 15 og 16.
+
+## Planlagt innhold
+
+- Fra DNA via RNA til protein: replikasjon, transkripsjon og translasjon
+- Den genetiske koden
+- Verktøykasse: restriksjonsenzymer og PCR (utgangspunkt for senere kloning og rekombinant DNA)

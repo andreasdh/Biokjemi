@@ -1,0 +1,16 @@
+---
+title: "Metoder: karakterisering"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 11.
+
+## Planlagt innhold
+
+- Antistoffer i praksis: ELISA og Western blot
+- Massespektrometri
+- Strukturbestemmelse, kort: elektronmikroskopi, røntgenkrystallografi og NMR

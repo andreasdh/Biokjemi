@@ -23,6 +23,7 @@ quarto render         # bygger hele boka til _book/
 | `tools/` | Hjelpeskript (se under) |
 
 Nye kapitler legges til i `chapters:` i `_quarto.yml`.
+Kapitlene som ikke er skrevet ennå, ligger som plassholdere (`.qmd` med en «Under arbeid»-boks og et utkast til innhold). Skriv over filen når du lager kapittelet, eller gjør det om til en notebook med `tools/qmd_til_ipynb.py`.
 
 ## Publisering
 

@@ -14,6 +14,10 @@ Gjennom forklaringer, modeller, interaktive animasjoner og oppgaver får du øve
 
 ## Innhold
 
-- **Del 1** – ...
-- **Del 2** – ...
+- **Del 1: Grunnlaget** – sentrale begreper og de kjemiske prinsippene som går igjen: elektrontetthet, molekylære vekselvirkninger og termodynamikk.
+- **Del 2: Proteiner** – aminosyrer, proteinstruktur og folding, proteinfunksjon og metoder for å skille proteiner.
+- **Del 3: Enzymer** – katalyse, mekanismer og kinetikk, og metoder for å karakterisere proteiner.
+- **Del 4: Informasjon** – nukleinsyrer, den genetiske koden og proteinsyntese.
+- **Del 5: Membraner og signalering** – lipider, membraner, transport over membraner og biosignalering.
+- **Del 6: Metabolisme** – karbohydrater, glykolysen, sitronsyresyklusen, elektrontransportkjeden, fotosyntese og fettsyresyntese.
 

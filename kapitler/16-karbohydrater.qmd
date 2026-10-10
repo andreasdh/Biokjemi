@@ -1,0 +1,15 @@
+---
+title: "Karbohydrater"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 12.
+
+## Planlagt innhold
+
+- Monosakkarider, disakkarider og polysakkarider
+- Lagring, struktur og gjenkjenning på celleoverflaten

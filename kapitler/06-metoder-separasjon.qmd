@@ -1,0 +1,17 @@
+---
+title: "Metoder: separasjon"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 7.
+
+## Planlagt innhold
+
+- Prinsipp: utnytt forskjeller i ladning (pI), størrelse, hydrofobisitet og spesifikk binding
+- Kromatografi: ionebytter, gelfiltrering, hydrofob interaksjon og affinitet
+- Elektroforese (SDS-PAGE, isoelektrisk fokusering) og sentrifugering
+- Massespektrometri nevnes kort som detektor (utdypes i «Metoder: karakterisering»)

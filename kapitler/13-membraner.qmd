@@ -1,0 +1,15 @@
+---
+title: "Membraner"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 17.
+
+## Planlagt innhold
+
+- Oppbygging av biologiske membraner
+- Membranproteiner og fluiditet

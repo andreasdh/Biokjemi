@@ -1,0 +1,15 @@
+---
+title: "Sitronsyresyklusen"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 21.
+
+## Planlagt innhold
+
+- Fra pyruvat til acetyl-CoA
+- Sitronsyresyklusen og regulering

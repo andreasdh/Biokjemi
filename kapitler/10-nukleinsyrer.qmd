@@ -1,0 +1,15 @@
+---
+title: "Nukleinsyrer"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 14.
+
+## Planlagt innhold
+
+- Byggesteiner og struktur til DNA og RNA
+- Basepar, dobbeltheliks og de ulike RNA-typene
