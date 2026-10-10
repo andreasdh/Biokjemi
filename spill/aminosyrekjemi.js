@@ -62,7 +62,7 @@
     });
 
     const stroke = `stroke="currentColor" stroke-width="${(1.6).toFixed(2)}" stroke-linecap="round"`;
-    const korte = (i) => (info[i].har ? fs * (at[i].el.length > 1 ? 0.85 : 0.62) : 0);
+    const korte = (i) => (info[i].har ? (at[i].el === "P" ? fs * 0.95 : fs * (at[i].el.length > 1 ? 0.85 : 0.62)) : 0);
     let ut = "";
 
     // uthevinger (myke flekker bak)
@@ -82,7 +82,7 @@
       u.atomer.forEach((i) => {
         lag += `<circle cx="${px(i)}" cy="${py(i)}" r="${r}" fill="${u.farge}"/>`;
       });
-      ut += `<g opacity="0.28">${lag}</g>`;
+      ut += `<g class="bk-uthev" opacity="0.28">${lag}</g>`;
     });
 
     // bindinger
@@ -141,6 +141,11 @@
     at.forEach((a, i) => {
       if (!info[i].har) return;
       const x = px(i), y = py(i);
+      if (a.el === "P") {
+        // fosfatgruppe tegnes som en liten oransje sirkel
+        ut += `<circle cx="${x}" cy="${y}" r="${fs * 0.8}" fill="#e0884d" stroke="#b86a2a" stroke-width="1.2"/><text x="${x}" y="${y}" dy="0.35em" text-anchor="middle" font-size="${fs * 0.95}" font-weight="700" fill="#fff">P</text>`;
+        return;
+      }
       const farge = ELFARGE[a.el] || "currentColor";
       const h = a.h > 0 ? "H" + (a.h > 1 ? sub(a.h) : "") : "";
       const venstre = info[i].venstre;

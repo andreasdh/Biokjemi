@@ -1,0 +1,78 @@
+```{ojs}
+//| echo: false
+// NAD⁺ tar imot et hydrid (H⁻) fra substratet: substratet oksideres, NAD⁺ reduseres til NADH.
+{
+  let redusert = false, anim = false;
+  const W = 560, H = 240;
+  const cx = 400, cy = 105, R = 40;
+  const v = (i) => { const a = ((-90 + 60 * i) * Math.PI) / 180; return [cx + R * Math.cos(a), cy + R * Math.sin(a)]; };
+  const L = (a, b, f = "currentColor", w = 2.4) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${f}" stroke-width="${w}" stroke-linecap="round"/>`;
+  const inn = (a, b, f = 0.17) => { // dobbeltbinding på innsiden
+    const mx = cx, my = cy;
+    const p = (q) => [q[0] + (mx - q[0]) * 0.17, q[1] + (my - q[1]) * 0.17];
+    const pa = p(a), pb = p(b);
+    const sh = (u, w) => [u[0] + (w[0] - u[0]) * 0.12, u[1] + (w[1] - u[1]) * 0.12];
+    return L(sh(pa, pb), sh(pb, pa), "currentColor", 2);
+  };
+  const T = (x, y, s, f = "currentColor", size = 14, bold = 700, anker = "middle") => `<text x="${x}" y="${y}" dy="0.35em" text-anchor="${anker}" font-size="${size}" font-weight="${bold}" fill="${f}">${s}</text>`;
+  const knapp = html`<button class="bk-knapp"></button>`;
+  const tegning = html`<div></div>`;
+  const panel = html`<div class="bk-panel k-blue"></div>`;
+
+  function tegn(hx = null, hy = null) {
+    const p = [0, 1, 2, 3, 4, 5].map(v);
+    let s = "";
+    // substrat
+    const sx = 110, sy = 90;
+    s += L([sx, sy], [sx - 50, sy + 28]) + L([sx, sy], [sx + 50, sy + 28]);
+    s += T(sx - 62, sy + 36, "R", "#d9534f", 15) + T(sx + 62, sy + 36, "R′", "#d9534f", 15);
+    if (!redusert) {
+      s += L([sx, sy], [sx, sy - 48]) + T(sx, sy - 62, "OH", "#e0584d", 15);
+      s += L([sx, sy], [sx, sy + 46]);
+      s += `<circle cx="${sx}" cy="${sy + 62}" r="13" fill="#e0584d" fill-opacity="0.2" stroke="#e0584d" stroke-width="2"/>` + T(sx, sy + 62, "H", "#e0584d", 14);
+      s += T(sx, 226, "alkohol (redusert)", "currentColor", 12, 400);
+    } else {
+      s += L([sx - 3, sy], [sx - 3, sy - 48]) + L([sx + 3, sy], [sx + 3, sy - 48]) + T(sx, sy - 62, "O", "#e0584d", 15);
+      s += T(sx, 226, "keton (oksidert)", "currentColor", 12, 400);
+    }
+    // nikotinamidring
+    for (let i = 0; i < 6; i++) s += L(p[i], p[(i + 1) % 6]);
+    if (!redusert) {
+      s += inn(p[2], p[3]) + inn(p[0], p[1]) + inn(p[4], p[5]);
+      s += T(p[3][0] + 18, p[3][1] + 12, "N⁺", "#4a90c2", 15);
+    } else {
+      s += inn(p[1], p[2]) + inn(p[4], p[5]);
+      s += T(p[3][0] + 14, p[3][1] + 12, "N", "#4a90c2", 15);
+      s += T(p[0][0] - 14, p[0][1] - 14, "H", "#e0584d", 13) + T(p[0][0] + 14, p[0][1] - 14, "H", "#e0584d", 13);
+    }
+    s += L(p[3], [p[3][0], p[3][1] + 40]) + T(p[3][0], p[3][1] + 52, "ribose-ADP", "currentColor", 11, 400);
+    s += L(p[1], [p[1][0] + 38, p[1][1] - 12]) + T(p[1][0] + 70, p[1][1] - 18, "CONH₂", "currentColor", 13);
+    s += T(cx, 226, redusert ? "NADH" : "NAD⁺", "#3d7ea6", 15);
+    if (hx !== null) s += `<circle cx="${hx}" cy="${hy}" r="11" fill="#e0584d"/>` + T(hx, hy, "H⁻", "#fff", 11);
+    tegning.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto;display:block;margin:0 auto" role="img" aria-label="NAD⁺ tar imot et hydrid" font-family="inherit">${s}</svg>`;
+  }
+  function oppdater() {
+    tegn();
+    knapp.textContent = redusert ? "Tilbake til start" : "Flytt hydridet (H⁻)";
+    panel.innerHTML = redusert
+      ? `<p><strong>Substratet er oksidert, og NAD⁺ er redusert til NADH.</strong> Alkoholen har mistet et H (og tilhørende elektroner) og er blitt et keton. NADH har tatt imot hydridet i C4-posisjonen i ringen. Det andre protonet (H⁺) blir igjen i løsningen.</p>`
+      : `<p><strong>NAD⁺ er elektronmottakeren.</strong> Når en alkohol oksideres, overføres to elektroner og ett proton som et <em>hydridion</em> (H⁻) til C4 i nikotinamidringen. Den positivt ladde ringen er elektronfattig og tar gjerne imot elektroner.</p>`;
+  }
+  knapp.onclick = () => {
+    if (anim) return;
+    if (redusert) { redusert = false; oppdater(); return; }
+    anim = true;
+    const fra = [110, 152], til = v(0), t0 = performance.now(), dur = 1100;
+    const steg = (nå) => {
+      const t = Math.min(1, (nå - t0) / dur), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      const x = fra[0] + (til[0] - fra[0]) * e, y = fra[1] + (til[1] - fra[1]) * e - 70 * Math.sin(Math.PI * e);
+      tegn(x, y);
+      if (t < 1) requestAnimationFrame(steg); else { redusert = true; anim = false; oppdater(); }
+    };
+    requestAnimationFrame(steg);
+  };
+  const rot = html`<div class="bk-aa-boks">${tegning}<div>${knapp}</div>${panel}</div>`;
+  oppdater();
+  return rot;
+}
+```

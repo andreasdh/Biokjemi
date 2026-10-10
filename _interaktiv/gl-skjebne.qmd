@@ -1,0 +1,75 @@
+```{ojs}
+//| echo: false
+// Hvorfor må NADH reoksideres? Et enkelt regnskap for NAD⁺ i glykolysen, med og uten laktat og oksygen.
+{
+  const MODI = [
+    ["ingen", "Ingen reoksidering"],
+    ["laktat", "Uten O₂: melkesyregjæring"],
+    ["o2", "Med O₂: mitokondriene tar over"],
+  ];
+  let modus = "ingen", kjorer = false, synlig = true, timer = null;
+  const POOL = 6;
+  let s;
+  const nullstill = () => {
+    s = { glc: 6, nad: POOL, nadh: 0, atp: 0, pyr: 0, lak: 0, acetyl: 0, brukt: 0, ekstra: 0 };
+  };
+  nullstill();
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const tegning = html`<div></div>`;
+  const panel = html`<div class="bk-panel k-blue"></div>`;
+  const start = html`<button class="bk-knapp">Start</button>`;
+  const nytt = html`<button class="bk-knapp">Start på nytt</button>`;
+
+  function tikk() {
+    if (s.glc > 0 && s.nad >= 2) {
+      s.glc--; s.brukt++; s.nad -= 2; s.nadh += 2; s.atp += 2; s.pyr += 2;
+    }
+    if (modus === "laktat") {
+      const k = Math.min(s.pyr, s.nadh);
+      s.pyr -= k; s.nadh -= k; s.nad += k; s.lak += k;
+    } else if (modus === "o2") {
+      s.nad += s.nadh; s.nadh = 0;
+      s.acetyl += s.pyr; s.pyr = 0;
+      if (s.brukt > s.ekstra / 28) s.ekstra += 28;
+    }
+    oppdater();
+    if (s.glc === 0 && s.nadh === 0 && s.pyr === 0) stopp();
+    else if (modus === "ingen" && s.glc > 0 && s.nad < 2) stopp(true);
+  }
+  function stopp() { kjorer = false; clearInterval(timer); start.textContent = "Start"; oppdater(); }
+  function oppdater() {
+    const celler = (n, farge, tot = POOL) => Array.from({ length: tot }, (_, i) => `<span class="gl-celle" style="background:${i < n ? farge : "transparent"}"></span>`).join("");
+    const stoppet = modus === "ingen" && s.glc > 0 && s.nad < 2;
+    tegning.innerHTML = `<div class="gl-nadregn">
+      <div><span class="gl-rtekst">Glukose igjen</span><div class="gl-celler">${celler(s.glc, "#e8c35a", 6)}</div></div>
+      <div><span class="gl-rtekst">NAD⁺ (kan ta imot elektroner)</span><div class="gl-celler">${celler(s.nad, "#6bb2da")}</div></div>
+      <div><span class="gl-rtekst">NADH (har tatt imot elektroner)</span><div class="gl-celler">${celler(s.nadh, "#3d7ea6")}</div></div>
+      <div class="gl-teller"><b>${s.atp}</b> ATP fra glykolysen · <b>${s.pyr}</b> pyruvat · <b>${s.lak}</b> laktat${modus === "o2" ? ` · <b>${s.acetyl}</b> acetyl-CoA` : ""}${modus === "o2" && s.ekstra ? ` · <b>≈ ${s.ekstra}</b> ekstra ATP fra mitokondriene (sitronsyresyklusen og elektrontransportkjeden)` : ""}</div>
+      ${stoppet ? '<div class="gl-stopp">Glykolysen har stoppet: alt NAD⁺ er brukt opp, og NADH har ingen vei videre.</div>' : ""}</div>`;
+    const tekst = {
+      ingen: "Trinn 6 (GAPDH) trenger NAD⁺ for å oksidere G3P. Hver glukose bruker opp 2 NAD⁺ og gir 2 NADH. Uten noen måte å få NAD⁺ tilbake går cellen raskt tom, og hele glykolysen stopper.",
+      laktat: "Uten oksygen overfører cellen elektronene fra NADH til pyruvat, som blir til laktat. NAD⁺ er tilbake, og glykolysen kan fortsette. Det gir bare 2 ATP per glukose, men det holder veien åpen. Slik er det i muskler under sprint og i røde blodceller.",
+      o2: "Med oksygen leverer NADH elektronene sine til elektrontransportkjeden, og pyruvat går inn i mitokondriene som acetyl-CoA (sitronsyresyklusen). NAD⁺ er tilbake, og utbyttet blir mange ganger større. Det kommer vi til i de to neste kapitlene.",
+    }[modus];
+    panel.innerHTML = `<p>${tekst}</p>`;
+    chips.querySelectorAll("button").forEach((b) => b.classList.toggle("valgt", b.dataset.m === modus));
+  }
+  MODI.forEach(([m, navn]) => {
+    const b = html`<button class="bk-chip" data-m="${m}">${navn}</button>`;
+    b.onclick = () => { stopp(); nullstill(); modus = m; oppdater(); };
+    chips.append(b);
+  });
+  start.onclick = () => {
+    if (kjorer) return stopp();
+    if (s.glc === 0 || (modus === "ingen" && s.nad < 2)) nullstill();
+    kjorer = true; start.textContent = "Pause"; timer = setInterval(() => { if (synlig) tikk(); }, 800);
+  };
+  nytt.onclick = () => { stopp(); nullstill(); oppdater(); };
+  const rot = html`<div class="bk-aa-boks"><p class="bk-hint">Seks glukosemolekyler og en liten pool av NAD⁺. Velg hva cellen gjør med NADH, og trykk start.</p>${chips}${tegning}<div>${start}${nytt}</div>${panel}</div>`;
+  oppdater();
+  const obs = new IntersectionObserver(([e]) => { synlig = e.isIntersecting; });
+  obs.observe(rot);
+  invalidation.then(() => { clearInterval(timer); obs.disconnect(); });
+  return rot;
+}
+```

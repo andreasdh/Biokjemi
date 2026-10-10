@@ -1,0 +1,16 @@
+---
+title: "Enzymer: katalyse og mekanismer"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 8 og 9.
+
+## Planlagt innhold
+
+- Hvorfor enzymer virker: senket aktiveringsenergi og stabilisering av overgangstilstanden
+- Sentrale katalyseprinsipper (syre-base, kovalent og metallion-katalyse, nærhet og orientering)
+- Eksempler på mekanismer

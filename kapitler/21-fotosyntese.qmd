@@ -1,0 +1,14 @@
+---
+title: "Fotosyntese"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 23.
+
+## Planlagt innhold
+
+- Lysreaksjonene og Calvin-syklusen

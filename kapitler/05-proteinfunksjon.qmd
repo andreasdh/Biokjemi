@@ -1,0 +1,16 @@
+---
+title: "Proteinfunksjon"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 6.
+
+## Planlagt innhold
+
+- Ligandbinding og spesifisitet
+- Samarbeid mellom bindingssteder (for eksempel hemoglobin)
+- Antistoffer og andre bindingsproteiner

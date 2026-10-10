@@ -1,0 +1,15 @@
+---
+title: "Lipider"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 13.
+
+## Planlagt innhold
+
+- Fettsyrer, triglyserider og membranlipider
+- Selvorganisering i vann: den hydrofobe effekten i praksis

@@ -1,0 +1,15 @@
+---
+title: "Membrantransport"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 18.
+
+## Planlagt innhold
+
+- Diffusjon, kanaler og bærere
+- Aktiv transport og ΔG for transport mot en gradient

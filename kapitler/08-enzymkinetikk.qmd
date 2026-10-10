@@ -1,0 +1,16 @@
+---
+title: "Enzymkinetikk"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 10.
+
+## Planlagt innhold
+
+- Michaelis–Menten-kinetikk, Km og vmax
+- Inhibering
+- Regulering av enzymaktivitet

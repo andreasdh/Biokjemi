@@ -19,10 +19,11 @@ quarto render         # bygger hele boka til _book/
 | `kapitler/` | Kapitler (`.ipynb` eller `.qmd`) |
 | `_interaktiv/` | Kode til interaktive figurer (Observable JS), hentes inn i kapitlene |
 | `_figurer/` | Statiske SVG-illustrasjoner som hentes inn i kapitlene |
-| `spill/` | Aminosyrespillet (egen nettside) og delt kode for kapittel 3. Kopieres til den bygde boka (`resources:` i `_quarto.yml`) |
+| `spill/` | Aminosyrespillet (egen nettside) og delt kode og data for kapittel 3, 17 og 18 (strukturtegner, aminosyredata, glykolysedata). Kopieres til den bygde boka (`resources:` i `_quarto.yml`) |
 | `tools/` | Hjelpeskript (se under) |
 
 Nye kapitler legges til i `chapters:` i `_quarto.yml`.
+Kapitlene som ikke er skrevet ennå, ligger som plassholdere (`.qmd` med en «Under arbeid»-boks og et utkast til innhold). Skriv over filen når du lager kapittelet, eller gjør det om til en notebook med `tools/qmd_til_ipynb.py`.
 
 ## Publisering
 
@@ -63,5 +64,6 @@ Installer først det som trengs: `pip install -r tools/requirements.txt`.
 |---|---|
 | `qmd_til_ipynb.py` | Gjør en `.qmd`-fil om til en notebook, delt i celler per overskrift, boks og figur. Testet: den bygde siden blir lik. |
 | `lag_aminosyredata.py` | Lager strukturdata (2D-koordinater, ladningstilstander, pKₐ, R/S) for de 20 aminosyrene og skriver `spill/aminosyredata.js`. Brukes av både kapittel 3 og spillet. Kjøres bare hvis du endrer aminosyrelisten. |
+| `lag_glykolysedata.py` | Lager strukturer, trinn og tekster til glykolysen (`spill/glykolysedata.js`). **Teksten til de ti trinnene (hva, hvorfor, videre) står i listen `STEG` i dette skriptet**, og konsentrasjonene og ΔG°′-verdiene i `KONC` og `STEG`. Kjør skriptet på nytt etter endringer. |
 | `lag_molekyldata.py` | Regner ut partialladninger og 2D-koordinater til molekylvisningen i kapittel 2 og skriver `_interaktiv/molekyldata.qmd`. Må bare kjøres hvis du endrer listen over molekyler i skriptet. |
 

@@ -26,13 +26,37 @@ book:
       chapters:
         - kapitler/01-sentrale-begreper.qmd
         - kapitler/02-kjemiske-prinsipper.ipynb
-
-    - part: "Del 2: Biologiske makromolekyler"
+    - part: "Del 2: Proteiner"
       chapters:
         - kapitler/03-aminosyrer.ipynb
-    - part: "Del 3: Metabolisme"
+        - kapitler/04-proteinstruktur-og-folding.qmd
+        - kapitler/05-proteinfunksjon.qmd
+        - kapitler/06-metoder-separasjon.qmd
+    - part: "Del 3: Enzymer"
       chapters:
-        - kapitler/03-mal.qmd
+        - kapitler/07-enzymer.qmd
+        - kapitler/08-enzymkinetikk.qmd
+        - kapitler/09-metoder-karakterisering.qmd
+    - part: "Del 4: Informasjon"
+      chapters:
+        - kapitler/10-nukleinsyrer.qmd
+        - kapitler/11-genetisk-kode.qmd
+    - part: "Del 5: Membraner og signalering"
+      chapters:
+        - kapitler/12-lipider.qmd
+        - kapitler/13-membraner.qmd
+        - kapitler/14-membrantransport.qmd
+        - kapitler/15-biosignalering.qmd
+    - part: "Del 6: Metabolisme"
+      chapters:
+        - kapitler/16-karbohydrater.qmd
+        - kapitler/17-stoffskiftet.ipynb
+        - kapitler/18-glykolysen.ipynb
+        - kapitler/19-sitronsyresyklusen.qmd
+        - kapitler/20-elektrontransportkjeden.qmd
+        - kapitler/21-fotosyntese.qmd
+        - kapitler/22-fettsyresyntese.qmd
+
   appendices:
     - kapitler/ordliste.qmd
 

@@ -1,0 +1,39 @@
+```{ojs}
+//| echo: false
+// Karbonets oksidasjonstrapp: jo flere bindinger til oksygen, jo mindre elektrontetthet på karbonet og jo mindre energi igjen.
+{
+  const trinn = [
+    { navn: "Metan", formel: "CH₄", ox: "−4", g: 820, tett: 1.0, tekst: "Karbonet har fire C–H-bindinger. Karbon er litt mer elektronegativt enn hydrogen, så elektrontettheten ligger mest på karbonet. Mest redusert, og mest energi å hente." },
+    { navn: "Metanol", formel: "CH₃OH", ox: "−2", g: 703, tett: 0.8, tekst: "Én C–H er byttet med C–O. Oksygen trekker elektroner bort fra karbonet." },
+    { navn: "Formaldehyd", formel: "H₂C=O", ox: "0", g: 523, tett: 0.6, tekst: "To bindinger til oksygen (C=O). Karbonet har mistet enda mer elektrontetthet." },
+    { navn: "Maursyre", formel: "HCOOH", ox: "+2", g: 285, tett: 0.4, tekst: "Tre bindinger til oksygen. Karbonet er blitt tydelig δ⁺." },
+    { navn: "Karbondioksid", formel: "O=C=O", ox: "+4", g: 0, tett: 0.2, tekst: "Fire bindinger til oksygen. Karbonet er fullt oksidert, og det er ingen energi igjen å hente ved oksidasjon." },
+  ];
+  let k = 0;
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const rad = html`<div class="gl-oks"></div>`;
+  const panel = html`<div class="bk-panel k-coral"></div>`;
+  const neste = html`<button class="bk-knapp">Oksider ett trinn →</button>`;
+  const tilbake = html`<button class="bk-knapp">Tilbake</button>`;
+
+  function oppdater() {
+    rad.innerHTML = trinn.map((t, i) => `<div class="gl-okskort ${i === k ? "valgt" : i < k ? "forbi" : ""}" data-i="${i}">
+      <div class="gl-sky" style="--t:${t.tett}"><span>C</span></div>
+      <div class="gl-formel">${t.formel}</div><div class="gl-oksnavn">${t.navn}</div>
+      <div class="gl-oksnr">oksidasjonstall ${t.ox}</div>
+      <div class="gl-energibar"><i style="width:${(t.g / 820) * 100}%"></i></div><div class="gl-energitekst">${t.g > 0 ? "−" + t.g : "0"} kJ/mol</div></div>`).join("");
+    rad.querySelectorAll(".gl-okskort").forEach((e) => (e.onclick = () => { k = +e.dataset.i; oppdater(); }));
+    const t = trinn[k];
+    const frigjort = k > 0 ? trinn[k - 1].g - t.g : 0;
+    panel.innerHTML = `<h4>${t.navn} (${t.formel})</h4><p>${t.tekst}</p>
+      ${k > 0 ? `<p>Fra forrige trinn ble det frigjort <strong>${frigjort} kJ/mol</strong> (ΔG°′ for oksidasjonen). ` : "<p>"}Energien som kan hentes ved å oksidere videre helt til CO₂ er <strong>${t.g} kJ/mol</strong>.</p>`;
+    neste.disabled = k === trinn.length - 1;
+    tilbake.disabled = k === 0;
+  }
+  neste.onclick = () => { k = Math.min(trinn.length - 1, k + 1); oppdater(); };
+  tilbake.onclick = () => { k = Math.max(0, k - 1); oppdater(); };
+  const rot = html`<div class="bk-aa-boks"><p class="bk-hint">Den gule skyen viser hvor mye elektrontetthet som er igjen på karbonet. Trykk deg gjennom fra metan til CO₂.</p>${rad}<div>${tilbake}${neste}</div>${panel}</div>`;
+  oppdater();
+  return rot;
+}
+```

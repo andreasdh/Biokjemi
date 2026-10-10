@@ -1,0 +1,116 @@
+```{ojs}
+//| echo: false
+// Glukose inn i cellen: GLUT-kanalen slipper glukose gjennom begge veier. Heksokinase «låser» glukosen inne.
+{
+  const B = 560, H = 330, MEM_Y = 150, MEM_T = 26, GAP_X = B / 2, GAP_W = 84;
+  const N_UTE = 22;
+  let heksokinase = false;
+  let partikler = [];
+  let inn = 0, ut = 0, atpBrukt = 0, kjorer = true, synlig = true;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  function nyUte() {
+    return { x: rnd(14, B - 14), y: rnd(14, MEM_Y - 10), type: "glc", side: 0, kryss: 0 };
+  }
+  function nullstill() {
+    partikler = Array.from({ length: N_UTE }, nyUte);
+    inn = 0; ut = 0; atpBrukt = 0;
+  }
+  nullstill();
+
+  const knappAv = html`<button class="bk-chip valgt">Uten heksokinase</button>`;
+  const knappPaa = html`<button class="bk-chip">Med heksokinase</button>`;
+  const chips = html`<div class="bk-chiprad">${knappAv}${knappPaa}</div>`;
+  const tegning = html`<div class="gl-glut"></div>`;
+  const tall = html`<div class="bk-panel k-amber"></div>`;
+  const nytt = html`<button class="bk-knapp">Start på nytt</button>`;
+  const pause = html`<button class="bk-knapp">Pause</button>`;
+
+  function sett(v) {
+    heksokinase = v;
+    knappAv.classList.toggle("valgt", !v);
+    knappPaa.classList.toggle("valgt", v);
+  }
+  knappAv.onclick = () => sett(false);
+  knappPaa.onclick = () => sett(true);
+  nytt.onclick = () => nullstill();
+  pause.onclick = () => { kjorer = !kjorer; pause.textContent = kjorer ? "Pause" : "Fortsett"; };
+
+  function steg() {
+    const nye = [];
+    for (const p of partikler) {
+      if (p.kryss > 0) {
+        p.y += p.dy; p.kryss--;
+        if (p.kryss === 0) {
+          if (p.side === 1) { p.side = 0; ut++; continue; /* ut i blodet */ }
+          p.side = 1; inn++;
+        }
+        nye.push(p); continue;
+      }
+      p.x += rnd(-9, 9); p.y += rnd(-9, 9);
+      const y0 = p.side === 0 ? 12 : MEM_Y + MEM_T + 12, y1 = p.side === 0 ? MEM_Y - 10 : H - 12;
+      p.x = Math.max(12, Math.min(B - 12, p.x));
+      // GLUT: bare glukose passerer, og med samme sannsynlighet begge veier (slik at likevekten blir lik konsentrasjon)
+      if (p.type === "glc" && Math.random() < 0.0016) {
+        p.x = GAP_X + rnd(-GAP_W / 2 + 12, GAP_W / 2 - 12);
+        p.y = p.side === 0 ? MEM_Y - 12 : MEM_Y + MEM_T + 12;
+        p.kryss = 9; p.dy = (p.side === 0 ? 1 : -1) * (MEM_T + 24) / 9;
+        nye.push(p); continue;
+      }
+      p.y = Math.max(y0, Math.min(y1, p.y));
+      // heksokinase: glukose inne → glukose-6-fosfat (kan ikke ut)
+      if (heksokinase && p.side === 1 && p.type === "glc" && Math.random() < 0.004) {
+        p.type = "g6p"; atpBrukt++;
+      }
+      nye.push(p);
+    }
+    partikler = nye;
+    // blodet holder glukosekonsentrasjonen konstant
+    while (partikler.filter((p) => p.side === 0).length < N_UTE) partikler.push(nyUte());
+    // glukose-6-fosfat brukes videre i glykolysen (holder antallet nede)
+    const g6p = partikler.filter((p) => p.type === "g6p");
+    if (g6p.length > 36) partikler.splice(partikler.indexOf(g6p[0]), 1);
+  }
+
+  function tegn() {
+    const glcInne = partikler.filter((p) => p.side === 1 && p.type === "glc" && p.kryss === 0).length;
+    const g6p = partikler.filter((p) => p.type === "g6p").length;
+    const konInne = (glcInne / N_UTE) * 5;
+    let dots = "";
+    for (const p of partikler) {
+      if (p.type === "glc") dots += `<circle cx="${p.x}" cy="${p.y}" r="6" fill="#e8c35a" stroke="#b88a2a" stroke-width="1.5"/>`;
+      else dots += `<circle cx="${p.x}" cy="${p.y}" r="6" fill="#e8c35a" stroke="#b88a2a" stroke-width="1.5"/><circle cx="${p.x + 6}" cy="${p.y - 6}" r="5.5" fill="#e0884d" stroke="#b86a2a"/><text x="${p.x + 6}" y="${p.y - 6}" dy="0.35em" font-size="8" font-weight="700" text-anchor="middle" fill="#fff">P</text>`;
+    }
+    tegning.innerHTML = `<svg viewBox="0 0 ${B} ${H}" class="gl-glutsvg" role="img" aria-label="Glukose som diffunderer gjennom en GLUT-kanal inn i en celle">
+      <rect x="0" y="0" width="${B}" height="${MEM_Y}" fill="#a9d0e6" fill-opacity="0.22"/>
+      <rect x="0" y="${MEM_Y + MEM_T}" width="${B}" height="${H - MEM_Y - MEM_T}" fill="#f4dca0" fill-opacity="0.22"/>
+      <rect x="0" y="${MEM_Y}" width="${GAP_X - GAP_W / 2}" height="${MEM_T}" fill="#d77aa6" fill-opacity="0.55"/>
+      <rect x="${GAP_X + GAP_W / 2}" y="${MEM_Y}" width="${B - GAP_X - GAP_W / 2}" height="${MEM_T}" fill="#d77aa6" fill-opacity="0.55"/>
+      <rect x="${GAP_X - GAP_W / 2 - 4}" y="${MEM_Y - 6}" width="12" height="${MEM_T + 12}" rx="5" fill="#8a5fb3"/>
+      <rect x="${GAP_X + GAP_W / 2 - 8}" y="${MEM_Y - 6}" width="12" height="${MEM_T + 12}" rx="5" fill="#8a5fb3"/>
+      <text x="${GAP_X}" y="${MEM_Y + MEM_T + 28}" text-anchor="middle" font-size="12" font-weight="700" fill="#8a5fb3">GLUT</text>
+      <text x="12" y="20" font-size="13" fill="currentColor" opacity="0.8">Utenfor cellen (blod): ca. 5 mM glukose</text>
+      <text x="12" y="${H - 10}" font-size="13" fill="currentColor" opacity="0.8">Inne i cellen</text>
+      ${dots}</svg>`;
+    tall.innerHTML = `<p><strong>Fri glukose inne:</strong> ca. ${glKomma(konInne, 1)} mM (ute: 5,0 mM)
+      · <strong>Glukose-6-fosfat inne:</strong> ${g6p}
+      · <strong>Netto opptak:</strong> ${inn - ut} molekyler (inn ${inn}, ut ${ut}).</p>
+      <p class="bk-hint">${heksokinase
+        ? "Heksokinase bruker ATP til å lage glukose-6-fosfat (oransje P). Det kan ikke gå ut gjennom GLUT, og den frie glukosekonsentrasjonen inne forblir lav. Dermed fortsetter glukose å strømme inn."
+        : "Uten heksokinase går glukose like lett ut som inn. Konsentrasjonen inne nærmer seg konsentrasjonen ute, og det blir ikke noe mer nettoopptak. GLUT er bare en vei, ikke en pumpe."}</p>`;
+  }
+
+  let anim;
+  function lop() {
+    if (kjorer && synlig) { steg(); steg(); steg(); tegn(); }
+    anim = requestAnimationFrame(lop);
+  }
+  tegn();
+  anim = requestAnimationFrame(lop);
+  const rot = html`<div class="bk-aa-boks"><p class="bk-hint">Glukose (gule kuler) diffunderer tilfeldig, og GLUT-kanalen slipper glukose gjennom begge veier. Bytt mellom å ha heksokinase i cellen eller ikke.</p>${chips}${tegning}${tall}<div>${pause}${nytt}</div></div>`;
+  const obs = new IntersectionObserver(([e]) => { synlig = e.isIntersecting; });
+  obs.observe(rot);
+  invalidation.then(() => { cancelAnimationFrame(anim); obs.disconnect(); });
+  return rot;
+}
+```

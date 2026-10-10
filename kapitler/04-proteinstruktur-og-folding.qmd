@@ -1,0 +1,17 @@
+---
+title: "Proteinstruktur og folding"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 4 og 5.
+
+## Planlagt innhold
+
+- Fra peptidkjede til protein: primær-, sekundær-, tertiær- og kvartærstruktur
+- Kreftene som holder strukturen sammen (hydrogenbindinger, saltbroer, London-krefter og den hydrofobe effekten)
+- Hvordan og hvorfor proteiner folder seg: termodynamikk og energilandskap (kobles til HP-modellen i kapittel 2)
+- Feilfolding og chaperoner

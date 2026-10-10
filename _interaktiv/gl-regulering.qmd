@@ -1,0 +1,91 @@
+```{ojs}
+//| echo: false
+// Regulering av de tre kontrollpunktene ut fra cellens energistatus.
+{
+  const klem = (x) => Math.max(0, Math.min(1, x));
+  const sA = Inputs.range([0, 1], { value: 0.85, step: 0.01, label: "Energi (ATP)" });
+  const sC = Inputs.range([0, 1], { value: 0.3, step: 0.01, label: "Sitrat" });
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const kortene = html`<div class="gl-regkort"></div>`;
+  const flyt = html`<div></div>`;
+  const panel = html`<div class="bk-panel k-green"></div>`;
+  let J = 0.2, t = 0, synlig = true;
+  const tilstander = [["Hvile (mye ATP)", 0.9, 0.5], ["Hard trening (lite ATP)", 0.15, 0.05]];
+
+  function modell() {
+    const a = +sA.value, c = +sC.value;
+    const amp = Math.pow(1 - a, 2);
+    const pfk = klem(0.05 + 0.95 * (1 - Math.pow(a, 2.2)) * (1 - 0.65 * c) + 0.35 * amp);
+    const L = klem(1 - pfk);
+    const hk = pfk;
+    const fbp = pfk;
+    const pk = klem((0.2 + 0.8 * fbp) * (1 - 0.55 * a));
+    return { a, c, pfk, L, hk, fbp, pk };
+  }
+  const kortHtml = (navn, kort, akt, effekter) =>
+    `<div class="gl-reg"><h4>${navn} <small>${kort}</small></h4>
+      <div class="gl-akt-bar"><i style="width:${Math.round(akt * 100)}%"></i></div><div class="gl-akt-tekst">Aktivitet: ${Math.round(akt * 100)} %</div>
+      <ul>${effekter.map(([t, pa]) => `<li class="${pa ? "paa" : ""}">${t}</li>`).join("")}</ul></div>`;
+
+  function oppdater() {
+    const m = modell();
+    J = m.pfk;
+    kortene.innerHTML =
+      kortHtml("Heksokinase", "trinn 1", m.hk, [["G6P ⊣ (produkthemming)", m.L > 0.4]]) +
+      kortHtml("PFK-1", "trinn 3", m.pfk, [["ATP ⊣", m.a > 0.5], ["Sitrat ⊣", m.c > 0.4], ["AMP/ADP ↑", m.a < 0.5], ["Fruktose-2,6-bisfosfat ↑ (lever)", false]]) +
+      kortHtml("Pyruvatkinase", "trinn 10", m.pk, [["Fruktose-1,6-bisfosfat ↑", m.fbp > 0.5], ["ATP ⊣", m.a > 0.5], ["Alanin ⊣", false]]);
+    const bar = (navn, v, farge) => `<div class="gl-niva"><span>${navn}</span><div><i style="width:${Math.round(v * 100)}%;background:${farge}"></i></div></div>`;
+    flyt.innerHTML = `<div class="gl-flyt-boks"><canvas class="gl-flyt" width="560" height="64"></canvas>
+      ${bar("Glukose-6-fosfat og fruktose-6-fosfat (opphopning)", m.L, "#e0884d")}${bar("Fruktose-1,6-bisfosfat", m.fbp, "#c9962f")}</div>`;
+    const tekst = [];
+    if (m.a > 0.6) tekst.push("<strong>Mye ATP:</strong> cellen trenger ikke mer energi. ATP (og sitrat) hemmer PFK-1, og glykolysen bremses i midten.");
+    else if (m.a < 0.4) tekst.push("<strong>Lite ATP, mye AMP/ADP:</strong> cellen trenger energi. AMP aktiverer PFK-1, og glykolysen går for fullt.");
+    else tekst.push("<strong>Middels energinivå:</strong> aktiviteten ligger et sted mellom.");
+    if (m.pfk < 0.5) tekst.push("Når PFK-1 bremser, hoper fruktose-6-fosfat og dermed glukose-6-fosfat seg opp (se søylen). Glukose-6-fosfat hemmer heksokinase, så bremsen forplanter seg bakover til opptaket av glukose.");
+    else tekst.push("Når PFK-1 slipper mye gjennom, forbrukes glukose-6-fosfat raskt, og heksokinase er ikke hemmet.");
+    tekst.push(`Fruktose-1,6-bisfosfat aktiverer pyruvatkinase (fremovermating): mer flyt i starten gir mer flyt på slutten.`);
+    panel.innerHTML = `<p>${tekst.join("</p><p>")}</p>`;
+  }
+  function tegnFlyt() {
+    const cv = flyt.querySelector("canvas");
+    if (!cv) return;
+    const ctx = cv.getContext("2d");
+    ctx.clearRect(0, 0, 560, 64);
+    const farge = getComputedStyle(cv).color || "#888";
+    ctx.strokeStyle = farge; ctx.globalAlpha = 0.35; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(10, 32); ctx.lineTo(550, 32); ctx.stroke(); ctx.globalAlpha = 1;
+    const ventil = (x, nav, aapen) => {
+      ctx.fillStyle = "#8a5fb3"; ctx.fillRect(x - 5, 8, 10, 48 * (1 - aapen) * 0.5);
+      ctx.fillRect(x - 5, 56 - 48 * (1 - aapen) * 0.5, 10, 48 * (1 - aapen) * 0.5);
+      ctx.fillStyle = farge; ctx.font = "11px sans-serif"; ctx.textAlign = "center"; ctx.fillText(nav, x, 62);
+    };
+    const m = modell();
+    ventil(110, "HK", m.hk); ventil(260, "PFK-1", m.pfk); ventil(470, "PK", m.pk);
+    const n = 14;
+    for (let i = 0; i < n; i++) {
+      const f = (i / n + t) % 1;
+      const x = 10 + f * 540;
+      ctx.fillStyle = "#e8c35a"; ctx.beginPath(); ctx.arc(x, 32, 5, 0, 6.3); ctx.fill();
+    }
+  }
+  let anim, forrige = performance.now();
+  function lop(nå) {
+    const dt = (nå - forrige) / 1000; forrige = nå;
+    if (synlig) { t = (t + dt * 0.12 * (0.05 + J)) % 1; tegnFlyt(); }
+    anim = requestAnimationFrame(lop);
+  }
+  tilstander.forEach(([n, a, c]) => {
+    const b = html`<button class="bk-chip">${n}</button>`;
+    b.onclick = () => { sA.value = a; sC.value = c; oppdater(); };
+    chips.append(b);
+  });
+  [sA, sC].forEach((s) => s.addEventListener("input", oppdater));
+  const rot = html`<div class="bk-aa-boks"><p class="bk-hint">Velg en tilstand eller dra i glidebryterne. Se hva som skjer med de tre kontrollpunktene og med opphopningen av mellomprodukter.</p>${chips}${sA}${sC}${flyt}${kortene}${panel}</div>`;
+  oppdater();
+  anim = requestAnimationFrame(lop);
+  const obs = new IntersectionObserver(([e]) => { synlig = e.isIntersecting; });
+  obs.observe(rot);
+  invalidation.then(() => { cancelAnimationFrame(anim); obs.disconnect(); });
+  return rot;
+}
+```

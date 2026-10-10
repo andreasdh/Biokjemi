@@ -1,0 +1,15 @@
+---
+title: "Fettsyresyntese"
+---
+
+::: {.callout-note}
+## Under arbeid
+Dette kapittelet er ikke skrevet ennå. Under står planen (utkast). Erstatt innholdet i denne filen når du skriver kapittelet.
+:::
+
+Tilsvarer forelesning 24.
+
+## Planlagt innhold
+
+- Hvordan fettsyrer bygges opp fra acetyl-CoA
+- Regulering og sammenheng med resten av stoffskiftet

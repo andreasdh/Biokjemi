@@ -1,0 +1,73 @@
+```{ojs}
+//| echo: false
+// Fosfatstigen: hvem kan gi fosfat til hvem? ΔG°′ for overføring = ΔG°′(hydrolyse, giver) − ΔG°′(hydrolyse, mottakerens fosfat).
+{
+  const G = GL.gl.fosfatstige;
+  const finn = (id) => G.find((x) => x.id === id);
+  const mottakere = [
+    { id: "atp", navn: "ADP (→ ATP)", prod: "atp" },
+    { id: "g6p", navn: "Glukose (→ G6P)", prod: "g6p" },
+    { id: "gly3p", navn: "Glyserol (→ glyserol-3-fosfat)", prod: "gly3p" },
+  ];
+  const eks = [
+    ["Trinn 1: ATP → glukose", "atp", "g6p"],
+    ["Trinn 7: 1,3-BPG → ADP", "bpg13", "atp"],
+    ["Trinn 10: PEP → ADP", "pep", "atp"],
+    ["Hva med G6P → ADP?", "g6p", "atp"],
+  ];
+  let giver = "atp", mott = "g6p", W = 520;
+  const chips = html`<div class="bk-chiprad"></div>`;
+  const stige = html`<div></div>`;
+  const panel = html`<div class="bk-panel k-amber"></div>`;
+  const selG = html`<select class="gl-select" aria-label="Fosfatgiver"></select>`;
+  const selM = html`<select class="gl-select" aria-label="Mottaker"></select>`;
+  G.forEach((x) => selG.append(new Option(x.navn, x.id)));
+  mottakere.forEach((x) => selM.append(new Option(x.navn, x.prod)));
+
+  function oppdater() {
+    const g = finn(giver), m = finn(mott);
+    const dG = g.g - m.g;
+    const H = 330, l = 30, r = 10, t = 12;
+    const rad = (H - t - 20) / 8;
+    const sorter = G.slice().sort((a, b) => a.g - b.g);
+    const Y = (id) => t + sorter.findIndex((x) => x.id === id) * rad + rad / 2;
+    const maks = 70, bw = (v) => (-v / maks) * (W - 250);
+    let s = "";
+    sorter.forEach((x) => {
+      const y = Y(x.id), er = x.id === giver ? "giver" : x.id === mott ? "mott" : "";
+      const f = er === "giver" ? "#e0884d" : er === "mott" ? "#3f8468" : "#8aa0ad";
+      s += `<rect x="215" y="${y - rad / 2 + 4}" width="${bw(x.g)}" height="${rad - 8}" rx="4" fill="${f}" fill-opacity="${er ? 0.85 : 0.35}"/>
+        <text x="208" y="${y}" dy="0.35em" text-anchor="end" font-size="12" font-weight="${er ? 700 : 400}" fill="currentColor">${x.navn}</text>
+        <text x="${219 + bw(x.g)}" y="${y}" dy="0.35em" font-size="11" fill="currentColor" opacity="0.8">${glKomma(x.g)}</text>`;
+    });
+    // pil fra giver til mottaker (til høyre for søylene)
+    const yg = Y(giver), ym = Y(mott), xp = W - 30;
+    const fp = dG < 0 ? "#3f8468" : "#c8553f";
+    s += `<line x1="${219 + bw(finn(giver).g)}" x2="${xp}" y1="${yg}" y2="${yg}" stroke="#e0884d" stroke-dasharray="2 4"/><line x1="${219 + bw(finn(mott).g)}" x2="${xp}" y1="${ym}" y2="${ym}" stroke="#3f8468" stroke-dasharray="2 4"/>`;
+    s += `<path d="M${xp} ${yg} C ${xp + 22} ${yg}, ${xp + 22} ${ym}, ${xp} ${ym}" fill="none" stroke="${fp}" stroke-width="3" stroke-dasharray="${dG < 0 ? "" : "6 4"}" marker-end="url(#spiss2)"/>
+      <defs><marker id="spiss2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="${fp}"/></marker></defs>`;
+    stige.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto;display:block;margin:0 auto" role="img" aria-label="Fosfatstige: ΔG°′ for hydrolyse" font-family="inherit">${s}
+      <text x="${W - 4}" y="${H - 4}" text-anchor="end" font-size="10" fill="currentColor" opacity="0.6">ΔG°′ for hydrolyse av fosfatet (kJ/mol)</text></svg>`;
+    const ok = dG < 0;
+    panel.style.setProperty("--ks", ok ? "#3f8468" : "#c8553f");
+    panel.innerHTML = `<p><strong>${g.navn} → ${m.navn.split(" (")[0]}</strong></p>
+      <div class="gl-eform"><span><small>ΔG°′ (giver, hydrolyse)</small>${glKomma(g.g)}</span><b>−</b><span><small>ΔG°′ (mottaker, hydrolyse)</small>${glKomma(m.g)}</span><b>=</b><span class="res"><small>ΔG°′ overføring</small>${glKomma(dG)}</span><em>kJ/mol</em></div>
+      <p style="margin-top:0.6rem">${ok
+        ? "Gunstig: giveren har høyere fosfatoverføringspotensial enn mottakerens produkt, så fosfatet «faller nedover stigen». Kjemisk kan du se det som to koblede reaksjoner: hydrolysen av giveren (gunstig) driver dannelsen av mottakerens fosfat (ugunstig)."
+        : "Ugunstig: fosfatet må «opp» stigen, og det går ikke av seg selv. Du trenger en giver høyere oppe, for eksempel ATP, PEP eller 1,3-bisfosfoglyserat."}</p>`;
+    selG.value = giver; selM.value = mott;
+  }
+  eks.forEach(([n, g, m]) => {
+    const b = html`<button class="bk-chip">${n}</button>`;
+    b.onclick = () => { giver = g; mott = m; oppdater(); };
+    chips.append(b);
+  });
+  selG.onchange = () => { giver = selG.value; oppdater(); };
+  selM.onchange = () => { mott = selM.value; oppdater(); };
+  const rot = html`<div class="bk-aa-boks"><p class="bk-hint">Jo lenger ned i verdi, jo bedre fosfatgiver. Velg et eksempel fra glykolysen, eller sett sammen en giver og en mottaker selv.</p>${chips}
+    <div class="gl-velg"><label>Giver: ${selG}</label><label>Mottaker: ${selM}</label></div>${stige}${panel}</div>`;
+  oppdater();
+  bkTilpass(rot, 560, (w) => { W = Math.max(330, w); oppdater(); }, invalidation);
+  return rot;
+}
+```
