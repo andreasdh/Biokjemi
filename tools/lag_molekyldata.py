@@ -382,16 +382,16 @@ def katalog():
          "delladninger. Slike molekyler kan ikke danne hydrogenbindinger.",
          metan_manuell())
     legg("butan", "Hydrokarbonkjede (butan)", "gruppe",
-         "Hydrokarbonkjeder, som i fettsyrer og i sidekjedene til leucin og valin, er upolare. "
+         "Hydrokarbonkjeder, som i fettsyrer og i sidekjedene til upolare aminosyrer, er upolare. "
          "De trives dårlig i vann og trives godt sammen med hverandre.",
          bygg("CCCC"))
     legg("benzen", "Aromatisk ring (benzen)", "gruppe",
          "Aromatiske ringer, som i fenylalanin, er også upolare. Den store, bevegelige "
-         "π-elektronskyen gjør dem gode til London-krefter og stabling.",
+         "π-elektronskyen og muligheten for stabling gjør at de danner sterkere London-krefter.",
          bygg("c1ccccc1"))
     legg("etanol", "Hydroksyl (etanol)", "gruppe",
          "O–H er polar: O er δ⁻ og H er δ⁺. Hydroksylgruppen kan både gi og ta imot hydrogenbindinger "
-         "(donor og akseptor). Finnes i serin, treonin og sukker.",
+         "(donor og akseptor). Finnes i enklete aminosyrer og i karbohydrater.",
          bygg("CCO"))
     legg("acetaldehyd", "Aldehyd (acetaldehyd)", "gruppe",
          "C=O er sterkt polar: O er δ⁻ og C er δ⁺. Karbonylgruppen kan ta imot hydrogenbindinger, "
@@ -402,31 +402,30 @@ def katalog():
          bygg("CC(C)=O"))
     legg("eddiksyre", "Karboksyl (eddiksyre og acetat)", "gruppe",
          "Karboksylgruppen kan gi fra seg et proton. Da flyttes elektrontettheten, og ladningen "
-         "deles mellom de to oksygenatomene. Ved fysiologisk pH er den som regel deprotonert og negativ "
-         "(aspartat, glutamat).",
+         "deles mellom de to oksygenatomene (resonans). Ved fysiologisk pH er den som regel deprotonert og negativ ",
          pKa=4.76,
          syre={"navn": "eddiksyre (–COOH)", **til_json(sentrer(bygg("CC(=O)O")))},
          base={"navn": "acetat (–COO⁻)",
                **til_json(sentrer(bygg("CC(=O)[O-]", symmetriser=[[2, 3]])))})
-    legg("metylamin", "Amino (metylamin og metylammonium)", "gruppe",
+    legg("metylamin", "Amino (metylamin)", "gruppe",
          "Aminogruppen tar lett opp et proton. Da blir den positivt ladd (–NH₃⁺) og kan danne "
-         "ionebindinger med negative grupper. Ved fysiologisk pH er amino-gruppen i lysin positiv.",
+         "ionebindinger med negative grupper.",
          pKa=10.6,
          syre={"navn": "metylammonium (–NH₃⁺)", **til_json(sentrer(bygg("C[NH3+]")))},
          base={"navn": "metylamin (–NH₂)", **til_json(sentrer(bygg("CN")))})
     legg("fosfat", "Fosfat (metylfosfat)", "gruppe",
          "Fosfatgrupper (DNA-ryggraden, ATP) bærer typisk to negative ladninger ved fysiologisk pH. "
-         "Mange negative ladninger så tett gjør at ATP er et «spent» molekyl.",
+         "Mange negative ladninger gir elektrostatisk frastøtning og ustabilitet.",
          pKa=6.3,
          syre={"navn": "R–O–PO₃H⁻ (monoanion)", **til_json(sentrer(bygg("COP(=O)(O)[O-]", symmetriser=[[3, 5]])))},
          base={"navn": "R–O–PO₃²⁻ (dianion)", **til_json(sentrer(bygg("COP(=O)([O-])[O-]", symmetriser=[[3, 4, 5]])))})
-    legg("tiol", "Sulfhydryl (metantiol)", "gruppe",
-         "S–H er bare svakt polar (S og H har nesten lik elektronegativitet). Cystein kan likevel "
+    legg("tiol", "Tiol", "gruppe",
+         "S–H er nesten upolar (S og H har nesten lik elektronegativitet). Aminosyren cystein kan derimot "
          "danne disulfidbroer, en kovalent binding som stabiliserer proteiner.",
          bygg("CS"))
     legg("peptid", "Peptidbinding (N-metylacetamid)", "gruppe",
          "Skjelettet i alle proteiner: C=O (δ⁻, akseptor) og N–H (δ⁺, donor) kan danne hydrogenbindinger. "
-         "Disse binder sammen α-heliks og β-flak.",
+         "Disse binder sammen sekundæstrukturer i proteiner: α-heliks og β-flak.",
          bygg("CNC(C)=O"))
     legg("vann", "Vann (H₂O)", "gruppe",
          "O er mye mer elektronegativ enn H. O blir δ⁻, H blir δ⁺, og siden molekylet er bøyd, "
@@ -439,7 +438,7 @@ def katalog():
          "akseptor (frie elektronpar på O). Nettverket brytes og dannes igjen hele tiden.",
          vannnettverk())
     legg("par_at", "Basepar A–T", "binding",
-         "Adenin og tymin kjenner hverandre igjen: to hydrogenbindinger (N–H···O og N–H···N).",
+         "Adenin og tymin danner to hydrogenbindinger (N–H···O og N–H···N).",
          lag_par("Cn1cnc2c(N)ncnc12", "Cc1cn(C)c(=O)[nH]c1=O",
                  [(1, 6, 9), (2, 7, 7)]))
     legg("par_gc", "Basepar G–C", "binding",

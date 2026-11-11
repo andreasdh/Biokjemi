@@ -5,7 +5,7 @@ title: "Introduksjon til sentrale begreper"
 ::: {.laeringsmal}
 Læringsmål
 
-Etter dette kapittelet kan du:
+Etter dette kapittelet skal du kunne:
 
 - beskrive de fire gruppene av biomolekyler: nukleinsyrer, proteiner, lipider og karbohydrater
 - forklare det sentrale dogmet, altså hvordan informasjon flyter fra gen til egenskap
@@ -25,13 +25,13 @@ Biokjemi består av mange deler, men de henger tett sammen. Under finner du et t
 ## Fire ideer som går igjen
 Hvis du bare skal ta med deg noen få tanker fra hele emnet, så ta med disse:
 
-1. *Molekylær struktur gir egenskaper som muliggjør biologisk funksjon*
+1. *Molekylær struktur gir egenskaper som muliggjør biologisk funksjon* \\
    Formen, ladningsfordelingen og bevegeligheten til et molekyl påvirker hva det kan gjøre. Dette knytter kjemisk oppbygning til alt fra membraner til enzymkatalyse.
-2. *Biologisk funksjon oppstår gjennom samspill mellom molekyler*
+2. *Biologisk funksjon oppstår gjennom samspill mellom molekyler* \\
    Molekyler binder, gjenkjenner og påvirker hverandre gjennom kjemiske vekselvirkninger. Samspillet avhenger av omgivelsene, blant annet pH, temperatur og konsentrasjon.
-3. *Liv er avhengig av energiomsetning og kontroll over kjemiske reaksjoner*
+3. *Liv er avhengig av energiomsetning og kontroll over kjemiske reaksjoner* \\
    Termodynamikk forklarer hvilke prosesser som er gunstige under gitte betingelser, mens kinetikk forklarer hvor raskt de skjer. Reaksjonskobling og enzymer gjør at celler kan drive og regulere nødvendige prosesser.
-4. *Biologiske systemer lagrer, bruker og viderefører informasjon*
+4. *Biologiske systemer lagrer, bruker og viderefører informasjon* \\
    Informasjon i DNA kommer til uttrykk gjennom RNA og proteiner. Molekylære mekanismer for kopiering, genuttrykk og regulering knytter denne informasjonen til cellens struktur og aktivitet.
 
 Så: tenk konseptuelt, og **tenk kjemi!** Det er ikke meningen at du skal pugge alt. Prøv heller å forstå *hvorfor*.
@@ -55,13 +55,13 @@ Her er noen av oppdagelsene som har formet faget gjennom årene. **Klikk på et 
 
 Vi bruker mange ulike metoder for å skape ny kunnskap i biokjemi. Relativt enkle forsøksoppsett, med gassoppsamling, veiing og støkiometriske beregninger, står bak historiske bidrag mot å avdekke hvordan levende organismer omsetter ulike stoffer. Ved å undersøke hva som ble forbrukt og dannet, kunne forskere finne mønstre og sammenhenger lenge før de kjente molekylene og mekanismene bak. Ta som eksempel tidlige studier av gjæring, som er en prosess der gjærsopp bruker enzymer til å omdanne sukker til karbondioksid og etanol ved anaerobe forhold. Målinger av hvor mye sukker som ble forbrukt, og hvor mye karbondioksid og etanol som ble dannet, gjorde det mulig å beskrive en samlet stoffomsetning lenge før enzymene og reaksjonstrinnene var kjent.
 
-Nå har vi derimot mange avanserte metoder vi kan bruke 
+Nå har vi derimot mange avanserte metoder vi kan bruke, og de kan hver for seg fortelle en liten historie som kan settes sammen til en større helhet.
 
 | Metode | Hva forteller den oss? |
 |---|---|
-| **Røntgenkrystallografi** | 3D-struktur til molekyler som er krystallisert. Har gitt strukturen til blant annet DNA, myoglobin og tusenvis av andre biomolekyler. |
+| **Røntgenkrystallografi** | 3D-struktur til molekyler som er krystallisert. Har gitt strukturen til blant annet DNA, myoglobin og tusenvis av andre biomolekyler, spesielt proteiner. |
 | **NMR-spektroskopi** | Struktur og bevegelse til biomolekyler, blant annet i løsning. |
-| **Kryo-elektronmikroskopi** | 3D-struktur til blant annet store molekylære komplekser ved avbildning av hurtigfryste prøver. |
+| **Kryo-elektronmikroskopi** | 3D-struktur til blant annet store molekylære proteinkomplekser ved avbildning av hurtigfryste prøver. |
 | **Massespektrometri** | Måler ioners masse–ladningsforhold og kan brukes til å identifisere og mengdebestemme molekyler i en prøve. |
 | **DNA-sekvensering** | Rekkefølgen av basene i DNA. |
 | **UV–Vis- og fluorescensspektroskopi** | Konsentrasjoner og endringer i molekylenes omgivelser. Kan brukes til å følge reaksjoner, enzymkinetikk og undersøke molekylært samspill. |
