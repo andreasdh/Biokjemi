@@ -210,6 +210,13 @@ body.quarto-dark .sidebar-logo { background: #f7fafb; padding: 0.4rem; }
 .bk-hp .bk-hp-flytt { fill: none; stroke: #e0584d; stroke-width: 2.5; opacity: 0.85; }
 .bk-hp .bk-hp-h { fill: #f4dca0; stroke: #b88a2a; stroke-width: 2; }
 .bk-hp .bk-hp-p { fill: #b4dfcd; stroke: #3f8468; stroke-width: 2; }
+.bk-ld { display: block; height: auto; margin: 0.4rem auto; max-width: 640px; width: 100%; }
+.bk-ld .bk-ld-atom { fill: rgba(127, 170, 190, 0.08); stroke: currentColor; stroke-width: 2.2; }
+.bk-ld .bk-ld-kjerne { fill: #3d7ea6; stroke: var(--bs-body-bg, #fff); stroke-width: 1.5; }
+.bk-ld .bk-ld-delta { font-size: 22px; font-weight: 700; text-anchor: middle; }
+.bk-ld .bk-ld-navn { fill: currentColor; font-size: 14px; opacity: 0.75; text-anchor: middle; }
+.bk-ld .bk-ld-pil { fill: currentColor; }
+.bk-ld .bk-ld-pilnavn { fill: currentColor; font-size: 13px; text-anchor: middle; }
 .bk-bufferbar { border-radius: 0.5rem; display: flex; height: 2.2rem; margin: 0.8rem 0; overflow: hidden; }
 .bk-bufferbar div { align-items: center; color: #1f2f38; display: flex; font-size: 0.9rem; font-weight: 600;
   justify-content: center; overflow: hidden; transition: width 0.15s; white-space: nowrap; }
