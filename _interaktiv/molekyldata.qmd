@@ -254,7 +254,7 @@ molekyldata = [
   },
   {
     id: "tiol",
-    navn: "Sulfhydryl (metantiol)",
+    navn: "Tiol (metantiol)",
     gruppe: "gruppe",
     tekst: `S–H er bare svakt polar (S og H har nesten lik elektronegativitet). Cystein kan likevel
       danne disulfidbroer, en kovalent binding som stabiliserer proteiner.`,

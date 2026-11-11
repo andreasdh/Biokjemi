@@ -420,7 +420,7 @@ def katalog():
          pKa=6.3,
          syre={"navn": "R–O–PO₃H⁻ (monoanion)", **til_json(sentrer(bygg("COP(=O)(O)[O-]", symmetriser=[[3, 5]])))},
          base={"navn": "R–O–PO₃²⁻ (dianion)", **til_json(sentrer(bygg("COP(=O)([O-])[O-]", symmetriser=[[3, 4, 5]])))})
-    legg("tiol", "Sulfhydryl (metantiol)", "gruppe",
+    legg("tiol", "Tiol (metantiol)", "gruppe",
          "S–H er bare svakt polar (S og H har nesten lik elektronegativitet). Cystein kan likevel "
          "danne disulfidbroer, en kovalent binding som stabiliserer proteiner.",
          bygg("CS"))
