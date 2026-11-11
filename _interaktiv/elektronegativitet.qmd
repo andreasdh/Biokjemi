@@ -17,16 +17,15 @@
       grense: 0.4,
       navn: "Upolar kovalent binding",
       farge: "green",
-      tekst: `Elektronene deles omtrent likt, og det blir ingen delladninger. Slike bindinger
-       kan ikke danne hydrogenbindinger. Eksempler: C–C og C–H i fett, oljer og
-       hydrokarbonkjeder.`,
+      tekst: `Elektronene deles omtrent likt, og det blir ingen delladninger og heller ingen hydrogenbindinger. 
+      Eksempler: C–C og C–H i fett, oljer og hydrokarbonkjeder.`,
     },
     {
       grense: 1.7,
       navn: "Polar kovalent binding",
       farge: "blue",
       tekst: `Elektronene deles, men ulikt. Det mest elektronegative atomet blir δ⁻ og det
-       andre δ⁺. Dette er grunnlaget for hydrogenbindinger. Eksempler: O–H, N–H og C=O.`,
+       andre δ⁺. Dette gir grunnlag for å danne hydrogenbindinger. Eksempler: O–H, N–H og C=O.`,
     },
     {
       grense: 99,
