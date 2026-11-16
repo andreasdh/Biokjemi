@@ -182,7 +182,7 @@ STEG = [
      "hl": {"bpg13": ["O1b", "P1b"], "pg3": ["C1", "O1", "O1b"]},
      "hva": "Acylfosfatet gir fosfatgruppen sin til ADP. Det blir ATP og 3-fosfoglyserat.",
      "hvorfor": [
-         "1,3-bisfosfoglyserat er en bedre fosfatgiver enn ATP (se fosfatstigen). Da er det gunstig at fosfatet går fra 1,3-bisfosfoglyserat til ADP.",
+         "1,3-bisfosfoglyserat gir lettere fra seg fosfatet enn ATP gjør. Da er det gunstig at fosfatet går fra 1,3-bisfosfoglyserat til ADP.",
          "Dette kalles fosforylering på substratnivå: ATP lages direkte fra en energirik forbindelse, uten at elektrontransportkjeden er involvert.",
          "Siden vi har to G3P per glukose, får vi 2 ATP her. Da er de 2 ATP som ble investert, betalt tilbake. Fra nå er alt ATP gevinst."],
      "videre": "",
@@ -231,17 +231,6 @@ KONC = {  # typiske konsentrasjoner i røde blodceller (mM); nadox/nadred bare s
     "atp": 1.85, "adp": 0.14, "pi": 1.0, "nadox": 700.0, "nadred": 1.0,
 }
 
-FOSFATSTIGE = [  # ΔG°′ for hydrolyse av fosfatgruppen (kJ/mol)
-    {"id": "pep", "navn": "Fosfoenolpyruvat (PEP)", "g": -61.9},
-    {"id": "bpg13", "navn": "1,3-Bisfosfoglyserat", "g": -49.4},
-    {"id": "krea", "navn": "Fosfokreatin", "g": -43.1},
-    {"id": "atp", "navn": "ATP (→ ADP + Pᵢ)", "g": -30.5},
-    {"id": "g1p", "navn": "Glukose-1-fosfat", "g": -20.9},
-    {"id": "f6p", "navn": "Fruktose-6-fosfat", "g": -15.9},
-    {"id": "g6p", "navn": "Glukose-6-fosfat", "g": -13.8},
-    {"id": "gly3p", "navn": "Glyserol-3-fosfat", "g": -9.2},
-]
-
 FUNKSJONER = r"""
 BKAA.gl.RT = 0.008314 * 310.15; // kJ/mol ved 37 °C
 // Q for et trinn: konsentrasjoner i mM (konverteres til M), nadox/nadred bare som forhold
@@ -265,7 +254,6 @@ def main():
         "akter": AKTER,
         "steg": STEG,
         "konc": KONC,
-        "fosfatstige": FOSFATSTIGE,
     }
     js = ("// Generert av tools/lag_glykolysedata.py. Ikke rediger for hånd.\n"
           "window.BKAA = window.BKAA || {};\n"
