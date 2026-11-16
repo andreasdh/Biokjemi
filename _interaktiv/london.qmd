@@ -1,97 +1,93 @@
 ```{ojs}
 //| echo: false
-// London-krefter: elektronskyene svinger, og skyene i naboen svinger med (i motfase).
-// To ting å justere: størrelsen på molekylene (antall kontakter) og avstanden mellom dem.
+// London-krefter i tre trinn: (1) jevn elektronfordeling, (2) midlertidig dipol i molekyl 1,
+// (3) indusert dipol i molekyl 2 og tiltrekning. Spiller av trinnene automatisk; trykk på et trinn for å stoppe.
 {
   const BLA = "#a9d0e6", BLAK = "#3d7ea6", ROD = "#e0584d", GRONN = "#3f8468";
   const uid = "lk" + Math.random().toString(36).slice(2, 7);
-  const ANTALL = [2, 6];
-  let n = ANTALL[0], W = 560, pause = false, t = 0, sist = null, snitt = 0;
-  const st = new Array(6).fill(0); // forskyvning av skyen i øverste molekyl
-  const sb = new Array(6).fill(0); // forskyvning av skyen i nederste molekyl
-  const us = new Array(6).fill(0); // tiltrekning for hvert kontaktpar (0–1)
+  // forskyvning av elektronskyen, som andel av radius (negativ = mot venstre)
+  const TRINN = [
+    { navn: "1. Jevn fordeling", a: 0, b: 0,
+      tekst: "Elektronene er jevnt fordelt rundt kjernen. Molekylet er upolart og har ingen delladninger." },
+    { navn: "2. Midlertidig dipol", a: -0.3, b: 0,
+      tekst: "Elektronene beveger seg hele tiden. Et øyeblikk ligger skyen litt til venstre, og molekyl 1 får δ⁻ til venstre og δ⁺ til høyre." },
+    { navn: "3. Indusert dipol", a: -0.3, b: -0.2,
+      tekst: "δ⁺ i molekyl 1 drar i elektronene i molekyl 2, som også får en dipol. δ⁺ og δ⁻ tiltrekker hverandre. Dette er London-kraften." },
+  ];
+  let trinn = 0, W = 560, auto = true, tid = 0, sist = null, sa = 0, sb = 0;
   const reduser = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduser) auto = false;
 
-  const sD = Inputs.range([0, 1], { value: 0, step: 0.01, label: "Avstand" });
-  sD.querySelectorAll("input[type=number]").forEach((e) => (e.style.display = "none"));
   const chips = html`<div class="bk-chiprad"></div>`;
-  const pauseKnapp = html`<button class="bk-chip" style="margin-left:auto">Pause</button>`;
   const bilde = html`<div></div>`;
-
-  function geom() {
-    const r = Math.max(14, Math.min(28, (W - 40) / (6 * 1.85)));
-    const sp = 2 * r * 0.92;
-    const dMin = 2 * r + 44, dMax = 2 * r + 120;
-    const d = dMin + +sD.value * (dMax - dMin);
-    const pad = 12;
-    const yc = pad + r + dMax / 2; // molekylene flytter seg symmetrisk rundt midten
-    return { r, sp, dMin, dMax, d, pad, x0: W / 2 - ((n - 1) * sp) / 2, y1: yc - d / 2, H: pad * 2 + 2 * r + dMax + 36 };
-  }
-
-  function steg(dt) {
-    const g = geom(), A = 0.45 * g.r, f = g.dMin / g.d;
-    t += dt;
-    let sum = 0;
-    for (let i = 0; i < 6; i++) {
-      st[i] = A * (0.55 * Math.sin(1.8 * t + 0.8 * i) + 0.45 * Math.sin(2.9 * t + 1.9 * i + 1));
-      // skyen i naboen skyves motsatt vei, og mindre jo lenger unna den er
-      sb[i] += (-(f ** 3) * st[i] - sb[i]) * (1 - Math.exp(-dt / 0.1));
-      us[i] = Math.min(1, (st[i] / A) ** 2 * f ** 6);
-      if (i < n) sum += us[i];
-    }
-    snitt += (sum / (6 * 0.28) - snitt) * (1 - Math.exp(-dt / 0.4));
-  }
+  const tekst = html`<p aria-live="polite" style="min-height:4.8em;margin:0.4rem 0 0"></p>`;
 
   function tegn() {
-    const g = geom(), { r, sp, d, pad, x0, y1, H } = g, y2 = y1 + d;
-    const kjerner = [], skyer = [], piler = [];
-    for (let i = 0; i < n; i++) {
-      const cx = x0 + i * sp;
-      for (const [cy, s] of [[y1, st[i]], [y2, sb[i]]]) {
-        kjerner.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${BLA}" stroke="${BLAK}" stroke-width="2"/>`);
-        skyer.push(`<circle cx="${cx + s}" cy="${cy}" r="${r * 0.62}" fill="url(#${uid})"/>`);
-      }
-      const a = y1 + r + 3, b = y2 - r - 3, m = (a + b) / 2, u = us[i];
-      const k = 6 + 4 * u, ty = 2 + 3 * u;
-      piler.push(`<g stroke="${GRONN}" fill="${GRONN}" opacity="${0.3 + 0.7 * u}">
-        <line x1="${cx}" y1="${a}" x2="${cx}" y2="${m - k + 1}" stroke-width="${ty}" stroke-linecap="round"/>
-        <polygon points="${cx - k * 0.7},${m - k} ${cx + k * 0.7},${m - k} ${cx},${m}" stroke="none"/>
-        <line x1="${cx}" y1="${b}" x2="${cx}" y2="${m + k - 1}" stroke-width="${ty}" stroke-linecap="round"/>
-        <polygon points="${cx - k * 0.7},${m + k} ${cx + k * 0.7},${m + k} ${cx},${m}" stroke="none"/></g>`);
-    }
-    const my = H - 22, bx = pad + 92, bb = W - pad - bx, frak = Math.max(0, Math.min(1, snitt));
+    const r = Math.max(40, Math.min(60, (W - 20) / 5.6)), gap = 1.6 * r;
+    const H = Math.round(2 * r + 62), cy = r + 10;
+    const c1 = W / 2 - gap / 2 - r, c2 = W / 2 + gap / 2 + r;
+    const t = (v, a) => Math.max(0, Math.min(1, v / a));
+    const molekyl = (cx, s, navn) => {
+      const dipol = t(Math.abs(s), 0.15);       // 0 = ingen dipol, 1 = tydelig dipol
+      return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${BLA}" stroke="${BLAK}" stroke-width="2.5"/>
+        <circle cx="${cx + s * r}" cy="${cy}" r="${0.66 * r}" fill="url(#${uid})"/>
+        <circle cx="${cx}" cy="${cy}" r="9" fill="${BLAK}"/>
+        <text x="${cx}" y="${cy}" dy="0.36em" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">+</text>
+        <text x="${cx - 0.52 * r}" y="${cy}" dy="0.36em" text-anchor="middle" font-size="19" font-weight="700" fill="#fff"
+          opacity="${dipol}" style="paint-order:stroke;stroke:rgba(120,30,20,0.45);stroke-width:3px">δ⁻</text>
+        <text x="${cx + 0.7 * r}" y="${cy}" dy="0.36em" text-anchor="middle" font-size="19" font-weight="700" fill="#1f5f87"
+          opacity="${dipol}">δ⁺</text>
+        <text x="${cx}" y="${cy + r + 20}" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">${navn}</text>`;
+    };
+    const ap = t(Math.abs(sb), 0.12);             // pilene tones inn når molekyl 2 har fått en dipol
+    const x1 = c1 + r + 4, x2 = c2 - r - 4, m = (x1 + x2) / 2, k = 8;
+    const piler = `<g opacity="${ap}" stroke="${GRONN}" fill="${GRONN}">
+      <line x1="${x1}" y1="${cy}" x2="${m - 4 - k}" y2="${cy}" stroke-width="4.5" stroke-linecap="round"/>
+      <polygon points="${m - 4 - k},${cy - k} ${m - 4},${cy} ${m - 4 - k},${cy + k}" stroke="none"/>
+      <line x1="${x2}" y1="${cy}" x2="${m + 4 + k}" y2="${cy}" stroke-width="4.5" stroke-linecap="round"/>
+      <polygon points="${m + 4 + k},${cy - k} ${m + 4},${cy} ${m + 4 + k},${cy + k}" stroke="none"/>
+      <text x="${m}" y="${cy - 16}" text-anchor="middle" font-size="${gap < 80 ? 12 : 13}" font-weight="700" stroke="none">tiltrekning</text></g>`;
+    const lx = W / 2 - 112, ly = H - 12;
+    const tegnforklaring = `<circle cx="${lx}" cy="${ly}" r="6" fill="${BLAK}"/><text x="${lx + 13}" y="${ly}" dy="0.35em" font-size="12.5" fill="currentColor">kjerne (+)</text>
+      <circle cx="${lx + 108}" cy="${ly}" r="6.5" fill="${ROD}"/><text x="${lx + 121}" y="${ly}" dy="0.35em" font-size="12.5" fill="currentColor">elektronsky (−)</text>`;
     bilde.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto;display:block;margin:0 auto" role="img"
-      aria-label="To molekyler oppå hverandre. Elektronskyene svinger, og tiltrekningen mellom molekylene vises som piler og en måler." font-family="inherit">
-      <defs><radialGradient id="${uid}"><stop offset="0" stop-color="${ROD}" stop-opacity="1"/>
-        <stop offset="0.7" stop-color="${ROD}" stop-opacity="0.85"/><stop offset="1" stop-color="${ROD}" stop-opacity="0.15"/></radialGradient></defs>
-      ${kjerner.join("")}${skyer.join("")}${piler.join("")}
-      <text x="${pad}" y="${my}" dy="0.35em" font-size="13" font-weight="700" fill="currentColor">Tiltrekning</text>
-      <rect x="${bx}" y="${my - 7}" width="${bb}" height="14" rx="7" fill="rgba(127,170,190,0.25)"/>
-      <rect class="lk-maler" x="${bx}" y="${my - 7}" width="${Math.max(8, frak * bb)}" height="14" rx="7" fill="${GRONN}" data-verdi="${frak.toFixed(3)}"/></svg>`;
+      aria-label="To upolare molekyler. Elektronskyen i molekyl 1 forskyves, og molekyl 2 følger etter, slik at de får en svak tiltrekning." font-family="inherit">
+      <defs><radialGradient id="${uid}"><stop offset="0" stop-color="${ROD}" stop-opacity="0.95"/>
+        <stop offset="0.75" stop-color="${ROD}" stop-opacity="0.8"/><stop offset="1" stop-color="${ROD}" stop-opacity="0.35"/></radialGradient></defs>
+      ${molekyl(c1, sa, "Molekyl 1")}${molekyl(c2, sb, "Molekyl 2")}${piler}${tegnforklaring}</svg>`;
   }
 
-  const merk = () => chips.querySelectorAll("button").forEach((b, i) => { if (i < 2) b.classList.toggle("valgt", n === ANTALL[i]); });
-  ["Lite molekyl", "Stort molekyl"].forEach((navn, i) => {
-    const b = html`<button class="bk-chip">${navn}</button>`;
-    b.onclick = () => { n = ANTALL[i]; merk(); tegn(); };
+  function velg(i, stopp) {
+    trinn = i;
+    tid = 0;
+    if (stopp) auto = false;
+    chips.querySelectorAll("button").forEach((b, j) => b.classList.toggle("valgt", j === i));
+    tekst.textContent = TRINN[i].tekst;
+    if (reduser) { sa = TRINN[i].a; sb = TRINN[i].b; tegn(); }   // ingen glidende overgang
+  }
+  TRINN.forEach((s, i) => {
+    const b = html`<button class="bk-chip">${s.navn}</button>`;
+    b.onclick = () => velg(i, true);
     chips.append(b);
   });
-  chips.append(pauseKnapp);
-  pauseKnapp.onclick = () => { pause = !pause; pauseKnapp.textContent = pause ? "Spill av" : "Pause"; if (pause) tegn(); };
-  sD.addEventListener("input", () => { steg(0.0001); tegn(); });
 
-  const rot = html`<div class="bk-aa-boks">${chips}${bilde}${sD}
-    <p class="bk-hint">Rød: elektronskyen. Blå: kjernene. Her i sakte film.</p></div>`;
-
-  merk();
-  if (reduser) { pause = true; pauseKnapp.textContent = "Spill av"; for (let k = 0; k < 40; k++) steg(0.05); }
+  const rot = html`<div class="bk-aa-boks">${chips}${bilde}${tekst}</div>`;
+  velg(0, false);
   tegn();
 
   let anim, synlig = true;
   function lop(nå) {
     const dt = sist === null ? 0.016 : Math.min(0.05, (nå - sist) / 1000);
     sist = nå;
-    if (synlig && !pause) { steg(dt); tegn(); }
+    if (synlig) {
+      if (auto) {
+        tid += dt;
+        if (tid > 4.5) velg((trinn + 1) % TRINN.length, false);
+      }
+      const mal = TRINN[trinn], q = 1 - Math.exp(-dt / 0.28);
+      const na = sa + (mal.a - sa) * q, nb = sb + (mal.b - sb) * q;
+      if (!reduser && Math.abs(na - sa) + Math.abs(nb - sb) > 1e-4) { sa = na; sb = nb; tegn(); }
+    }
     anim = requestAnimationFrame(lop);
   }
   anim = requestAnimationFrame(lop);
