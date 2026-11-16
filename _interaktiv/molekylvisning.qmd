@@ -6,7 +6,8 @@ lagMolekylVisning = {
   const NEG = "#e0584d",
     POS = "#3d7ea6",
     GRONN = "#3f8468",
-    GUL = "#c9962f";
+    GUL = "#c9962f",
+    LILLA = "#8f63c7";
   const komma = (x) => String(x).replace(".", ",");
   const ladning = (q) => (q > 0 ? "+" : q < 0 ? "−" : "") + komma(Math.abs(q).toFixed(2));
   let teller = 0;
@@ -21,7 +22,7 @@ lagMolekylVisning = {
       maxx = Math.max(...xs);
     const miny = Math.min(...ys),
       maxy = Math.max(...ys);
-    const H = Math.round(Math.max(190, Math.min(260, W * 0.46))),
+    const H = Math.round(Math.max(190, Math.min(form.ion ? 280 : 260, W * 0.46))),
       pad = W < 400 ? 26 : 38;
     const skala = Math.min(
       synlig.length <= 5 ? 72 : 46,
@@ -77,8 +78,43 @@ lagMolekylVisning = {
       x1="${px(a)}" y1="${py(a)}" x2="${px(b)}" y2="${py(b)}"/>`,
     );
 
+    // ionebinding (saltbro): prikket linje i egen farge mellom det positive og det negative atomet.
+    // Merket settes på den siden av linjen som har mest plass.
+    const ion = (form.ion || []).map(([a, b]) => {
+      const mx = (px(a) + px(b)) / 2,
+        my = (py(a) + py(b)) / 2;
+      const lengde = Math.hypot(px(b) - px(a), py(b) - py(a)) || 1;
+      const ux = (px(b) - px(a)) / lengde,
+        uy = (py(b) - py(a)) / lengde;
+      // kandidater: langs linjen og på begge sider; velg den med mest luft til atomene
+      const hindre = [
+        ...synlig.map((i) => [px(i), py(i)]),
+        ...synlig.filter((i) => at[i].fq).map((i) => [px(i) + 13, py(i) - 12]), // ±-merkene
+      ];
+      let beste = null;
+      for (const t of [-0.2, 0, 0.2])
+        for (const side of [-1, 1]) {
+          const cx = mx + t * lengde * ux - side * 19 * uy,
+            cy = my + t * lengde * uy + side * 19 * ux;
+          const luft = Math.min(
+            ...[-34, 0, 34].flatMap((dx) =>
+              hindre.map(([hx, hy]) => Math.hypot(hx - (cx + dx), hy - cy)),
+            ),
+          );
+          const inni = cx - 36 >= 2 && cx + 36 <= W - 2 && cy >= 10 && cy <= H - 6;
+          if (inni && (!beste || luft > beste.luft)) beste = { cx, cy, luft };
+        }
+      beste = beste || { cx: mx, cy: my - 14 };
+      return svg`<g class="bk-ion">
+        <line class="bk-ionlinje" stroke="${LILLA}" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="0.1 7"
+          x1="${px(a)}" y1="${py(a)}" x2="${px(b)}" y2="${py(b)}"/>
+        <text class="bk-ionnavn" fill="${LILLA}" font-size="${W < 400 ? 11.5 : 13}" font-weight="700" text-anchor="middle"
+          paint-order="stroke" stroke-width="4" stroke-linejoin="round" style="stroke:var(--bs-body-bg, #fff)"
+          x="${beste.cx}" y="${beste.cy}" dy="0.35em">ionebinding</text></g>`;
+    });
+
     // på smale skjermer og i store figurer utelater vi δ-merkene for å unngå rot
-    const visDelta = W >= 420 || synlig.length <= 6;
+    const visDelta = !form.ion && (W >= 420 || synlig.length <= 6);
     const atomer = synlig.map((i) => {
       const a = at[i],
         x = px(i),
@@ -88,7 +124,7 @@ lagMolekylVisning = {
       const tittel = `${a.el}: ${niva} (${ladning(q)})`;
       const delta =
         visDelta && Math.abs(q) >= 0.12 && a.el !== "Na" && a.el !== "Cl"
-          ? svg`<text class="bk-delta" font-size="13" font-weight="700" x="${x + 14}" y="${y - 12}"
+          ? svg`<text class="bk-delta" font-size="13" font-weight="700" x="${x + (a.fq ? 25 : 14)}" y="${y - 12}"
               fill="${q < 0 ? NEG : POS}">${q < 0 ? "δ⁻" : "δ⁺"}</text>`
           : null;
       const ring =
@@ -97,7 +133,10 @@ lagMolekylVisning = {
             stroke="${a.a ? GRONN : GUL}"/>`
           : null;
       const fortegn = a.fq > 0 ? "+" : "−";
-      const fq = a.fq ? svg`<text class="bk-fq" fill="currentColor" font-size="12" x="${x + 9}" y="${y - 7}">${fortegn}</text>` : null;
+      const fq = a.fq
+        ? svg`<g class="bk-fq"><circle cx="${x + 13}" cy="${y - 12}" r="7.5" fill="${a.fq > 0 ? POS : NEG}"/>
+            <text fill="#fff" font-size="12" font-weight="700" text-anchor="middle" x="${x + 13}" y="${y - 12}" dy="0.35em">${fortegn}</text></g>`
+        : null;
       const bokstav = merket(i)
         ? svg`<circle cx="${x}" cy="${y}" r="9.5" class="bk-bak" fill="#fff" fill-opacity="0.85"/>
               <text class="bk-bokstav" fill="currentColor" font-weight="700" font-size="15" text-anchor="middle" x="${x}" y="${y}" dy="0.35em">${a.el}</text>${fq}`
@@ -123,7 +162,7 @@ lagMolekylVisning = {
         <radialGradient id="${uid}-pos"><stop offset="0" stop-color="${POS}" stop-opacity="0.95"/>
           <stop offset="1" stop-color="${POS}" stop-opacity="0"/></radialGradient>
       </defs>
-      ${glod}${hb}${bindinger}${atomer}
+      ${glod}${hb}${bindinger}${ion}${atomer}
     </svg>`;
   }
 
@@ -148,9 +187,11 @@ lagMolekylVisning = {
     const legende = html`<div class="bk-legende">
       <span style="background:#f2c3b4">δ⁻ mye elektrontetthet</span>
       <span style="background:#a9d0e6">δ⁺ lite elektrontetthet</span>
+      <span class="bk-ionlegende" style="border:2px dotted ${LILLA};color:inherit">ionebinding (saltbro)</span>
       <span class="bk-stedlegende" style="border:2px solid ${GRONN}">akseptor</span>
       <span class="bk-stedlegende" style="border:2px solid ${GUL}">donor (H)</span></div>`;
     const stedLegende = legende.querySelectorAll(".bk-stedlegende");
+    const ionLegende = legende.querySelector(".bk-ionlegende");
     const atomInfo = html`<p class="bk-hint">Klikk på et atom for å se partialladningen.</p>`;
 
     const form = () => {
@@ -187,6 +228,7 @@ lagMolekylVisning = {
       stedLegende.forEach((l) => {
         l.style.display = visSteder ? "" : "none";
       });
+      ionLegende.style.display = f.ion && f.ion.length ? "" : "none";
       stedKnapp.style.display = stedknapp ? "" : "none";
       if (chips)
         chips

@@ -158,6 +158,8 @@ def sentrer(m, skala=1.0):
 
 def til_json(m):
     ut = {"atomer": [], "bindinger": m["bindinger"], "hb": m["hb"]}
+    if m.get("ion"):
+        ut["ion"] = m["ion"]
     for a in m["atomer"]:
         d = {"el": a["el"], "x": rund(a["x"]), "y": rund(a["y"]), "q": rund(a["q"], 2)}
         if a.get("fq"):
@@ -364,6 +366,141 @@ def lag_par(smiles1, smiles2, lenker):
 
 
 # ----------------------------------------------------------------------------------
+# Saltbro (ionebinding) mellom to ladde grupper
+# ----------------------------------------------------------------------------------
+def fordel_ladning(m, indekser, total):
+    """Fordel en gruppes formelle ladning jevnt på atomene i gruppen. Gasteiger-ladningene
+    gjør N i –NH3+ svakt negativ (og legger ladningen på H-ene), og det blir misvisende i en
+    figur som skal vise at gruppen er positiv som helhet."""
+    for i in indekser:
+        m["atomer"][i]["q"] = total / len(indekser)
+
+
+def til_r(m, idx):
+    """Gjør atomet om til 'R' (resten av aminosyren): et merket atom uten ladning."""
+    m["atomer"][idx].update({"el": "R", "q": 0.0, "fq": 0, "d": 0, "a": 0})
+
+
+def vifte_h(m, tung_idx, vinkler=(-100, 0, 100)):
+    """Tegn H-ene på et atom (f.eks. N i –NH3+) som en bred vifte bort fra naboen, slik at det blir
+    god plass mellom dem til å tegne en linje inn mot atomet."""
+    nabo = [b if a == tung_idx else a for a, b, _ in m["bindinger"] if tung_idx in (a, b)]
+    nabo = [i for i in nabo if m["atomer"][i]["el"] != "H"][0]
+    N, C = m["atomer"][tung_idx], m["atomer"][nabo]
+    v = math.atan2(N["y"] - C["y"], N["x"] - C["x"])
+    for h, rel in zip(h_pa(m, tung_idx), vinkler):
+        m["atomer"][h]["x"] = N["x"] + H_LENGDE * BOND * math.cos(v + math.radians(rel))
+        m["atomer"][h]["y"] = N["y"] + H_LENGDE * BOND * math.sin(v + math.radians(rel))
+
+
+def tilpass_ion(m1, m2, kation, anion, avstand=2.9):
+    """Roter/flytt m2 slik at kationen (N+ i m1) og anionen (O- i m2) møtes på ca. 2,9 Å, uten at
+    linjen mellom dem følger en N–H-binding og uten at molekylene overlapper."""
+    rng = random.Random(1)
+    P1 = np.array([[a["x"], a["y"]] for a in m1["atomer"]])
+    P2 = np.array([[a["x"], a["y"]] for a in m2["atomer"]])
+    c2 = P2.mean(axis=0)
+    synlig1 = [i for i, a in enumerate(m1["atomer"]) if not a["skjul"]]
+    synlig2 = [i for i, a in enumerate(m2["atomer"]) if not a["skjul"]]
+    h_kation = h_pa(m1, kation)
+    naboer_anion = [b if a == anion else a for a, b, _ in m2["bindinger"] if anion in (a, b)]
+    naboer_anion = [i for i in naboer_anion if m2["atomer"][i]["el"] != "H"]
+
+    def transform(params, speil):
+        th, tx, ty = params
+        P = P2 - c2
+        if speil:
+            P = P * np.array([1, -1])
+        R = np.array([[math.cos(th), -math.sin(th)], [math.sin(th), math.cos(th)]])
+        return P @ R.T + np.array([tx, ty])
+
+    def kostnad(params, speil):
+        Q = transform(params, speil)
+        N, O = P1[kation], Q[anion]
+        akse = O - N
+        d = np.linalg.norm(akse)
+        k = (d - avstand) ** 2 * 10
+        u = akse / (d + 1e-9)
+        # linjen N···O skal ikke følge en N–H-binding (da ville de overlappe i tegningen)
+        for h in h_kation:
+            v = P1[h] - N
+            cos = float(u @ v / (np.linalg.norm(v) + 1e-9))
+            if cos > 0.7:
+                k += (cos - 0.7) ** 2 * 20
+            k += max(0.0, 1.9 - np.linalg.norm(P1[h] - O)) ** 2 * 10
+        # C–O···N-vinkelen omtrent 120 grader (ikke rett på linje med C–O)
+        for c in naboer_anion:
+            v = Q[c] - O
+            cos = float(v @ (-akse) / (np.linalg.norm(v) * d + 1e-9))
+            k += (cos + 0.5) ** 2 * 1.5
+        for a in synlig1:
+            for b in synlig2:
+                dd = np.linalg.norm(P1[a] - Q[b])
+                if dd < 1.45:
+                    k += (1.45 - dd) ** 2 * 6
+        return k
+
+    beste = (1e9, None, None)
+    for speil in (False, True):
+        for _ in range(120):
+            start = [rng.uniform(0, 2 * math.pi), rng.uniform(-8, 8), rng.uniform(-8, 8)]
+            res = minimize(kostnad, start, args=(speil,), method="Nelder-Mead",
+                           options={"xatol": 1e-4, "fatol": 1e-7, "maxiter": 3000})
+            if res.fun < beste[0]:
+                beste = (res.fun, res.x, speil)
+    _, params, speil = beste
+    Q = transform(params, speil)
+    for a, p in zip(m2["atomer"], Q):
+        a["x"], a["y"] = p[0], p[1]
+    return beste[0]
+
+
+def lag_saltbro(smiles_pos, smiles_neg, kation, anion, r_pos=(), r_neg=()):
+    """To molekyler (sidekjeder) som holdes sammen av en ionebinding (saltbro).
+    kation: indeks til det positive atomet (N+) i den første SMILES, anion: indeks til det
+    negative atomet (O-) i den andre. r_pos / r_neg: atomer som tegnes som 'R'.
+    Resultatet får en liste `ion` med linjen N+···O- (tegnes stiplet i en egen farge)."""
+    m1 = bygg(smiles_pos)
+    m2 = bygg(smiles_neg)
+    for i in r_pos:
+        til_r(m1, i)
+    for i in r_neg:
+        til_r(m2, i)
+    vifte_h(m1, kation)
+    fordel_ladning(m1, [kation] + h_pa(m1, kation), 1.0)
+    sentrer(m1)
+    sentrer(m2)
+    kost = tilpass_ion(m1, m2, kation, anion)
+    n1 = len(m1["atomer"])
+    m = {"atomer": m1["atomer"] + m2["atomer"],
+         "bindinger": m1["bindinger"] + [[a + n1, b + n1, o] for a, b, o in m2["bindinger"]],
+         "hb": [], "ion": [[kation, anion + n1]]}
+    # drei hele komplekset til den stillingen som gir størst tegning i en bred figur (ca. 560 x 250)
+    N = np.array([m["atomer"][kation]["x"], m["atomer"][kation]["y"]])
+    O = np.array([m["atomer"][anion + n1]["x"], m["atomer"][anion + n1]["y"]])
+    P = np.array([[a["x"], a["y"]] for a in m["atomer"] if not a["skjul"]])
+    P0 = P - N
+
+    def tegnestorrelse(vinkel):
+        R = np.array([[math.cos(vinkel), -math.sin(vinkel)], [math.sin(vinkel), math.cos(vinkel)]])
+        Q = P0 @ R.T
+        b, h = np.ptp(Q[:, 0]), np.ptp(Q[:, 1])
+        return min((560 - 80) / max(b, 0.1), (250 - 80) / max(h, 0.1))
+
+    kandidater = [math.radians(g) for g in range(0, 360, 2)]
+    vinkel = max(kandidater, key=tegnestorrelse)
+    R = np.array([[math.cos(vinkel), -math.sin(vinkel)], [math.sin(vinkel), math.cos(vinkel)]])
+    if (R @ (O - N))[0] < 0:          # kationen skal ligge til venstre for anionen
+        vinkel += math.pi
+        R = np.array([[math.cos(vinkel), -math.sin(vinkel)], [math.sin(vinkel), math.cos(vinkel)]])
+    for a in m["atomer"]:
+        a["x"], a["y"] = (R @ (np.array([a["x"], a["y"]]) - N)).tolist()
+    m["_kost"] = kost
+    print("   saltbro, tilpasning", round(kost, 3), " N···O =", round(float(np.linalg.norm(O - N)), 2))
+    return m
+
+
+# ----------------------------------------------------------------------------------
 # Katalog
 # ----------------------------------------------------------------------------------
 def katalog():
@@ -391,7 +528,7 @@ def katalog():
          bygg("c1ccccc1"))
     legg("etanol", "Hydroksyl (etanol)", "gruppe",
          "O–H er polar: O er δ⁻ og H er δ⁺. Hydroksylgruppen kan både gi og ta imot hydrogenbindinger "
-         "(donor og akseptor). Finnes i enklete aminosyrer og i karbohydrater.",
+         "(donor og akseptor). Finnes i enkelte aminosyrer og i karbohydrater.",
          bygg("CCO"))
     legg("acetaldehyd", "Aldehyd (acetaldehyd)", "gruppe",
          "C=O er sterkt polar: O er δ⁻ og C er δ⁺. Karbonylgruppen kan ta imot hydrogenbindinger, "
@@ -402,7 +539,7 @@ def katalog():
          bygg("CC(C)=O"))
     legg("eddiksyre", "Karboksyl (eddiksyre og acetat)", "gruppe",
          "Karboksylgruppen kan gi fra seg et proton. Da flyttes elektrontettheten, og ladningen "
-         "deles mellom de to oksygenatomene (resonans). Ved fysiologisk pH er den som regel deprotonert og negativ ",
+         "deles mellom de to oksygenatomene (resonans). Ved fysiologisk pH er den som regel deprotonert og negativ.",
          pKa=4.76,
          syre={"navn": "eddiksyre (–COOH)", **til_json(sentrer(bygg("CC(=O)O")))},
          base={"navn": "acetat (–COO⁻)",
@@ -419,7 +556,7 @@ def katalog():
          pKa=6.3,
          syre={"navn": "R–O–PO₃H⁻ (monoanion)", **til_json(sentrer(bygg("COP(=O)(O)[O-]", symmetriser=[[3, 5]])))},
          base={"navn": "R–O–PO₃²⁻ (dianion)", **til_json(sentrer(bygg("COP(=O)([O-])[O-]", symmetriser=[[3, 4, 5]])))})
-    legg("tiol", "Tiol", "gruppe",
+    legg("tiol", "Tiol (metantiol)", "gruppe",
          "S–H er nesten upolar (S og H har nesten lik elektronegativitet). Aminosyren cystein kan derimot "
          "danne disulfidbroer, en kovalent binding som stabiliserer proteiner.",
          bygg("CS"))
@@ -449,11 +586,17 @@ def katalog():
          "N–H (donor) i én peptidgruppe binder til C=O (akseptor) i en annen. Slike bindinger "
          "gjentas mange ganger i α-heliks og β-flak.",
          lag_par("CNC(C)=O", "CNC(C)=O", [(1, 1, 4)]))
-    legg("na_vann", "Na⁺ i vann", "binding",
-         "Elektronene er ikke delt i en ionebinding. Når salt løses, vender δ⁻ O i vann seg mot Na⁺ "
-         "(ion–dipol-interaksjon) og skjermer ionet.",
+    legg("saltbro", "Saltbro: lysin og aspartat", "binding",
+         "Ionebinding mellom sidekjedene til to aminosyrer. Lysin har en positivt ladd aminogruppe (–NH₃⁺), "
+         "og aspartat har en negativt ladd karboksylgruppe (–COO⁻). De tiltrekker hverandre med ren "
+         "elektrostatikk (prikket linje), og elektronene er ikke delt mellom gruppene. Avstanden er omtrent "
+         "3 Å, og ladningen i –COO⁻ er fordelt på begge oksygenatomene. R er resten av aminosyren.",
+         lag_saltbro("CCCCC[NH3+]", "CCC(=O)[O-]", kation=5, anion=4, r_pos=[0], r_neg=[0]))
+    legg("na_vann", "Na⁺ i vann (ion–dipol)", "binding",
+         "Dette er ikke en ionebinding mellom to ioner, men en ion–dipol-interaksjon: δ⁻ O i vann vender "
+         "seg mot Na⁺ og skjermer ionet. Dette kalles hydratisering.",
          hydrert_ion("Na"))
-    legg("cl_vann", "Cl⁻ i vann", "binding",
+    legg("cl_vann", "Cl⁻ i vann (ion–dipol)", "binding",
          "For anioner er det omvendt: δ⁺ H i vann vender seg mot Cl⁻. Slik kan vann bryte "
          "ionegitteret og holde begge ionene i løsning.",
          hydrert_ion("Cl"))
@@ -493,12 +636,14 @@ def main():
         ut.append(f"{pad}],")
         ut.append(f"{pad}bindinger: {js_liste(g['bindinger'], innrykk, 8)},")
         ut.append(f"{pad}hb: {js_liste(g['hb'], innrykk, 8)},")
+        if g.get("ion"):
+            ut.append(f"{pad}ion: {js_liste(g['ion'], innrykk, 8)},")
         return ut
 
     for post in data:
         linjer.append("  {")
         for nokkel, verdi in post.items():
-            if nokkel in ("atomer", "bindinger", "hb", "syre", "base"):
+            if nokkel in ("atomer", "bindinger", "hb", "ion", "syre", "base"):
                 continue
             if nokkel == "tekst":
                 linjer.append(f"    tekst: {js_streng(verdi, 4)},")
